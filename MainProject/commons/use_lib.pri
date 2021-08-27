@@ -1,0 +1,1 @@
+LIBS += -L$$FS_LIBRARY_DIR -l$$FS_LIB_NAME
