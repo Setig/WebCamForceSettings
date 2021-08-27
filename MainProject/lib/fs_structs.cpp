@@ -26,7 +26,8 @@
 
 #include <QDataStream>
 
-#include <windef.h>
+#include <windows.h>
+#include <ks.h>
 #include <ksmedia.h>
 
 #include <WebCamFS/Camera>
@@ -99,9 +100,9 @@ FSCameraData &FSCameraData::operator=(const FSCameraData &other) noexcept
 
 FSRangeParams::FSRangeParams() noexcept
     : m_isNull(true)
-    , m_min(0)
-    , m_max(0)
-    , m_step(0)
+    , m_minValue(0)
+    , m_maxValue(0)
+    , m_stepValue(0)
     , m_value(0)
     , m_flags(KSPROPERTY_CAMERACONTROL_FLAGS_ABSOLUTE)
 {
@@ -114,9 +115,9 @@ FSRangeParams::FSRangeParams(long min,
                              long value,
                              long flags)
     : m_isNull(false)
-    , m_min(min)
-    , m_max(max)
-    , m_step(step)
+    , m_minValue(min)
+    , m_maxValue(max)
+    , m_stepValue(step)
     , m_value(value)
     , m_flags(flags)
 {
@@ -125,9 +126,9 @@ FSRangeParams::FSRangeParams(long min,
 
 FSRangeParams::FSRangeParams(const FSRangeParams &other) noexcept
     : m_isNull(other.isNull())
-    , m_min(other.min())
-    , m_max(other.max())
-    , m_step(other.step())
+    , m_minValue(other.minValue())
+    , m_maxValue(other.maxValue())
+    , m_stepValue(other.stepValue())
     , m_value(other.value())
     , m_flags(other.flags())
 {
@@ -139,19 +140,19 @@ bool FSRangeParams::isNull() const
     return m_isNull;
 }
 
-long FSRangeParams::min() const
+long FSRangeParams::minValue() const
 {
-    return m_min;
+    return m_minValue;
 }
 
-long FSRangeParams::max() const
+long FSRangeParams::maxValue() const
 {
-    return m_max;
+    return m_maxValue;
 }
 
-long FSRangeParams::step() const
+long FSRangeParams::stepValue() const
 {
-    return m_step;
+    return m_stepValue;
 }
 
 long FSRangeParams::value() const
@@ -177,9 +178,9 @@ bool FSRangeParams::isSupportManualControl() const
 bool FSRangeParams::operator==(const FSRangeParams &other) const noexcept
 {
     return (this->m_isNull == other.m_isNull &&
-            this->m_min    == other.m_min    &&
-            this->m_max    == other.m_max    &&
-            this->m_step   == other.m_step   &&
+            this->m_minValue    == other.m_minValue    &&
+            this->m_maxValue    == other.m_maxValue    &&
+            this->m_stepValue   == other.m_stepValue   &&
             this->m_value  == other.m_value  &&
             this->m_flags  == other.m_flags);
 }
@@ -192,9 +193,9 @@ bool FSRangeParams::operator!=(const FSRangeParams &other) const noexcept
 FSRangeParams &FSRangeParams::operator=(const FSRangeParams &other) noexcept
 {
     this->m_isNull = other.m_isNull;
-    this->m_min    = other.m_min;
-    this->m_max    = other.m_max;
-    this->m_step   = other.m_step;
+    this->m_minValue    = other.m_minValue;
+    this->m_maxValue    = other.m_maxValue;
+    this->m_stepValue   = other.m_stepValue;
     this->m_value  = other.m_value;
     this->m_flags  = other.m_flags;
 
@@ -251,9 +252,9 @@ QByteArray FSRangeParams::toByteArray() const
     const quint16 majorVersion = 1;
     const quint16 minorVersion = 0;
     const bool isNull  = this->isNull();
-    const qint32 min   = this->min();
-    const qint32 max   = this->max();
-    const qint32 step  = this->step();
+    const qint32 min   = this->minValue();
+    const qint32 max   = this->maxValue();
+    const qint32 step  = this->stepValue();
     const qint32 value = this->value();
     const qint32 flags = this->flags();
 

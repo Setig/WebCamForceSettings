@@ -454,13 +454,13 @@ QCheckBox *FSCameraSettingsDialogPrivate::getLockCheckBox(Ui::FSCameraSettingsDi
 
 int FSCameraSettingsDialogPrivate::valueForSlider(int value, const FSRangeParams &rangeParams)
 {
-    if (!rangeParams.isNull() && rangeParams.step() != 0) {
-        const int resultValue = value / rangeParams.step();
+    if (!rangeParams.isNull() && rangeParams.stepValue() != 0) {
+        const int resultValue = value / rangeParams.stepValue();
 
-        if (resultValue > rangeParams.max() / rangeParams.step())
-            return rangeParams.max() / rangeParams.step();
-        else if (resultValue < rangeParams.min() / rangeParams.step())
-            return rangeParams.min() / rangeParams.step();
+        if (resultValue > rangeParams.maxValue() / rangeParams.stepValue())
+            return rangeParams.maxValue() / rangeParams.stepValue();
+        else if (resultValue < rangeParams.minValue() / rangeParams.stepValue())
+            return rangeParams.minValue() / rangeParams.stepValue();
 
         return resultValue;
     }
@@ -472,12 +472,12 @@ int FSCameraSettingsDialogPrivate::valueForSlider(int value, const FSRangeParams
 int FSCameraSettingsDialogPrivate::valueForSpinBox(int value, const FSRangeParams &rangeParams)
 {
     if (!rangeParams.isNull()) {
-        int resultValue = qRound(double(value) / rangeParams.step()) * rangeParams.step();
+        int resultValue = qRound(double(value) / rangeParams.stepValue()) * rangeParams.stepValue();
 
-        if (resultValue > rangeParams.max())
-            return rangeParams.max();
-        else if (resultValue < rangeParams.min())
-            return rangeParams.min();
+        if (resultValue > rangeParams.maxValue())
+            return rangeParams.maxValue();
+        else if (resultValue < rangeParams.minValue())
+            return rangeParams.minValue();
 
         return resultValue;
     }
@@ -489,12 +489,12 @@ int FSCameraSettingsDialogPrivate::valueForSpinBox(int value, const FSRangeParam
 int FSCameraSettingsDialogPrivate::valueFromSlider(int value, const FSRangeParams &rangeParams)
 {
     if (!rangeParams.isNull()) {
-        int resultValue = value * rangeParams.step();
+        int resultValue = value * rangeParams.stepValue();
 
-        if (resultValue > rangeParams.max())
-            return rangeParams.max();
-        else if (resultValue < rangeParams.min())
-            return rangeParams.min();
+        if (resultValue > rangeParams.maxValue())
+            return rangeParams.maxValue();
+        else if (resultValue < rangeParams.minValue())
+            return rangeParams.minValue();
 
         return resultValue;
     }
@@ -506,12 +506,12 @@ int FSCameraSettingsDialogPrivate::valueFromSlider(int value, const FSRangeParam
 int FSCameraSettingsDialogPrivate::valueFromSpinBox(int value, const FSRangeParams &rangeParams)
 {
     if (!rangeParams.isNull()) {
-        int resultValue = qRound(double(value) / rangeParams.step()) * rangeParams.step();
+        int resultValue = qRound(double(value) / rangeParams.stepValue()) * rangeParams.stepValue();
 
-        if (resultValue > rangeParams.max())
-            return rangeParams.max();
-        else if (resultValue < rangeParams.min())
-            return rangeParams.min();
+        if (resultValue > rangeParams.maxValue())
+            return rangeParams.maxValue();
+        else if (resultValue < rangeParams.minValue())
+            return rangeParams.minValue();
 
         return resultValue;
     }
@@ -583,8 +583,8 @@ void FSCameraSettingsDialogPrivate::setSliderRangeParams(QSlider *slider,
         slider->blockSignals(true);
 
         if (!rangeParams.isNull()) {
-            slider->setMinimum(valueForSlider(rangeParams.min(), rangeParams));
-            slider->setMaximum(valueForSlider(rangeParams.max(), rangeParams));
+            slider->setMinimum(valueForSlider(rangeParams.minValue(), rangeParams));
+            slider->setMaximum(valueForSlider(rangeParams.maxValue(), rangeParams));
             slider->setSingleStep(1);
             slider->setPageStep(1);
             slider->setValue(valueForSlider(rangeParams.value(), rangeParams));
@@ -609,9 +609,9 @@ void FSCameraSettingsDialogPrivate::setSpinBoxRangeParams(QSpinBox *spinBox,
         spinBox->blockSignals(true);
 
         if (!rangeParams.isNull()) {
-            spinBox->setMinimum(valueForSpinBox(rangeParams.min(), rangeParams));
-            spinBox->setMaximum(valueForSpinBox(rangeParams.max(), rangeParams));
-            spinBox->setSingleStep(rangeParams.step());
+            spinBox->setMinimum(valueForSpinBox(rangeParams.minValue(), rangeParams));
+            spinBox->setMaximum(valueForSpinBox(rangeParams.maxValue(), rangeParams));
+            spinBox->setSingleStep(rangeParams.stepValue());
             spinBox->setValue(valueForSpinBox(rangeParams.value(), rangeParams));
         } else {
             spinBox->setMinimum(0);
@@ -662,10 +662,10 @@ void FSCameraSettingsDialogPrivate::setComboBoxPowerlineFrequencyRangeParams(Ui:
     ui->comboBoxPowerlineFrequency->clear();
 
     if (!rangeParams.isNull()) {
-        const int delta = rangeParams.max() - rangeParams.min();
+        const int delta = rangeParams.maxValue() - rangeParams.minValue();
 
         if (delta <= 3 && delta > 0) {
-            for (int i = rangeParams.min(); i <= rangeParams.max(); i += rangeParams.step()) {
+            for (int i = rangeParams.minValue(); i <= rangeParams.maxValue(); i += rangeParams.stepValue()) {
                 switch (i) {
                 case 1:
                     ui->comboBoxPowerlineFrequency->addItem(STRING_POWERLINE_FREQUENCY_50);

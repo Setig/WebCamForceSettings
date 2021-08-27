@@ -72,7 +72,7 @@ void FSCoreSettings::sync()
         statSettingsInstance->sync();
 }
 
-void FSCoreSettings::setUsuallyAvailableCamerasCount(unsigned int count)
+void FSCoreSettings::setUsuallyAvailableCamerasCount(uint count)
 {
     if (!fastInstance())
         return;
@@ -82,14 +82,14 @@ void FSCoreSettings::setUsuallyAvailableCamerasCount(unsigned int count)
     endGroup();
 }
 
-unsigned int FSCoreSettings::usuallyAvailableCamerasCount()
+uint FSCoreSettings::usuallyAvailableCamerasCount()
 {
     if (!fastInstance())
         return USUALLY_AVAILABLE_CAMERAS_COUNT_DEFAULT_VALUE;
 
     beginStatisticsGroup();
-    const unsigned int value = fastInstance()->value(USUALLY_AVAILABLE_CAMERAS_COUNT_NAME,
-                                                     USUALLY_AVAILABLE_CAMERAS_COUNT_DEFAULT_VALUE).toUInt();
+    const uint value = fastInstance()->value(USUALLY_AVAILABLE_CAMERAS_COUNT_NAME,
+                                             USUALLY_AVAILABLE_CAMERAS_COUNT_DEFAULT_VALUE).toUInt();
     endGroup();
 
     if (value == 0)
@@ -98,12 +98,12 @@ unsigned int FSCoreSettings::usuallyAvailableCamerasCount()
     return value;
 }
 
-unsigned int FSCoreSettings::defaultUsuallyAvailableCamerasCount()
+uint FSCoreSettings::defaultUsuallyAvailableCamerasCount()
 {
     return USUALLY_AVAILABLE_CAMERAS_COUNT_DEFAULT_VALUE;
 }
 
-void FSCoreSettings::setMaxLockProperties(unsigned int count)
+void FSCoreSettings::setMaxLockProperties(uint count)
 {
     if (!fastInstance())
         return;
@@ -113,14 +113,14 @@ void FSCoreSettings::setMaxLockProperties(unsigned int count)
     endGroup();
 }
 
-unsigned int FSCoreSettings::maxLockProperties()
+uint FSCoreSettings::maxLockProperties()
 {
     if (!fastInstance())
-        return MAX_LOCK_PROPERTIES_DEFAULT_VALUE;
+        return uint(MAX_LOCK_PROPERTIES_DEFAULT_VALUE);
 
     beginStatisticsGroup();
-    const unsigned int value = fastInstance()->value(MAX_LOCK_PROPERTIES_NAME,
-                                                     MAX_LOCK_PROPERTIES_DEFAULT_VALUE).toUInt();
+    const uint value = fastInstance()->value(MAX_LOCK_PROPERTIES_NAME,
+                                             MAX_LOCK_PROPERTIES_DEFAULT_VALUE).toUInt();
     endGroup();
 
     if (value == 0)
@@ -129,9 +129,9 @@ unsigned int FSCoreSettings::maxLockProperties()
     return value;
 }
 
-unsigned int FSCoreSettings::defaultMaxLockProperties()
+uint FSCoreSettings::defaultMaxLockProperties()
 {
-    return MAX_LOCK_PROPERTIES_DEFAULT_VALUE;
+    return uint(MAX_LOCK_PROPERTIES_DEFAULT_VALUE);
 }
 
 void FSCoreSettings::setUserNames(const QVariantMap &map)

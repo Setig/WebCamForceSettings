@@ -156,14 +156,14 @@ int FSAbstractCameraSettingsModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
 
-    return d->cachedVectorDevicePaths.size();
+    return int(d->cachedVectorDevicePaths.size());
 }
 
 int FSAbstractCameraSettingsModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
 
-    return d->vectorHorizontalSectionNames.size();
+    return int(d->vectorHorizontalSectionNames.size());
 }
 
 QVariant FSAbstractCameraSettingsModel::data(const QModelIndex &index,
@@ -279,7 +279,7 @@ void FSAbstractCameraSettingsModel::addDevice(const DevicePath &devicePath)
 {
     int beforeIndex = -1;
 
-    const int count = d->cachedVectorDevicePaths.size();
+    const int count = int(d->cachedVectorDevicePaths.size());
     for (int i = 0; i < count; i++) {
         const QString &tmpDevicePath = d->cachedVectorDevicePaths.at(i);
         if (tmpDevicePath == devicePath) {
@@ -305,7 +305,7 @@ void FSAbstractCameraSettingsModel::addDevice(const DevicePath &devicePath)
 
 void FSAbstractCameraSettingsModel::removeDevice(const DevicePath &devicePath)
 {
-    const int count = d->cachedVectorDevicePaths.size();
+    const int count = int(d->cachedVectorDevicePaths.size());
     for (int i = 0; i < count; i++) {
         const QString &tmpDevicePath = d->cachedVectorDevicePaths.at(i);
         if (tmpDevicePath == devicePath) {
@@ -395,7 +395,7 @@ void FSAbstractCameraSettingsModel::init()
 
 void FSAbstractCameraSettingsModel::updateCachedDevicePathsAndRows()
 {
-    const int count = d->cachedVectorDevicePaths.size();
+    const int count = int(d->cachedVectorDevicePaths.size());
 
     d->umapDevicePathsAndRows.clear();
     d->umapDevicePathsAndRows.reserve(count);

@@ -153,7 +153,7 @@ FSLockPropertiesManager::~FSLockPropertiesManager()
         uint count = 1;
 
         for (const auto &[camera, lockedPropertiesValues] : d->umapManualLockCamerasParams) {
-            uint size = lockedPropertiesValues.size();
+            uint size = uint(lockedPropertiesValues.size());
 
             if (count < size)
                 count = size;

@@ -10,6 +10,9 @@ include(../commons/side_projects.pri)
 
 TARGET = $$FS_GUI_NAME
 
+LIBS += \
+    -ladvapi32
+
 SOURCES += \
         fsabstractcamerasettingsmodel.cpp \
         fsautostart.cpp \

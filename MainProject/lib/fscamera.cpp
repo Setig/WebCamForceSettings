@@ -30,6 +30,7 @@
 #include <strmif.h>
 #include <olectl.h>
 
+#include <ks.h>
 #include <ksmedia.h>
 
 #include <map>
@@ -403,7 +404,7 @@ void FSCamera::printCamerasInfo()
 
                             for (const auto& [key, name] : mapVideoProcAmpProperties) {
                                 QString spaces;
-                                spaces.fill(' ', (25 - name.length()));
+                                spaces.fill(' ', (25 - int(name.length())));
 
                                 printf("%s%s: ", spaces.toLatin1().constData(), name.c_str());
 
@@ -454,7 +455,7 @@ void FSCamera::printCamerasInfo()
 
                             for (const auto& [key, name] : mapCameraControlProperty) {
                                 QString spaces;
-                                spaces.fill(' ', (25 - name.length()));
+                                spaces.fill(' ', (25 - int(name.length())));
 
                                 printf("%s%s: ", spaces.toLatin1().constData(), name.c_str());
 

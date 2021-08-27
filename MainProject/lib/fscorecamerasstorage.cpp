@@ -66,7 +66,7 @@ FSCoreCamerasStorage::FSCoreCamerasStorage(QObject *parent)
 FSCoreCamerasStorage::~FSCoreCamerasStorage()
 {
     // Update statistics param
-    FSSettings::setUsuallyAvailableCamerasCount(d->umapCameraPaths.size());
+    FSSettings::setUsuallyAvailableCamerasCount(int(d->umapCameraPaths.size()));
 
     for (const auto &[devicePath, camera] : d->umapCameraPaths)
         delete camera;

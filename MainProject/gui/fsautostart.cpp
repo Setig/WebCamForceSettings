@@ -50,7 +50,7 @@ void FSAutoStart::setAutoStart(bool isAutoStart, FSAutoStartLastError *lastError
     if (isAutoStart) {
         std::vector<TCHAR> vecModuleFilePath(START_BUFFER_SIZE);
 
-        DWORD pathLen = GetModuleFileName(NULL, &vecModuleFilePath.at(0), vecModuleFilePath.size());
+        DWORD pathLen = GetModuleFileName(NULL, &vecModuleFilePath.at(0), DWORD(vecModuleFilePath.size()));
         DWORD wLastError = GetLastError();
         int i = 0;
 
@@ -62,7 +62,7 @@ void FSAutoStart::setAutoStart(bool isAutoStart, FSAutoStartLastError *lastError
 
             vecModuleFilePath.resize(vecModuleFilePath.size() * 1.5);
 
-            pathLen = GetModuleFileName(NULL, &vecModuleFilePath.at(0), vecModuleFilePath.size());
+            pathLen = GetModuleFileName(NULL, &vecModuleFilePath.at(0), DWORD(vecModuleFilePath.size()));
             wLastError = GetLastError();
         }
 
@@ -113,7 +113,7 @@ bool FSAutoStart::isAutoStart(FSAutoStartLastError *lastError)
 
     DWORD lpType = REG_NONE;
     std::vector<TCHAR> vecModuleFilePathFromReg(START_BUFFER_SIZE);
-    DWORD pathLenFromReg = vecModuleFilePathFromReg.size();
+    DWORD pathLenFromReg = DWORD(vecModuleFilePathFromReg.size());
 
     fres = RegQueryValueEx(newValue, TEXT(APP_REG_VALUE), 0, &lpType, (LPBYTE)&vecModuleFilePathFromReg.at(0), &pathLenFromReg);
     int i = 0;
@@ -130,7 +130,7 @@ bool FSAutoStart::isAutoStart(FSAutoStartLastError *lastError)
         i++;
 
         vecModuleFilePathFromReg.resize(vecModuleFilePathFromReg.size() * 1.5);
-        pathLenFromReg = vecModuleFilePathFromReg.size();
+        pathLenFromReg = DWORD(vecModuleFilePathFromReg.size());
 
         fres = RegQueryValueEx(newValue, TEXT(APP_REG_VALUE), 0, &lpType, (LPBYTE)&vecModuleFilePathFromReg.at(0), &pathLenFromReg);
     }
@@ -152,7 +152,7 @@ bool FSAutoStart::isAutoStart(FSAutoStartLastError *lastError)
 
     std::vector<TCHAR> vecModuleFilePath(START_BUFFER_SIZE);
 
-    DWORD pathLen = GetModuleFileName(NULL, &vecModuleFilePath.at(0), vecModuleFilePath.size());
+    DWORD pathLen = GetModuleFileName(NULL, &vecModuleFilePath.at(0), DWORD(vecModuleFilePath.size()));
     DWORD wLastError = GetLastError();
     i = 0;
 
@@ -164,7 +164,7 @@ bool FSAutoStart::isAutoStart(FSAutoStartLastError *lastError)
 
         vecModuleFilePath.resize(vecModuleFilePath.size() * 1.5);
 
-        pathLen = GetModuleFileName(NULL, &vecModuleFilePath.at(0), vecModuleFilePath.size());
+        pathLen = GetModuleFileName(NULL, &vecModuleFilePath.at(0), DWORD(vecModuleFilePath.size()));
         wLastError = GetLastError();
     }
 

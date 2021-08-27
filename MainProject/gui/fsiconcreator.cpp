@@ -44,7 +44,7 @@ QPixmap FSIconCreator::generate(int size)
     painter.setBrush(backgroundColor);
 
     // Draw background circle
-    float marginScale = 0.01;
+    double marginScale = 0.01;
     painter.drawEllipse(size * marginScale,
                         size * marginScale,
                         size * (1 - 2 * marginScale),
@@ -54,10 +54,10 @@ QPixmap FSIconCreator::generate(int size)
     painter.setBrush(frontgroundColor);
 
     // Draw webcam head
-    float camHeadYOffsetScale = 0.3;
-    float camHeadWidthScale = 0.8;
-    float camHeadHeightScale = 0.32;
-    float camHeadRoundedScale = 0.05;
+    double camHeadYOffsetScale = 0.3;
+    double camHeadWidthScale = 0.8;
+    double camHeadHeightScale = 0.32;
+    double camHeadRoundedScale = 0.05;
     painter.drawRoundedRect(size * (0.5 - camHeadWidthScale / 2),
                             size * camHeadYOffsetScale,
                             size * camHeadWidthScale,
@@ -66,17 +66,17 @@ QPixmap FSIconCreator::generate(int size)
                             hypotenuse * camHeadRoundedScale);
 
     // Draw webcam leg
-    float camLegWidthScale = 0.125;
-    float camLegHeightScale = 0.075;
+    double camLegWidthScale = 0.125;
+    double camLegHeightScale = 0.075;
     painter.drawRect(size * (0.5 - camLegWidthScale / 2),
                      size * (camHeadYOffsetScale + camHeadHeightScale),
                      size * camLegWidthScale,
                      qRound(size * camLegHeightScale));
 
     // Draw webcam footing
-    float camFootingWidthScale = 0.5;
-    float camFootingHeightScale = 0.1;
-    float camFootingRoundedScale = 0.025;
+    double camFootingWidthScale = 0.5;
+    double camFootingHeightScale = 0.1;
+    double camFootingRoundedScale = 0.025;
     painter.drawRoundedRect(size * (0.5 - camFootingWidthScale / 2),
                             size * (camHeadYOffsetScale + camHeadHeightScale + camLegHeightScale),
                             size * camFootingWidthScale,
@@ -91,8 +91,8 @@ QPixmap FSIconCreator::generate(int size)
                             hypotenuse * (camFootingRoundedScale * 0.375));
 
     // Draw webcam border lens
-    float camBorderLensWidthScale = 0.0275;
-    float camBorderLensRadiusScale = 0.1;
+    double camBorderLensWidthScale = 0.0275;
+    double camBorderLensRadiusScale = 0.1;
     painter.setPen(QPen(backgroundColor, hypotenuse * camBorderLensWidthScale));
     painter.setBrush(QBrush());
     painter.drawEllipse(QPointF(size * 0.5,
@@ -104,9 +104,9 @@ QPixmap FSIconCreator::generate(int size)
     painter.setBrush(backgroundColor);
 
     // Draw lens flare
-    float camFlareRadiusScale = 0.02;
-    float camFlareXOffsetScale = 0.7;
-    float camFlareYOffsetScale = 0.3;
+    double camFlareRadiusScale = 0.02;
+    double camFlareXOffsetScale = 0.7;
+    double camFlareYOffsetScale = 0.3;
     painter.drawEllipse(QPointF(size * (0.5 - camBorderLensRadiusScale + camFlareXOffsetScale * 2 * camBorderLensRadiusScale),
                                 size * (camHeadYOffsetScale + camHeadHeightScale / 2 - camBorderLensRadiusScale + camFlareYOffsetScale * 2 * camBorderLensRadiusScale)),
                         size * camFlareRadiusScale,

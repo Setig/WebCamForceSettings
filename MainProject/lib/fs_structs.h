@@ -34,7 +34,7 @@ typedef QString DeviceName;
 typedef QString DevicePath;
 
 class FSCamera;
-class IBaseFilter;
+struct IBaseFilter;
 
 struct FS_LIB_EXPORT FSCameraData
 {
@@ -77,12 +77,12 @@ struct FS_LIB_EXPORT FSRangeParams
 
     FSRangeParams(const FSRangeParams &other) noexcept;
 
-    bool isNull() const;
-    long min()    const;
-    long max()    const;
-    long step()   const;
-    long value()  const;
-    long flags()  const;
+    bool isNull()    const;
+    long minValue()  const;
+    long maxValue()  const;
+    long stepValue() const;
+    long value()     const;
+    long flags()     const;
 
     bool isSupportAutoControl()   const;
     bool isSupportManualControl() const;
@@ -96,9 +96,9 @@ struct FS_LIB_EXPORT FSRangeParams
 
 private:
     bool m_isNull;
-    long m_min;
-    long m_max;
-    long m_step;
+    long m_minValue;
+    long m_maxValue;
+    long m_stepValue;
     long m_value;
     long m_flags;
 };

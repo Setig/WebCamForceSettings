@@ -480,7 +480,7 @@ void FSSystemTrayIcon::about()
                 "<p> * block the properties of the webcam if a third-party application resets certain parameters;</p>"
                 "<p> * switch between prepared webcam presets.</p>"
                 "<p>Author by %3."
-        ).arg("Alexander Tsyganov");
+                ).arg("Alexander Tsyganov");
 
     QMessageBox msgBox(qApp->activeWindow());
     msgBox.setWindowTitle(tr("About %1...").arg(qApp->applicationName()));

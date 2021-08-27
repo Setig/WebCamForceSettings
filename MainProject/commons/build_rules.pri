@@ -1,3 +1,8 @@
+!versionAtLeast(QT_VERSION, 5.15.0) {
+    message("Cannot use Qt $${QT_VERSION}")
+    error("Use Qt 5.15.0 or newer")
+}
+
 MOC_DIR     = ./moc
 OBJECTS_DIR = ./objects
 RCC_DIR     = ./rcc

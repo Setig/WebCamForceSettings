@@ -41,13 +41,13 @@ public:
 
     static void sync();
 
-    static void setUsuallyAvailableCamerasCount(unsigned int count);
-    static unsigned int usuallyAvailableCamerasCount();
-    static unsigned int defaultUsuallyAvailableCamerasCount();
+    static void setUsuallyAvailableCamerasCount(uint count);
+    static uint usuallyAvailableCamerasCount();
+    static uint defaultUsuallyAvailableCamerasCount();
 
-    static void setMaxLockProperties(unsigned int count);
-    static unsigned int maxLockProperties();
-    static unsigned int defaultMaxLockProperties();
+    static void setMaxLockProperties(uint count);
+    static uint maxLockProperties();
+    static uint defaultMaxLockProperties();
 
     static void setUserNames(const QVariantMap &map);
     static QVariantMap userNames();
