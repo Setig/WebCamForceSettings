@@ -37,6 +37,6 @@ Approximate file types location scheme (without Qt libraries):
 > libWebCamForceSettings.dll<br/>
 > WebCamForceSettings.exe<br/>
 > wcfs.exe<br/>
-> translations/wcfs_*.qm<br/>
-> translations/qt/qt_*.qm<br/>
+> translations/wcfs_\*.qm<br/>
+> translations/qt/qt_\*.qm<br/>
 > translations/qt/qtbase_*.qm<br/>
