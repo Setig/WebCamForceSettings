@@ -38,6 +38,7 @@
 #include <WebCamFS/IconCreator>
 #include <WebCamFS/AppArguments>
 #include <WebCamFS/SystemTrayIcon>
+#include <WebCamFS/CamerasStorage>
 #include <WebCamFS/TranslationsHelper>
 #include <WebCamFS/CameraSettingsDialog>
 
@@ -45,7 +46,8 @@
 #include <QLabel>
 #endif // SHOW_ONLY_PROJECT_ICON
 
-int showCameraSettingsDialogByDevicePath(const DevicePath &devicePath)
+int showCameraSettingsDialogByDevicePath(const DevicePath &devicePath,
+                                         bool isUseDefaultSettings)
 {
     FSCamera *camera = FSCamera::findCameraByDevicePath(devicePath);
 
@@ -58,11 +60,23 @@ int showCameraSettingsDialogByDevicePath(const DevicePath &devicePath)
     FSSettings::initialization();
     fsTH->setCurrentLocale(FSSettings::currentLocale());
 
+    FSCamerasStorage *camerasStorage = nullptr;
+
+    if (isUseDefaultSettings) {
+        camerasStorage = new FSCamerasStorage();
+        camerasStorage->loadDefaultValueParams();
+        camera->setCoreCamerasStorage(camerasStorage);
+    }
+
     FSCameraSettingsDialog dialog(camera);
 
     dialog.exec();
 
     delete camera;
+
+    if (camerasStorage)
+        delete camerasStorage;
+
     return 0;
 }
 
@@ -133,6 +147,7 @@ int main(int argc, char *argv[])
     // Application arguments parsing
     {
         int showCameraSettingsDialogArgIndex = -1;
+        bool isUseDefaultSettings = false;
 
         const QStringList appArgs = a.arguments().mid(1);
 
@@ -146,6 +161,9 @@ int main(int argc, char *argv[])
             } else if (arg.startsWith(SHOW_CAMERA_SETTINGS_DIALOG_LONG_ARG_NAME "=")) {
                 showCameraSettingsDialogArgIndex = i;
                 continue;
+            } else if ( arg == USE_USER_DEFAULT_SETTINGS_SHORT_ARG_NAME ||
+                        arg == USE_USER_DEFAULT_SETTINGS_LONG_ARG_NAME ) {
+                isUseDefaultSettings = true;
             } else if (arg == CREATE_LOG_FILE_SHORT_ARG_NAME) {
                 const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/WebCamFS/logs";
                 QDir().mkpath(dirPath);
@@ -185,7 +203,7 @@ int main(int argc, char *argv[])
             }
 
             if (!devicePath.isEmpty()) {
-                return showCameraSettingsDialogByDevicePath(devicePath);
+                return showCameraSettingsDialogByDevicePath(devicePath, isUseDefaultSettings);
             } else {
                 qCritical("Device path is empty!\n");
                 return 1;
