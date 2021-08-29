@@ -182,20 +182,6 @@ FSCameraPathsUMap FSCoreCamerasStorage::getCameraPathUMap() const
     return d->umapCameraPaths;
 }
 
-void FSCoreCamerasStorage::saveAll()
-{
-    saveUserNamesSettings();
-    saveBlackList();
-
-    FSCoreSettings::sync();
-}
-
-void FSCoreCamerasStorage::loadAll()
-{
-    loadUserNamesSettings();
-    loadBlackList();
-}
-
 DevicePath FSCoreCamerasStorage::findCameraPathByUserName(const DeviceName &userName)
 {
     if (!userName.isEmpty()) {
@@ -450,6 +436,20 @@ void FSCoreCamerasStorage::loadBlackList()
     }
 
     setBlackList(devicePaths);
+}
+
+void FSCoreCamerasStorage::saveAll()
+{
+    saveUserNamesSettings();
+    saveBlackList();
+
+    FSCoreSettings::sync();
+}
+
+void FSCoreCamerasStorage::loadAll()
+{
+    loadUserNamesSettings();
+    loadBlackList();
 }
 
 void FSCoreCamerasStorage::init()

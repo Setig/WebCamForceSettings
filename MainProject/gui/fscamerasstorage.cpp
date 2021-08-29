@@ -55,22 +55,6 @@ FSCamerasStorage::~FSCamerasStorage()
     d = nullptr;
 }
 
-void FSCamerasStorage::saveAll()
-{
-    FSCoreCamerasStorage::saveAll();
-
-    saveDefaultValueParams();
-    saveCameraUserPresets();
-}
-
-void FSCamerasStorage::loadAll()
-{
-    FSCoreCamerasStorage::loadAll();
-
-    loadDefaultValueParams();
-    loadCameraUserPresets();
-}
-
 void FSCamerasStorage::setUserDefaultValues(const FSCameraPathValuesUMap &umapCameraPathValues)
 {
     d->umapCameraUserDefaultValues = umapCameraPathValues;
@@ -607,6 +591,22 @@ void FSCamerasStorage::loadCameraUserPresets()
     }
 
     setCameraUserPresets(umapCameraPathUserPresets);
+}
+
+void FSCamerasStorage::saveAll()
+{
+    FSCoreCamerasStorage::saveAll();
+
+    saveDefaultValueParams();
+    saveCameraUserPresets();
+}
+
+void FSCamerasStorage::loadAll()
+{
+    FSCoreCamerasStorage::loadAll();
+
+    loadDefaultValueParams();
+    loadCameraUserPresets();
 }
 
 void FSCamerasStorage::init()

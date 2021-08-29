@@ -62,9 +62,6 @@ public:
     FSCamera *findCameraByDevicePath(const DevicePath &devicePath) const;
     FSCameraPathsUMap getCameraPathUMap() const;
 
-    virtual void saveAll();
-    virtual void loadAll();
-
 
     // Camera user names
     DevicePath findCameraPathByUserName(const DeviceName &userName);
@@ -98,6 +95,10 @@ public:
 
     void saveBlackList();
     void loadBlackList();
+
+public slots:
+    virtual void saveAll();
+    virtual void loadAll();
 
 signals:
     void addedCamera(const DevicePath &devicePath);

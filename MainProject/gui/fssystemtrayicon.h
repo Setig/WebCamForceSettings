@@ -96,6 +96,8 @@ private slots:
     void showCameraSettingsDialog();
 
     void removeOpenedCameraSettingsDialog(QObject *object);
+    void removeSettingsDialog(QObject *object);
+    void removeUserSettingsDialog(QObject *object);
 
     void updateDisplayName(const DevicePath &devicePath);
 

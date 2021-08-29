@@ -45,10 +45,6 @@ public:
     explicit FSCamerasStorage(QObject *parent = nullptr);
     ~FSCamerasStorage() override;
 
-    void saveAll() override;
-    void loadAll() override;
-
-
     // Camera user default names
     void setUserDefaultValues(const FSCameraPathValuesUMap &umapCameraPathValues);
     void setUserDefaultValues(const DevicePath &devicePath, const FSCameraPropertyValuesUMap &umapCameraPropertyValues);
@@ -94,6 +90,10 @@ public:
 
     void saveCameraUserPresets();
     void loadCameraUserPresets();
+
+public slots:
+    void saveAll() override;
+    void loadAll() override;
 
 signals:
     void cameraUserPresetNamesChanged(const DevicePath &devicePath);

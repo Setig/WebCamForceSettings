@@ -81,6 +81,9 @@ public:
 
     FSCameraAndOpenedCameraSettingsDialogUMap umapCameraAndOpenedCameraSettingsDialog;
     FSOpenedCameraSettingsDialogAndCameraUMap umapOpenedCameraSettingsDialogAndCamera;
+
+    FSSettingsDialog *settingsDialog;
+    FSCameraUserSettingsDialog *cameraSettingsDialog;
 };
 
 FSSystemTrayIconPrivate::FSSystemTrayIconPrivate()
@@ -92,6 +95,8 @@ FSSystemTrayIconPrivate::FSSystemTrayIconPrivate()
     , lockPropertiesPauseAbortAction(nullptr)
     , lockPropertiesManager(nullptr)
     , camerasStorage(nullptr)
+    , settingsDialog(nullptr)
+    , cameraSettingsDialog(nullptr)
 {
     const size_t standartCamerasCount = FSSettings::usuallyAvailableCamerasCount();
 
@@ -116,6 +121,13 @@ FSSystemTrayIcon::~FSSystemTrayIcon()
     hide();
 
     d->camerasStorage->saveAll();
+
+    for (const auto &[camera, cameraSettingsDialog] : d->umapCameraAndOpenedCameraSettingsDialog) {
+        delete cameraSettingsDialog;
+    }
+
+    delete d->settingsDialog;
+    delete d->cameraSettingsDialog;
 
     if (d->lockPropertiesManager)
         d->lockPropertiesManager->saveLockSettings();
@@ -505,39 +517,51 @@ void FSSystemTrayIcon::about()
 
 void FSSystemTrayIcon::execSettingsDialog()
 {
-    FSSettingsDialog dialog;
+    if (d->settingsDialog) {
+        d->settingsDialog->show();
+        d->settingsDialog->raise();
+        d->settingsDialog->activateWindow();
+        return;
+    }
+
+    d->settingsDialog = new FSSettingsDialog();
+    d->settingsDialog->setAttribute(Qt::WA_DeleteOnClose, true);
+
+    connect(d->settingsDialog, SIGNAL(destroyed(QObject*)),
+            this,                SLOT(removeSettingsDialog(QObject*)));
+
     FSAutoStartLastError isAutoStartLastError;
     const bool isAutoStart = FSAutoStart::isAutoStart(&isAutoStartLastError);
 
     if (isAutoStartLastError.isSuccess()) {
-        dialog.setAutoStartEnable(true);
-        dialog.setAutoStart(isAutoStart);
+        d->settingsDialog->setAutoStartEnable(true);
+        d->settingsDialog->setAutoStart(isAutoStart);
     } else {
         qCritical("%s: Failed to get auto start state(step=%d, error=%ld)!",
                   FSSystemTrayIcon::staticMetaObject.className(),
                   isAutoStartLastError.step(),
                   isAutoStartLastError.error());
 
-        dialog.setAutoStartEnable(false);
-        dialog.setAutoStart(false);
+        d->settingsDialog->setAutoStartEnable(false);
+        d->settingsDialog->setAutoStart(false);
     }
 
     fsTH->updateAvailableFSLocales();
-    dialog.setCurrentLocale(FSSettings::currentLocale());
+    d->settingsDialog->setCurrentLocale(FSSettings::currentLocale());
 
-    dialog.setCameraDetectionEnable(FSSettings::isCameraDetectionEnable());
-    dialog.setCameraDetectionInterval(FSSettings::cameraDetectionInterval());
-    dialog.setCameraValueUpdateEnable(FSSettings::isCameraValueUpdateEnable());
-    dialog.setCameraValueUpdateInterval(FSSettings::cameraValueUpdateInterval());
-    dialog.setLockPropertiesEnable(FSSettings::isLockPropertiesEnable());
-    dialog.setLockPropertiesInterval(FSSettings::lockPropertiesInterval());
+    d->settingsDialog->setCameraDetectionEnable(FSSettings::isCameraDetectionEnable());
+    d->settingsDialog->setCameraDetectionInterval(FSSettings::cameraDetectionInterval());
+    d->settingsDialog->setCameraValueUpdateEnable(FSSettings::isCameraValueUpdateEnable());
+    d->settingsDialog->setCameraValueUpdateInterval(FSSettings::cameraValueUpdateInterval());
+    d->settingsDialog->setLockPropertiesEnable(FSSettings::isLockPropertiesEnable());
+    d->settingsDialog->setLockPropertiesInterval(FSSettings::lockPropertiesInterval());
 
-    int res = dialog.exec();
+    int res = d->settingsDialog->exec();
 
     if (res == QDialog::Accepted) {
         if (isAutoStartLastError.isSuccess()) {
             FSAutoStartLastError lastError;
-            FSAutoStart::setAutoStart(dialog.isAutoStart(), &lastError);
+            FSAutoStart::setAutoStart(d->settingsDialog->isAutoStart(), &lastError);
 
             if (!lastError.isSuccess()) {
                 qCritical("%s: Failed to set auto start state(step=%d, error=%ld)!",
@@ -552,15 +576,15 @@ void FSSystemTrayIcon::execSettingsDialog()
             }
         }
 
-        FSSettings::setCurrentLocale(dialog.currentLocale());
-        fsTH->setCurrentLocale(dialog.currentLocale());
+        FSSettings::setCurrentLocale(d->settingsDialog->currentLocale());
+        fsTH->setCurrentLocale(d->settingsDialog->currentLocale());
 
-        FSSettings::setCameraDetectionEnable(dialog.isCameraDetectionEnable());
-        FSSettings::setCameraDetectionInterval(dialog.cameraDetectionInterval());
-        FSSettings::setCameraValueUpdateEnable(dialog.isCameraValueUpdateEnable());
-        FSSettings::setCameraValueUpdateInterval(dialog.cameraValueUpdateInterval());
-        FSSettings::setLockPropertiesEnable(dialog.isLockPropertiesEnable());
-        FSSettings::setLockPropertiesInterval(dialog.lockPropertiesInterval());
+        FSSettings::setCameraDetectionEnable(d->settingsDialog->isCameraDetectionEnable());
+        FSSettings::setCameraDetectionInterval(d->settingsDialog->cameraDetectionInterval());
+        FSSettings::setCameraValueUpdateEnable(d->settingsDialog->isCameraValueUpdateEnable());
+        FSSettings::setCameraValueUpdateInterval(d->settingsDialog->cameraValueUpdateInterval());
+        FSSettings::setLockPropertiesEnable(d->settingsDialog->isLockPropertiesEnable());
+        FSSettings::setLockPropertiesInterval(d->settingsDialog->lockPropertiesInterval());
         FSSettings::sync();
 
         updateCamerasDetectionTimer();
@@ -571,11 +595,24 @@ void FSSystemTrayIcon::execSettingsDialog()
 
 void FSSystemTrayIcon::execUserSettingsDialog()
 {
-    // TODO: Eliminate call duplication
-    FSCameraUserSettingsDialog dialog;
-    dialog.setCamerasStorage(d->camerasStorage);
-    dialog.exec();
-    d->camerasStorage->saveAll();
+    if (d->cameraSettingsDialog) {
+        d->cameraSettingsDialog->show();
+        d->cameraSettingsDialog->raise();
+        d->cameraSettingsDialog->activateWindow();
+        return;
+    }
+
+    d->cameraSettingsDialog = new FSCameraUserSettingsDialog();
+    d->cameraSettingsDialog->setAttribute(Qt::WA_DeleteOnClose, true);
+    d->cameraSettingsDialog->setCamerasStorage(d->camerasStorage);
+
+    connect(d->cameraSettingsDialog, SIGNAL(destroyed(QObject*)),
+            this,                      SLOT(removeUserSettingsDialog(QObject*)));
+
+    d->cameraSettingsDialog->show();
+
+    connect(d->cameraSettingsDialog, SIGNAL(finished(int)),
+            d->camerasStorage,         SLOT(saveAll()));
 }
 
 void FSSystemTrayIcon::onShowAvailableCamerasMenu()
@@ -857,6 +894,18 @@ void FSSystemTrayIcon::removeOpenedCameraSettingsDialog(QObject *object)
 
     d->umapCameraAndOpenedCameraSettingsDialog.erase(camera);
     d->umapOpenedCameraSettingsDialogAndCamera.erase(iterator);
+}
+
+void FSSystemTrayIcon::removeSettingsDialog(QObject *object)
+{
+    if (d->settingsDialog && object == d->settingsDialog)
+        d->settingsDialog = nullptr;
+}
+
+void FSSystemTrayIcon::removeUserSettingsDialog(QObject *object)
+{
+    if (d->cameraSettingsDialog && object == d->cameraSettingsDialog)
+        d->cameraSettingsDialog = nullptr;
 }
 
 void FSSystemTrayIcon::updateDisplayName(const DevicePath &devicePath)
