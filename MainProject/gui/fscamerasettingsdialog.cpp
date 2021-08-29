@@ -897,14 +897,14 @@ FSValueParams FSCameraSettingsDialogPrivate::getActualValue(FSCameraProperty pro
                       camera->devicePath().toLocal8Bit().constData());
         }
     } else if (mode == FSCameraSettingsDialog::ChangeDefaultValuesMode) {
-        FSCamerasStorage *camerasStorage = qobject_cast<FSCamerasStorage *>(camera->coreCamerasStorage());
+        FSCamerasStorage *camerasStorage = qobject_cast<FSCamerasStorage *>(camera->camerasStorage());
         if (camerasStorage && camerasStorage->isUserDefaultValueUsed(camera->devicePath(), property)) {
             result = camerasStorage->getUserDefaultValue(camera->devicePath(), property);
         } else {
             result = getDefaultValueFromRange(property);
         }
     } else {
-        FSCamerasStorage *camerasStorage = qobject_cast<FSCamerasStorage *>(camera->coreCamerasStorage());
+        FSCamerasStorage *camerasStorage = qobject_cast<FSCamerasStorage *>(camera->camerasStorage());
         if (camerasStorage && camerasStorage->isCameraUserPresetValueUsed(camera->devicePath(), currentPresetName, property)) {
             result = camerasStorage->getCameraUserPresetValue(camera->devicePath(), currentPresetName, property);
         } else {
@@ -928,7 +928,7 @@ FSValueParams FSCameraSettingsDialogPrivate::getDefaultValue(FSCameraProperty pr
     if (mode == FSCameraSettingsDialog::ChangeDefaultValuesMode) {
         result = getDefaultValueFromRange(property);
     } else {
-        FSCamerasStorage *camerasStorage = qobject_cast<FSCamerasStorage *>(camera->coreCamerasStorage());
+        FSCamerasStorage *camerasStorage = qobject_cast<FSCamerasStorage *>(camera->camerasStorage());
         if (camerasStorage && camerasStorage->isUserDefaultValueUsed(camera->devicePath(), property)) {
             result = camerasStorage->getUserDefaultValue(camera->devicePath(), property);
         } else {
@@ -1330,7 +1330,7 @@ FSValueParams FSCameraSettingsDialog::valueParams(FSCameraProperty property) con
 
 void FSCameraSettingsDialog::sendValuesToCameraStorage()
 {
-    FSCamerasStorage *camerasStorage = qobject_cast<FSCamerasStorage *>(d->camera->coreCamerasStorage());
+    FSCamerasStorage *camerasStorage = qobject_cast<FSCamerasStorage *>(d->camera->camerasStorage());
 
     if (!camerasStorage || d->mode == FSCameraSettingsDialog::LockPropertiesMode)
         return;
@@ -1725,7 +1725,7 @@ void FSCameraSettingsDialog::updatePresetsFromCameraStorage()
     d->currentPresetName.clear();
 
     if (d->mode == FSCameraSettingsDialog::ChangePresetMode) {
-        FSCamerasStorage *camerasStorage = qobject_cast<FSCamerasStorage *>(d->camera->coreCamerasStorage());
+        FSCamerasStorage *camerasStorage = qobject_cast<FSCamerasStorage *>(d->camera->camerasStorage());
 
         if (camerasStorage) {
             d->umapCameraUserPresets = camerasStorage->getCameraUserPresets(d->camera->devicePath());

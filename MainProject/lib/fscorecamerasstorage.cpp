@@ -145,7 +145,7 @@ void FSCoreCamerasStorage::registerCamera(FSCamera *camera)
     d->umapCameraPaths.insert( { devicePath, camera } );
     d->umapCameraNames.insert( { camera->name(), camera } );
 
-    camera->setCoreCamerasStorage(this);
+    camera->setCamerasStorage(this);
 
     emit addedCamera(devicePath);
 }
@@ -162,7 +162,7 @@ void FSCoreCamerasStorage::unregisterCamera(FSCamera *camera)
     d->umapCameraPaths.erase(iterator);
     d->umapCameraNames.erase(camera->name());
 
-    camera->setCoreCamerasStorage(nullptr);
+    camera->setCamerasStorage(nullptr);
 
     emit removedCamera(devicePath);
 }

@@ -306,7 +306,7 @@ FSCamera::~FSCamera()
     d = nullptr;
 }
 
-void FSCamera::setCoreCamerasStorage(FSCoreCamerasStorage *coreCamerasStorage)
+void FSCamera::setCamerasStorage(FSCoreCamerasStorage *coreCamerasStorage)
 {
     if (d->coreCamerasStorage != coreCamerasStorage)
     {
@@ -322,7 +322,7 @@ void FSCamera::setCoreCamerasStorage(FSCoreCamerasStorage *coreCamerasStorage)
     }
 }
 
-FSCoreCamerasStorage *FSCamera::coreCamerasStorage() const
+FSCoreCamerasStorage *FSCamera::camerasStorage() const
 {
     return d->coreCamerasStorage;
 }

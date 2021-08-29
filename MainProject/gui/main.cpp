@@ -65,7 +65,7 @@ int showCameraSettingsDialogByDevicePath(const DevicePath &devicePath,
     if (isUseDefaultSettings) {
         camerasStorage = new FSCamerasStorage();
         camerasStorage->loadDefaultValueParams();
-        camera->setCoreCamerasStorage(camerasStorage);
+        camera->setCamerasStorage(camerasStorage);
     }
 
     FSCameraSettingsDialog dialog(camera);

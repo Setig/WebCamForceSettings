@@ -43,8 +43,8 @@ public:
     explicit FSCamera(const FSCameraData &cameraData);
     virtual ~FSCamera();
 
-    void setCoreCamerasStorage(FSCoreCamerasStorage *coreCamerasStorage);
-    FSCoreCamerasStorage *coreCamerasStorage() const;
+    void setCamerasStorage(FSCoreCamerasStorage *coreCamerasStorage);
+    FSCoreCamerasStorage *camerasStorage() const;
 
     static bool initializeWinCOMLibrary();
     static void uninitializeWinCOMLibrary();
