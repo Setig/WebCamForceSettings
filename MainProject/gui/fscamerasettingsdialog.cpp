@@ -155,7 +155,7 @@ public:
                          FSCameraProperty property,
                          const FSValueParams &valueParams) const;
 
-    static void setLabelSelection(QLabel *label, const FSValueParams &valueParams, const FSValueParams &defaultParams);
+    static void setLabelSelection(QLabel *label, const FSValueParams &valueParams, const FSValueParams &defaultParams, bool isLock);
     static void setSliderValueParams(QSlider *slider, const FSValueParams &valueParams, const FSRangeParams &rangeParams, bool isLock);
     static void setSpinBoxValueParams(QSpinBox *spinBox, const FSValueParams &valueParams, const FSRangeParams &rangeParams, bool isLock);
     static void setAutoCheckBoxValueParams(QCheckBox *autoCheckBox, const FSValueParams &valueParams, const FSRangeParams &rangeParams, bool isLock);
@@ -729,17 +729,17 @@ void FSCameraSettingsDialogPrivate::setEditorsValue(Ui::FSCameraSettingsDialog *
     case FSCameraProperty::Iris:
     case FSCameraProperty::Focus:
         rangeParams = getRangeParams(property);
-        setLabelSelection(getLabel(ui, property), valueParams, getDefaultValue(property));
+        setLabelSelection(getLabel(ui, property), valueParams, getDefaultValue(property), isLock);
         setSliderValueParams(getSlider(ui, property), valueParams, rangeParams, isLock);
         setSpinBoxValueParams(getSpinBox(ui, property), valueParams, rangeParams, isLock);
         setAutoCheckBoxValueParams(getAutoCheckBox(ui, property), valueParams, rangeParams, isLock);
         break;
     case FSCameraProperty::ColorEnable:
-        setLabelSelection(getLabel(ui, property), valueParams, getDefaultValue(property));
+        setLabelSelection(getLabel(ui, property), valueParams, getDefaultValue(property), isLock);
         setCheckBoxColorEnableValueParams(ui, valueParams, isLock);
         break;
     case FSCameraProperty::PowerlineFrequency:
-        setLabelSelection(getLabel(ui, property), valueParams, getDefaultValue(property));
+        setLabelSelection(getLabel(ui, property), valueParams, getDefaultValue(property), isLock);
         setComboBoxPowerlineFrequencyValueParams(ui, valueParams, isLock);
         break;
     }
@@ -747,7 +747,8 @@ void FSCameraSettingsDialogPrivate::setEditorsValue(Ui::FSCameraSettingsDialog *
 
 void FSCameraSettingsDialogPrivate::setLabelSelection(QLabel *label,
                                                       const FSValueParams &valueParams,
-                                                      const FSValueParams &defaultParams)
+                                                      const FSValueParams &defaultParams,
+                                                      bool isLock)
 {
     if (label) {
         QFont font = label->font();
@@ -763,6 +764,7 @@ void FSCameraSettingsDialogPrivate::setLabelSelection(QLabel *label,
         }
 
         font.setBold(!isEqualParams);
+        font.setItalic(isLock);
         label->setFont(font);
     }
 }
@@ -1806,7 +1808,12 @@ bool FSCameraSettingsDialog::renameCurrentPresetName(const QString &newPresetNam
 
 void FSCameraSettingsDialog::updateLabelSelection(FSCameraProperty property)
 {
-    d->setLabelSelection(d->getLabel(ui, property), d->getEditorValue(ui, property), d->getDefaultValue(property));
+    bool isLock = false;
+
+    if (d->lockPropertiesManager && d->lockPropertiesManager->isLockedProperty(d->camera, property))
+        isLock = true;
+
+    d->setLabelSelection(d->getLabel(ui, property), d->getEditorValue(ui, property), d->getDefaultValue(property), isLock);
 }
 
 void FSCameraSettingsDialog::retranslate()
@@ -1836,6 +1843,7 @@ void FSCameraSettingsDialog::updateMinimumWidthLabels()
             const QFont oldFont = label->font();
             QFont font = label->font();
             font.setBold(true);
+            font.setItalic(true);
             label->setFont(font);
             label->adjustSize();
             label->setMinimumWidth(label->width());
