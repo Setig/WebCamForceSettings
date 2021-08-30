@@ -63,6 +63,9 @@ protected:
 
     static QSettings *fastInstance();
 
+    static QString getMainSettingsGroupName();
+    static QString getStatisticsGroup();
+
     static void beginMainSettingsGroup();
     static void beginStatisticsGroup();
     static void endGroup();

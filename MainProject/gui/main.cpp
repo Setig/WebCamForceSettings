@@ -33,6 +33,10 @@
 #include <qtsingleapplication.h>
 #endif // BUILD_WITH_QT_SINGLE_APPLICATION
 
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+#include "qeasysettings.hpp"
+#endif // BUILD_WITH_Q_EASY_SETTINGS
+
 #include <WebCamFS/Camera>
 #include <WebCamFS/Settings>
 #include <WebCamFS/IconCreator>
@@ -67,6 +71,12 @@ int showCameraSettingsDialogByDevicePath(const DevicePath &devicePath,
         camerasStorage->loadDefaultValueParams();
         camera->setCamerasStorage(camerasStorage);
     }
+
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+    QEasySettings::setStyle(QEasySettings::Style(isUseDefaultSettings ?
+                                                     FSSettings::customStyleIndex() :
+                                                     FSSettings::defaultCustomStyleIndex()));
+#endif // BUILD_WITH_Q_EASY_SETTINGS
 
     FSCameraSettingsDialog dialog(camera);
 

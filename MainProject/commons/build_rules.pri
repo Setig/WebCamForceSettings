@@ -13,7 +13,7 @@ DESTDIR = $$clean_path($$OUT_PWD/..)
 FS_LIBRARY_DIR=$$DESTDIR
 
 equals(TEMPLATE, app)|equals(TEMPLATE, lib) {
-    isEmpty(VERSION) VERSION = 0.9.8 # Global project version
+    isEmpty(VERSION) VERSION = 0.9.9 # Global project version
     DEFINES += "FS_PROJECT_GLOBAL_VERSION=\\\"$${VERSION}\\\""
 }
 

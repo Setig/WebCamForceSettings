@@ -1,5 +1,5 @@
 # WebCamForceSettings
-Is designed to work with the settings (properties) of the webcam.
+Is designed to work with video proc amp and camera control settings (properties) of the webcam.
 
 ## Build dependencies
 * Qt 5.15.0 or newer (need C++17)
@@ -11,7 +11,7 @@ wcfs&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs
 
 ## GUI argument options
 >Usage: WebCamForceSettings [OPTION]<br/>
-The application is designed to work with webcam settings.<br/><br/>
+The application is designed to work with webcam video proc amp and camera control settings (properties).<br/><br/>
 OPTIONS:<br/>
 -s, --show-camera-settings-dialog="devicePath"<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show dialog web camera settings by device path<br/>
@@ -20,8 +20,8 @@ OPTIONS:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"C:\Users\%USERNAME%\AppData\Local\Temp\WebCamFS\logs"<br/>
 
 ## Console argument options
->Usage: wcfs [OPTION]<br/>
-The console application is designed to work with webcam info.<br/><br/>
+>Usage: wcfs OPTION<br/>
+The console application is designed to work with webcam info (camera name, device path, video proc amp and camera control settings (properties)).<br/><br/>
 OPTIONS:<br/>
 -c, --cameras-info&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print info for all available web cameras(video input devices) in the OS<br/>
 -h, --help&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;display this help and exit<br/>

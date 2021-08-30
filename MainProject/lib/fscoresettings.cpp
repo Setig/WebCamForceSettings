@@ -219,6 +219,16 @@ QSettings *FSCoreSettings::fastInstance()
     return statSettingsInstance;
 }
 
+QString FSCoreSettings::getMainSettingsGroupName()
+{
+    return MAIN_SETTINGS_GROUP_NAME;
+}
+
+QString FSCoreSettings::getStatisticsGroup()
+{
+    return STATISTICS_SETTINGS_GROUP_NAME;
+}
+
 void FSCoreSettings::beginMainSettingsGroup()
 {
     statSettingsInstance->beginGroup(MAIN_SETTINGS_GROUP_NAME);

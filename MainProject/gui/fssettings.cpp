@@ -27,7 +27,12 @@
 #include <QLocale>
 #include <QSettings>
 
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+#include "qeasysettings.hpp"
+#endif // BUILD_WITH_Q_EASY_SETTINGS
+
 #define CURRENT_LOCALE_NAME               "CurrentLocale"
+#define STYLE_NAME                        "Style"
 #define CAMERA_DETECTION_ENABLE_NAME      "CameraDetectionEnable"
 #define CAMERA_DETECTION_INTERVAL_NAME    "CameraDetectionInterval"
 #define CAMERA_VALUE_UPDATE_ENABLE_NAME   "CameraValueUpdateEnable"
@@ -45,6 +50,21 @@
 #define CAMERA_VALUE_UPDATE_INTERVAL_DEFAULT_VALUE 1000
 #define LOCK_PROPERTIES_ENABLE_DEFAULT_VALUE       true
 #define LOCK_PROPERTIES_INTERVAL_DEFAULT_VALUE     250
+
+void FSSettings::initialization()
+{
+    FSCoreSettings::initialization();
+
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+    QEasySettings::init(QEasySettings::Format::iniFormat,
+                        fastInstance()->fileName());
+#endif // BUILD_WITH_Q_EASY_SETTINGS
+}
+
+void FSSettings::uninitialization()
+{
+    FSCoreSettings::uninitialization();
+}
 
 void FSSettings::setCurrentLocale(const QLocale &locale)
 {
@@ -77,6 +97,41 @@ QLocale FSSettings::defaultCurrentLocale()
     }
 
     return locale;
+}
+
+void FSSettings::setCustomStyleIndex(int styleIndex)
+{
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+    if (styleIndex == -1)
+        styleIndex = defaultCustomStyleIndex();
+
+    QEasySettings::writeSettings(getMainSettingsGroupName(), STYLE_NAME, styleIndex);
+#else
+    Q_UNUSED(styleIndex);
+#endif // BUILD_WITH_Q_EASY_SETTINGS
+}
+
+int FSSettings::customStyleIndex()
+{
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+    QVariant value = QEasySettings::readSettings(getMainSettingsGroupName(), STYLE_NAME);
+
+    if (value.isNull())
+        return defaultCustomStyleIndex();
+
+    return value.toInt();
+#else
+    return -1;
+#endif // BUILD_WITH_Q_EASY_SETTINGS
+}
+
+int FSSettings::defaultCustomStyleIndex()
+{
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+    return int(QEasySettings::Style::autoFusion);
+#else
+    return -1;
+#endif // BUILD_WITH_Q_EASY_SETTINGS
 }
 
 void FSSettings::setCameraDetectionEnable(bool isEnable)

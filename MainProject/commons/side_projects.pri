@@ -1,4 +1,11 @@
-QT_SINGLE_APPLICATION_PROJECT_PATH=$$clean_path($$PWD/../../SideProjects/qtsingleapplication)
+# pri file for side projects. (see file "WebCamForceSettings/SideProjects/README.txt")
+
+
+SIDE_PROJECT_DIRECTORY_PATH=$$clean_path($$PWD/../../SideProjects)
+
+
+# QtSingleApplication
+QT_SINGLE_APPLICATION_PROJECT_PATH=$$SIDE_PROJECT_DIRECTORY_PATH/qtsingleapplication
 
 exists($$QT_SINGLE_APPLICATION_PROJECT_PATH) {
     !contains(DEFINES, BUILD_WITHOUT_QT_SINGLE_APPLICATION) {
@@ -13,5 +20,25 @@ exists($$QT_SINGLE_APPLICATION_PROJECT_PATH) {
         message("Build without QtSingleApplication project.");
     }
 } else {
-    message("Directory for project QtSingleApplication not exist!")
+    message("Directory for QtSingleApplication project not exist!")
+}
+
+
+# QEasySettings
+Q_EASY_SETTINGS_PROJECT_PATH=$$SIDE_PROJECT_DIRECTORY_PATH/QEasySettings
+
+exists($$Q_EASY_SETTINGS_PROJECT_PATH) {
+    !contains(DEFINES, BUILD_WITHOUT_Q_EASY_SETTINGS) {
+        DEFINES+=BUILD_WITH_Q_EASY_SETTINGS
+
+        contains(TEMPLATE, app) {
+            INCLUDEPATH += $$Q_EASY_SETTINGS_PROJECT_PATH
+            SOURCES += $$Q_EASY_SETTINGS_PROJECT_PATH/qeasysettings.cpp
+            HEADERS += $$Q_EASY_SETTINGS_PROJECT_PATH/qeasysettings.hpp
+        }
+    } else {
+         message("Build without QEasySettings project.");
+    }
+} else {
+    message("Directory for QEasySettings project not exist!")
 }

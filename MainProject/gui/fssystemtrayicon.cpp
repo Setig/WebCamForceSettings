@@ -24,12 +24,16 @@
 
 #include "fssystemtrayicon.h"
 
+#include <unordered_map>
+
 #include <QMenu>
 #include <QTimer>
 #include <QMessageBox>
 #include <QApplication>
 
-#include <unordered_map>
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+#include "qeasysettings.hpp"
+#endif // BUILD_WITH_Q_EASY_SETTINGS
 
 #include <WebCamFS/Lib>
 #include <WebCamFS/Settings>
@@ -149,6 +153,10 @@ FSSystemTrayIcon::~FSSystemTrayIcon()
 void FSSystemTrayIcon::init()
 {
     d = new FSSystemTrayIconPrivate();
+
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+    QEasySettings::setStyle(QEasySettings::Style(FSSettings::customStyleIndex()));
+#endif // BUILD_WITH_Q_EASY_SETTINGS
 
     setIcon(qApp->windowIcon());
 
@@ -505,11 +513,15 @@ void FSSystemTrayIcon::about()
         QStringList projectsNames;
 
 #ifdef BUILD_WITH_QT_SINGLE_APPLICATION
-        projectsNames += "QtSingleApplication";
+        projectsNames += "QtSingleApplication(Digia Plc and/or its subsidiary(-ies))";
 #endif // BUILD_WITH_QT_SINGLE_APPLICATION
 
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+        projectsNames += "QEasySettings(mguludag)";
+#endif // BUILD_WITH_Q_EASY_SETTINGS
+
         if (!projectsNames.isEmpty())
-            msgBox.setDetailedText(tr("Used side projects: %1.").arg(projectsNames.join(", ")));
+            msgBox.setDetailedText(tr("Used side projects: \n%1.").arg(projectsNames.join("\n")));
     }
 
     msgBox.exec();
@@ -545,6 +557,10 @@ void FSSystemTrayIcon::execSettingsDialog()
     fsTH->updateAvailableFSLocales();
     d->settingsDialog->setCurrentLocale(FSSettings::currentLocale());
 
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+    d->settingsDialog->setCustomStyleIndex(FSSettings::customStyleIndex());
+#endif // BUILD_WITH_Q_EASY_SETTINGS
+
     d->settingsDialog->setCameraDetectionEnable(FSSettings::isCameraDetectionEnable());
     d->settingsDialog->setCameraDetectionInterval(FSSettings::cameraDetectionInterval());
     d->settingsDialog->setCameraValueUpdateEnable(FSSettings::isCameraValueUpdateEnable());
@@ -574,6 +590,12 @@ void FSSystemTrayIcon::execSettingsDialog()
 
         FSSettings::setCurrentLocale(d->settingsDialog->currentLocale());
         fsTH->setCurrentLocale(d->settingsDialog->currentLocale());
+
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+        const int styleIndex = d->settingsDialog->customStyleIndex();
+        FSSettings::setCustomStyleIndex(styleIndex);
+        QEasySettings::setStyle(QEasySettings::Style(styleIndex));
+#endif // BUILD_WITH_Q_EASY_SETTINGS
 
         FSSettings::setCameraDetectionEnable(d->settingsDialog->isCameraDetectionEnable());
         FSSettings::setCameraDetectionInterval(d->settingsDialog->cameraDetectionInterval());

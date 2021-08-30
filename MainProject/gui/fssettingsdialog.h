@@ -53,6 +53,9 @@ public:
     void setAutoStart(bool isAutoStart);
     bool isAutoStart() const;
 
+    void setCustomStyleIndex(int styleIndex);
+    int customStyleIndex() const;
+
     void setCameraDetectionEnable(bool isEnable);
     bool isCameraDetectionEnable() const;
 
@@ -82,6 +85,10 @@ private:
                                                QSpinBox *spinBox);
 
     static QString genLocaleName(const QLocale &locale);
+
+    static QStringList getCustomStyleNames();
+    static QString getCustomStyleName(int styleIndex);
+    static int getCustomStyleIndex(const QString &styleName);
 
 private slots:
     void retranslate();

@@ -33,8 +33,8 @@
 void printHelp()
 {
     fprintf(stdout,
-            "Usage: %s [OPTION]\n"
-            "The console application is designed to work with webcam info.\n\n"
+            "Usage: %s OPTION\n"
+            "The console application is designed to work with webcam info (camera name, device path, video proc amp and camera control settings (properties)).\n\n"
             "OPTIONS:\n"
             "%s, %s\tprint info for all available web cameras(video input devices) in the OS\n"
             "%s, %s\t\tdisplay this help and exit\n"
@@ -54,7 +54,7 @@ void printGUIHelp()
 {
     fprintf(stdout,
             "Usage: %s [OPTION]\n"
-            "The application is designed to work with webcam settings.\n\n"
+            "The application is designed to work with webcam video proc amp and camera control settings (properties).\n\n"
             "OPTIONS:\n"
             "%s, %s=\"devicePath\"\n\tshow dialog web camera settings by device path\n\t(devicePath for you webcam can be found using cameras info)\n\n"
             "%s\tcreate log file in directory:\n"

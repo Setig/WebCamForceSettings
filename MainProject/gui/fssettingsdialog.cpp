@@ -32,6 +32,16 @@
 #include <WebCamFS/Settings>
 #include <WebCamFS/TranslationsHelper>
 
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+#include "qeasysettings.hpp"
+
+#define AUTO_STYLE_NAME         tr("Auto")
+#define VISTA_STYLE_NAME        tr("Vista")
+#define CLASSIC_STYLE_NAME      tr("Classic")
+#define LIGHT_FUSION_STYLE_NAME tr("LightFusion")
+#define DARK_FUSION_STYLE_NAME  tr("DarkFusion")
+#endif // BUILD_WITH_Q_EASY_SETTINGS
+
 class FSSettingsDialogPrivate
 {
 public:
@@ -118,6 +128,16 @@ bool FSSettingsDialog::isAutoStart() const
     return ui->checkBoxAutoStart->isChecked();
 }
 
+void FSSettingsDialog::setCustomStyleIndex(int styleIndex)
+{
+    ui->comboBoxStyle->setCurrentIndex(ui->comboBoxStyle->findText(getCustomStyleName(styleIndex)));
+}
+
+int FSSettingsDialog::customStyleIndex() const
+{
+    return getCustomStyleIndex(ui->comboBoxStyle->itemText(ui->comboBoxStyle->currentIndex()));
+}
+
 void FSSettingsDialog::setCameraDetectionEnable(bool isEnable)
 {
     ui->checkBoxIsCameraDetectionEnable->setChecked(isEnable);
@@ -192,6 +212,14 @@ void FSSettingsDialog::init()
     connect(fsTH, &FSTranslationsHelper::currentLanguageChanged,
             this, &FSSettingsDialog::updateCurrentLanguage);
 
+    const QStringList customStyleNames = getCustomStyleNames();
+    if (!customStyleNames.isEmpty()) {
+        ui->comboBoxStyle->addItems(customStyleNames);
+    } else {
+        ui->labelStyle->setEnabled(false);
+        ui->comboBoxStyle->setEnabled(false);
+    }
+
     QPushButton *restoreDefaultsButton = ui->buttonBox->button(QDialogButtonBox::RestoreDefaults);
     connect(restoreDefaultsButton, SIGNAL(clicked(bool)),
             this,                    SLOT(restoreDefaultValues()));
@@ -227,6 +255,60 @@ void FSSettingsDialog::connectionCheckBoxWithLabelAndSpinBox(QCheckBox *checkBox
 QString FSSettingsDialog::genLocaleName(const QLocale &locale)
 {
     return QString("%1 (%2)").arg(QLocale::languageToString(locale.language()), locale.nativeLanguageName());
+}
+
+QStringList FSSettingsDialog::getCustomStyleNames()
+{
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+    return { AUTO_STYLE_NAME, VISTA_STYLE_NAME, CLASSIC_STYLE_NAME, LIGHT_FUSION_STYLE_NAME, DARK_FUSION_STYLE_NAME };
+#else
+    return QStringList();
+#endif // BUILD_WITH_Q_EASY_SETTINGS
+}
+
+QString FSSettingsDialog::getCustomStyleName(int styleIndex)
+{
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+    switch (styleIndex) {
+    case int(QEasySettings::Style::autoFusion):
+        return AUTO_STYLE_NAME;
+    case int(QEasySettings::Style::vista):
+        return VISTA_STYLE_NAME;
+    case int(QEasySettings::Style::classic):
+        return CLASSIC_STYLE_NAME;
+    case int(QEasySettings::Style::lightFusion):
+        return LIGHT_FUSION_STYLE_NAME;
+    case int(QEasySettings::Style::darkFusion):
+        return DARK_FUSION_STYLE_NAME;
+    default:
+        break;
+    }
+#else
+    Q_UNUSED(styleIndex);
+#endif // BUILD_WITH_Q_EASY_SETTINGS
+
+    return QString();
+}
+
+int FSSettingsDialog::getCustomStyleIndex(const QString &styleName)
+{
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+    if (styleName == AUTO_STYLE_NAME) {
+        return int(QEasySettings::Style::autoFusion);
+    } else if (styleName == VISTA_STYLE_NAME) {
+        return int(QEasySettings::Style::vista);
+    } else if (styleName == CLASSIC_STYLE_NAME) {
+        return int(QEasySettings::Style::classic);
+    } else if (styleName == LIGHT_FUSION_STYLE_NAME) {
+        return int(QEasySettings::Style::lightFusion);
+    } else if (styleName == DARK_FUSION_STYLE_NAME) {
+        return int(QEasySettings::Style::darkFusion);
+    }
+#else
+    Q_UNUSED(styleName);
+#endif // BUILD_WITH_Q_EASY_SETTINGS
+
+    return -1;
 }
 
 void FSSettingsDialog::retranslate()

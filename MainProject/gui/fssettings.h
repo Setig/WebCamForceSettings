@@ -29,9 +29,16 @@
 class FSSettings : public FSCoreSettings
 {
 public:
+    static void initialization();
+    static void uninitialization();
+
     static void setCurrentLocale(const QLocale &locale);
     static QLocale currentLocale();
     static QLocale defaultCurrentLocale();
+
+    static void setCustomStyleIndex(int styleIndex);
+    static int customStyleIndex();
+    static int defaultCustomStyleIndex();
 
     static void setCameraDetectionEnable(bool isEnable);
     static bool isCameraDetectionEnable();
