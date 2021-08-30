@@ -36,6 +36,7 @@
 #include <WebCamFS/CameraSettingsDialog>
 #include <WebCamFS/CameraUserSettingsModel>
 #include <WebCamFS/CameraDefaultSettingsModel>
+#include <WebCamFS/ChangeUserCameraSettingDialog>
 
 class FSCameraUserSettingsDialogPrivate
 {
@@ -371,50 +372,25 @@ void FSCameraUserSettingsDialog::execCameraUserSettingsDialog(const QModelIndex 
     if (devicePath.isEmpty())
         return;
 
-    QDialog dialog;
-
     FSCamera *camera = d->camerasStorage->findCameraByDevicePath(devicePath);
 
-    if (camera && !camera->name().isEmpty())
-        dialog.setWindowTitle(tr("Change camera user settings") + " \"" + camera->name() + "\"");
-    else
-        dialog.setWindowTitle(tr("Change camera user settings"));
+    FSChangeUserCameraSettingDialog dialog;
+    dialog.setCamera(camera);
 
-    dialog.setWindowFlags(dialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
-
-    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
-    connect(&buttonBox, &QDialogButtonBox::accepted,
-            &dialog,    &QDialog::accept);
-    connect(&buttonBox, &QDialogButtonBox::rejected,
-            &dialog,    &QDialog::reject);
-
-    QLabel label(tr("User name"), &dialog);
-    QLineEdit lineEdit(d->camerasStorage->getCameraUserName(devicePath), &dialog);
-
-    QCheckBox checkBox(tr("Blacklisted"), &dialog);
-    checkBox.setLayoutDirection(Qt::RightToLeft);
-
-    if (camerasStorage()->isContaintsBlackList(devicePath))
-        checkBox.setCheckState(Qt::Checked);
-    else
-        checkBox.setCheckState(Qt::Unchecked);
-
-    QGridLayout layout(&dialog);
-    layout.addWidget(&label, 0, 0);
-    layout.addWidget(&lineEdit, 0, 1);
-    layout.addWidget(&checkBox, 1, 0, 1, 2);
-    layout.addWidget(&buttonBox, 2, 0, 1, 2);
-    dialog.setLayout(&layout);
+    if (!camera) {
+        dialog.setUserName(d->camerasStorage->getCameraUserName(devicePath));
+        dialog.setBlacklisted(d->camerasStorage->isContaintsBlackList(devicePath));
+    }
 
 dialog_exec:
     int res = dialog.exec();
 
     if (res == QDialog::Accepted) {
-        if (!d->camerasStorage->setCameraUserName(devicePath, lineEdit.text())) {
+        if (!d->camerasStorage->setCameraUserName(devicePath, dialog.userName())) {
             goto dialog_exec;
         }
 
-        if (checkBox.isChecked())
+        if (dialog.isBlacklisted())
             d->camerasStorage->insertBlackList(devicePath);
         else
             d->camerasStorage->removeBlackList(devicePath);

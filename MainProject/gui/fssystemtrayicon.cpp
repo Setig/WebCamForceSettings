@@ -525,10 +525,6 @@ void FSSystemTrayIcon::execSettingsDialog()
     }
 
     d->settingsDialog = new FSSettingsDialog();
-    d->settingsDialog->setAttribute(Qt::WA_DeleteOnClose, true);
-
-    connect(d->settingsDialog, SIGNAL(destroyed(QObject*)),
-            this,                SLOT(removeSettingsDialog(QObject*)));
 
     FSAutoStartLastError isAutoStartLastError;
     const bool isAutoStart = FSAutoStart::isAutoStart(&isAutoStartLastError);
@@ -591,6 +587,9 @@ void FSSystemTrayIcon::execSettingsDialog()
         updateSettingsDialogs();
         updateLockPropertiesManager();
     }
+
+    delete d->settingsDialog;
+    d->settingsDialog = nullptr;
 }
 
 void FSSystemTrayIcon::execUserSettingsDialog()
@@ -894,12 +893,6 @@ void FSSystemTrayIcon::removeOpenedCameraSettingsDialog(QObject *object)
 
     d->umapCameraAndOpenedCameraSettingsDialog.erase(camera);
     d->umapOpenedCameraSettingsDialogAndCamera.erase(iterator);
-}
-
-void FSSystemTrayIcon::removeSettingsDialog(QObject *object)
-{
-    if (d->settingsDialog && object == d->settingsDialog)
-        d->settingsDialog = nullptr;
 }
 
 void FSSystemTrayIcon::removeUserSettingsDialog(QObject *object)

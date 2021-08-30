@@ -41,6 +41,7 @@
 #include <WebCamFS/CamerasStorage>
 #include <WebCamFS/TranslationsHelper>
 #include <WebCamFS/LockPropertiesManager>
+#include <WebCamFS/RenamePresetNameDialog>
 
 #define MAX_FS_CAMERA_FREE_PRESET_COUNT 1000
 #define MAX_FS_CAMERA_PROPERTY_COUNT    1000
@@ -2034,30 +2035,14 @@ void FSCameraSettingsDialog::removeCurrentPreset()
 
 void FSCameraSettingsDialog::execRenameCurrentPresetName()
 {
-    QDialog dialog;
-    dialog.setWindowTitle(tr("Change preset name"));
-    dialog.setWindowFlags(dialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
-
-    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
-    connect(&buttonBox, &QDialogButtonBox::accepted,
-            &dialog,    &QDialog::accept);
-    connect(&buttonBox, &QDialogButtonBox::rejected,
-            &dialog,    &QDialog::reject);
-
-    QLabel label(tr("Preset name"), &dialog);
-    QLineEdit lineEdit(d->currentPresetName, &dialog);
-
-    QGridLayout layout(&dialog);
-    layout.addWidget(&label, 0, 0);
-    layout.addWidget(&lineEdit, 0, 1);
-    layout.addWidget(&buttonBox, 1, 0, 1, 2);
-    dialog.setLayout(&layout);
+    FSRenamePresetNameDialog dialog;
+    dialog.setPresetName(d->currentPresetName);
 
 dialog_exec:
     int res = dialog.exec();
 
     if (res == QDialog::Accepted) {
-        if (!renameCurrentPresetName(lineEdit.text())) {
+        if (!renameCurrentPresetName(dialog.presetName())) {
             goto dialog_exec;
         }
     }

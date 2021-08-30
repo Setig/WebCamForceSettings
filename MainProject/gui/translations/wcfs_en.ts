@@ -4,22 +4,22 @@
 <context>
     <name>FSCameraDefaultSettingsModel</name>
     <message>
-        <location filename="../fscameradefaultsettingsmodel.cpp" line="8"/>
+        <location filename="../fscameradefaultsettingsmodel.cpp" line="119"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../fscameradefaultsettingsmodel.cpp" line="8"/>
+        <location filename="../fscameradefaultsettingsmodel.cpp" line="119"/>
         <source>Is connected</source>
         <translation>Is connected</translation>
     </message>
     <message>
-        <location filename="../fscameradefaultsettingsmodel.cpp" line="8"/>
+        <location filename="../fscameradefaultsettingsmodel.cpp" line="119"/>
         <source>Is exist default settings</source>
         <translation>Is exist default settings</translation>
     </message>
     <message>
-        <location filename="../fscameradefaultsettingsmodel.cpp" line="8"/>
+        <location filename="../fscameradefaultsettingsmodel.cpp" line="119"/>
         <source>Default settings count</source>
         <translation>Default settings count</translation>
     </message>
@@ -27,22 +27,22 @@
 <context>
     <name>FSCameraPresetsModel</name>
     <message>
-        <location filename="../fscamerapresetsmodel.cpp" line="8"/>
+        <location filename="../fscamerapresetsmodel.cpp" line="119"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../fscamerapresetsmodel.cpp" line="8"/>
+        <location filename="../fscamerapresetsmodel.cpp" line="119"/>
         <source>Is connected</source>
         <translation>Is connected</translation>
     </message>
     <message>
-        <location filename="../fscamerapresetsmodel.cpp" line="8"/>
+        <location filename="../fscamerapresetsmodel.cpp" line="119"/>
         <source>Is exist presets</source>
         <translation>Is exist presets</translation>
     </message>
     <message>
-        <location filename="../fscamerapresetsmodel.cpp" line="8"/>
+        <location filename="../fscamerapresetsmodel.cpp" line="119"/>
         <source>Presets count</source>
         <translation>Presets count</translation>
     </message>
@@ -96,149 +96,147 @@
         <translation>Rename</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="23"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="49"/>
         <source>Preset %1</source>
         <translation>Preset %1</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="24"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="50"/>
         <source>&lt;New preset&gt;</source>
         <translation>&lt;New preset&gt;</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="26"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="52"/>
         <source>50 Hz</source>
         <translation>50 Hz</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="27"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="53"/>
         <source>60 Hz</source>
         <translation>60 Hz</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="34"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="60"/>
         <source>Brightness</source>
         <translation>Brightness</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="36"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="62"/>
         <source>Contrast</source>
         <translation>Contrast</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="38"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="64"/>
         <source>Hue</source>
         <translation>Hue</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="40"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="66"/>
         <source>Saturation</source>
         <translation>Saturation</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="42"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="68"/>
         <source>Sharpness</source>
         <translation>Sharpness</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="44"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="70"/>
         <source>Gamma</source>
         <translation>Gamma</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="46"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="72"/>
         <source>Color enable</source>
         <translation>Color enable</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="48"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="74"/>
         <source>White balance</source>
         <translation>White balance</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="50"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="76"/>
         <source>Backlight compensation</source>
         <translation>Backlight compensation</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="52"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="78"/>
         <source>Gain</source>
         <translation>Gain</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="54"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="80"/>
         <source>Powerline frequency</source>
         <translation>Powerline frequency</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="56"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="82"/>
         <source>Pan</source>
         <translation>Pan</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="58"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="84"/>
         <source>Tilt</source>
         <translation>Tilt</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="60"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="86"/>
         <source>Roll</source>
         <translation>Roll</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="62"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="88"/>
         <source>Zoom</source>
         <translation>Zoom</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="64"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="90"/>
         <source>Exposure</source>
         <translation>Exposure</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="66"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="92"/>
         <source>Iris</source>
         <translation>Iris</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="68"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="94"/>
         <source>Focus</source>
         <translation>Focus</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="1346"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="1391"/>
         <source>Empty presets</source>
         <translation>Empty presets</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="1347"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="1392"/>
         <source>Empty presets found and will be deleted. Continue and delete empty presets?</source>
         <translation>Empty presets found and will be deleted. Continue and delete empty presets?</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="1359"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="1404"/>
         <source>Empty preset list: %1</source>
         <translation>Empty preset list: %1</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="1728"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="1779"/>
         <source>Invalid preset names</source>
         <translation>Invalid preset names</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="1729"/>
+        <location filename="../fscamerasettingsdialog.cpp" line="1780"/>
         <source>There is already such a name &quot;%1&quot;!</source>
         <translation>There is already such a name &quot;%1&quot;!</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="1973"/>
         <source>Change preset name</source>
-        <translation>Change preset name</translation>
+        <translation type="vanished">Change preset name</translation>
     </message>
     <message>
-        <location filename="../fscamerasettingsdialog.cpp" line="1982"/>
         <source>Preset name</source>
-        <translation>Preset name</translation>
+        <translation type="vanished">Preset name</translation>
     </message>
 </context>
 <context>
@@ -255,8 +253,6 @@
     </message>
     <message>
         <location filename="../fscamerausersettingsdialog.ui" line="30"/>
-        <location filename="../fscamerausersettingsdialog.cpp" line="347"/>
-        <location filename="../fscamerausersettingsdialog.cpp" line="349"/>
         <source>Change camera user settings</source>
         <translation>Change camera user settings</translation>
     </message>
@@ -301,42 +297,71 @@
         <translation>Clear presets</translation>
     </message>
     <message>
-        <location filename="../fscamerausersettingsdialog.cpp" line="359"/>
         <source>User name</source>
-        <translation>User name</translation>
+        <translation type="vanished">User name</translation>
     </message>
     <message>
-        <location filename="../fscamerausersettingsdialog.cpp" line="362"/>
         <source>Blacklisted</source>
-        <translation>Blacklisted</translation>
+        <translation type="vanished">Blacklisted</translation>
     </message>
 </context>
 <context>
     <name>FSCameraUserSettingsModel</name>
     <message>
-        <location filename="../fscamerausersettingsmodel.cpp" line="8"/>
+        <location filename="../fscamerausersettingsmodel.cpp" line="167"/>
         <source>Path</source>
         <translation>Path</translation>
     </message>
     <message>
-        <location filename="../fscamerausersettingsmodel.cpp" line="8"/>
+        <location filename="../fscamerausersettingsmodel.cpp" line="167"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../fscamerausersettingsmodel.cpp" line="8"/>
+        <location filename="../fscamerausersettingsmodel.cpp" line="167"/>
         <source>Is connected</source>
         <translation>Is connected</translation>
     </message>
     <message>
-        <location filename="../fscamerausersettingsmodel.cpp" line="8"/>
+        <location filename="../fscamerausersettingsmodel.cpp" line="167"/>
         <source>Blacklisted</source>
         <translation>Blacklisted</translation>
     </message>
     <message>
-        <location filename="../fscamerausersettingsmodel.cpp" line="8"/>
+        <location filename="../fscamerausersettingsmodel.cpp" line="167"/>
         <source>User name</source>
         <translation>User name</translation>
+    </message>
+</context>
+<context>
+    <name>FSChangeUserCameraSettingDialog</name>
+    <message>
+        <location filename="../fschangeusercamerasettingdialog.ui" line="14"/>
+        <source>Change camera user settings</source>
+        <translation>Change camera user settings</translation>
+    </message>
+    <message>
+        <location filename="../fschangeusercamerasettingdialog.ui" line="33"/>
+        <source>User name</source>
+        <translation>User name</translation>
+    </message>
+    <message>
+        <location filename="../fschangeusercamerasettingdialog.ui" line="46"/>
+        <source>Blacklisted</source>
+        <translation>Blacklisted</translation>
+    </message>
+</context>
+<context>
+    <name>FSRenamePresetNameDialog</name>
+    <message>
+        <location filename="../fsrenamepresetnamedialog.ui" line="14"/>
+        <source>Change preset name</source>
+        <translation>Change preset name</translation>
+    </message>
+    <message>
+        <location filename="../fsrenamepresetnamedialog.ui" line="33"/>
+        <source>Preset name</source>
+        <translation>Preset name</translation>
     </message>
 </context>
 <context>
@@ -347,42 +372,42 @@
         <translation>Settings dialog</translation>
     </message>
     <message>
-        <location filename="../fssettingsdialog.ui" line="147"/>
+        <location filename="../fssettingsdialog.ui" line="221"/>
         <source>Camera detection enable</source>
         <translation>Camera detection enable</translation>
     </message>
     <message>
-        <location filename="../fssettingsdialog.ui" line="154"/>
+        <location filename="../fssettingsdialog.ui" line="53"/>
         <source>Camera value update interval (msec)</source>
         <translation>Camera property value update interval (msec)</translation>
     </message>
     <message>
-        <location filename="../fssettingsdialog.ui" line="212"/>
+        <location filename="../fssettingsdialog.ui" line="95"/>
         <source>Language:</source>
         <translation>Language:</translation>
     </message>
     <message>
-        <location filename="../fssettingsdialog.ui" line="65"/>
+        <location filename="../fssettingsdialog.ui" line="111"/>
         <source>Is lock properties</source>
         <translation>Is lock properties</translation>
     </message>
     <message>
-        <location filename="../fssettingsdialog.ui" line="180"/>
+        <location filename="../fssettingsdialog.ui" line="208"/>
         <source>Lock properties interval (msec)</source>
         <translation>Lock properties interval (msec)</translation>
     </message>
     <message>
-        <location filename="../fssettingsdialog.ui" line="95"/>
+        <location filename="../fssettingsdialog.ui" line="185"/>
         <source>Is camera value update</source>
         <translation>Is camera property value update</translation>
     </message>
     <message>
-        <location filename="../fssettingsdialog.ui" line="72"/>
+        <location filename="../fssettingsdialog.ui" line="33"/>
         <source>Run along with the OS</source>
         <translation>Run along with the OS</translation>
     </message>
     <message>
-        <location filename="../fssettingsdialog.ui" line="36"/>
+        <location filename="../fssettingsdialog.ui" line="20"/>
         <source>Camera detection interval (msec)</source>
         <translation>Camera detection interval (msec)</translation>
     </message>
@@ -390,142 +415,142 @@
 <context>
     <name>FSSystemTrayIcon</name>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="22"/>
+        <location filename="../fssystemtrayicon.cpp" line="45"/>
         <source>Manual</source>
         <translation>Manual</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="128"/>
+        <location filename="../fssystemtrayicon.cpp" line="181"/>
         <source>Main menu</source>
         <translation>Main menu</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="132"/>
+        <location filename="../fssystemtrayicon.cpp" line="183"/>
         <source>About...</source>
         <translation>About...</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="133"/>
+        <location filename="../fssystemtrayicon.cpp" line="184"/>
         <source>About Qt...</source>
         <translation>About Qt...</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="135"/>
+        <location filename="../fssystemtrayicon.cpp" line="186"/>
         <source>Camera settings</source>
         <translation>Camera settings</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="140"/>
+        <location filename="../fssystemtrayicon.cpp" line="191"/>
         <source>Application settings...</source>
         <translation>Application settings...</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="141"/>
+        <location filename="../fssystemtrayicon.cpp" line="192"/>
         <source>User settings...</source>
         <translation>User settings...</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="143"/>
+        <location filename="../fssystemtrayicon.cpp" line="194"/>
         <source>Exit</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="154"/>
+        <location filename="../fssystemtrayicon.cpp" line="197"/>
         <source>WebCam force settings</source>
         <translation>WebCam force settings</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="172"/>
+        <location filename="../fssystemtrayicon.cpp" line="716"/>
         <source>Lock properties pause</source>
         <translation>Lock properties pause</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="173"/>
+        <location filename="../fssystemtrayicon.cpp" line="717"/>
         <source>for 5 minutes</source>
         <translation>for 5 minutes</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="174"/>
+        <location filename="../fssystemtrayicon.cpp" line="718"/>
         <source>for 15 minutes</source>
         <translation>for 15 minutes</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="175"/>
+        <location filename="../fssystemtrayicon.cpp" line="719"/>
         <source>for 30 minutes</source>
         <translation>for 30 minutes</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="176"/>
+        <location filename="../fssystemtrayicon.cpp" line="720"/>
         <source>for 1 hour</source>
         <translation>for 1 hour</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="177"/>
+        <location filename="../fssystemtrayicon.cpp" line="721"/>
         <source>for 2 hours</source>
         <translation>for 2 hours</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="178"/>
+        <location filename="../fssystemtrayicon.cpp" line="722"/>
         <source>for 4 hours</source>
         <translation>for 4 hours</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="179"/>
+        <location filename="../fssystemtrayicon.cpp" line="723"/>
         <source>for 12 hours</source>
         <translation>for 12 hours</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="180"/>
+        <location filename="../fssystemtrayicon.cpp" line="724"/>
         <source>for 24 hours</source>
         <translation>for 24 hours</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="191"/>
+        <location filename="../fssystemtrayicon.cpp" line="735"/>
         <source>Lock properties restore</source>
         <translation>Lock properties restore</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="354"/>
+        <location filename="../fssystemtrayicon.cpp" line="347"/>
         <source>Show current settings</source>
         <translation>Show current settings</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="466"/>
+        <location filename="../fssystemtrayicon.cpp" line="484"/>
         <source>&lt;h3&gt;About %1&lt;/h3&gt;&lt;p&gt;Library version: %2&lt;/p&gt;&lt;p&gt;Application version: %3&lt;/p&gt;</source>
         <translation>&lt;h3&gt;About %1&lt;/h3&gt;&lt;p&gt;Library version: %2&lt;/p&gt;&lt;p&gt;Application version: %3&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="471"/>
+        <location filename="../fssystemtrayicon.cpp" line="489"/>
         <source>&lt;p&gt;The application is designed to work with webcam settings:&lt;/p&gt;&lt;p&gt; * change the settings of any webcam in the system while the camera is running;&lt;/p&gt;&lt;p&gt; * block the properties of the webcam if a third-party application resets certain parameters;&lt;/p&gt;&lt;p&gt; * switch between prepared webcam presets.&lt;/p&gt;&lt;p&gt;Author by %3.</source>
         <translation>&lt;p&gt;The application is designed to work with webcam settings:&lt;/p&gt;&lt;p&gt; * change the settings of any webcam in the system while the camera is running;&lt;/p&gt;&lt;p&gt; * block the properties of the webcam if a third-party application resets certain parameters;&lt;/p&gt;&lt;p&gt; * switch between prepared webcam presets.&lt;/p&gt;&lt;p&gt;Author by %3.</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="480"/>
+        <location filename="../fssystemtrayicon.cpp" line="498"/>
         <source>About %1...</source>
         <translation>About %1...</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="494"/>
+        <location filename="../fssystemtrayicon.cpp" line="512"/>
         <source>Used side projects: %1.</source>
         <translation>Used side projects: %1.</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="543"/>
+        <location filename="../fssystemtrayicon.cpp" line="573"/>
         <source>Set auto start error</source>
         <translation>Set auto start error</translation>
     </message>
     <message>
-        <location filename="../fssystemtrayicon.cpp" line="544"/>
+        <location filename="../fssystemtrayicon.cpp" line="574"/>
         <source>Failed to change auto start state(step=%1, error=%2).</source>
         <translation>Failed to change auto start state(step=%1, error=%2).</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="178"/>
+        <location filename="../main.cpp" line="217"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="179"/>
+        <location filename="../main.cpp" line="218"/>
         <source>The application is already running.</source>
         <translation>The application is already running.</translation>
     </message>

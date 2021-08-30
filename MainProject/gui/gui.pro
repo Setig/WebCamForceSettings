@@ -20,8 +20,10 @@ SOURCES += \
         fscamerapresetsmodel.cpp \
         fscamerausersettingsdialog.cpp \
         fscamerausersettingsmodel.cpp \
+        fschangeusercamerasettingdialog.cpp \
         fsitemdelegate.cpp \
         fscamerasettingsdialog.cpp \
+        fsrenamepresetnamedialog.cpp \
         fssettings.cpp \
         fscamerasstorage.cpp \
         fsiconcreator.cpp \
@@ -38,9 +40,11 @@ HEADERS += \
     fscamerapresetsmodel.h \
     fscamerausersettingsdialog.h \
     fscamerausersettingsmodel.h \
+    fschangeusercamerasettingdialog.h \
     fsitemdelegate.h \
     fscamerasettingsdialog.h \
     fsiconcreator.h \
+    fsrenamepresetnamedialog.h \
     fssettings.h \
     fscamerasstorage.h \
     fslockpropertiesmanager.h \
@@ -61,11 +65,15 @@ HEADERS += \
     ../include/WebCamFS/SystemTrayIcon \
     ../include/WebCamFS/AutoStart \
     ../include/WebCamFS/TranslationsHelper \
+    ../include/WebCamFS/RenamePresetNameDialog \
+    ../include/WebCamFS/ChangeUserCameraSettingDialog \
     fstranslationshelper.h
 
 FORMS += \
     fscamerasettingsdialog.ui \
     fscamerausersettingsdialog.ui \
+    fschangeusercamerasettingdialog.ui \
+    fsrenamepresetnamedialog.ui \
     fssettingsdialog.ui
 
 OTHER_FILES += \
