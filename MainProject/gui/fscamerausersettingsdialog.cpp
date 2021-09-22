@@ -34,7 +34,9 @@
 #include <WebCamFS/TranslationsHelper>
 #include <WebCamFS/CameraPresetsModel>
 #include <WebCamFS/CameraSettingsDialog>
+#include <WebCamFS/LockPropertiesManager>
 #include <WebCamFS/CameraUserSettingsModel>
+#include <WebCamFS/CameraLockPropertiesModel>
 #include <WebCamFS/CameraDefaultSettingsModel>
 #include <WebCamFS/ChangeUserCameraSettingDialog>
 
@@ -48,10 +50,12 @@ public:
     FSCameraUserSettingsModel    *cameraUserSettingsModel;
     FSCameraDefaultSettingsModel *cameraDefaultSettingsModel;
     FSCameraPresetsModel         *cameraPresetsModel;
+    FSCameraLockPropertiesModel  *cameraLockPropertiesModel;
 
     QSortFilterProxyModel *cameraUserSettingsProxyModel;
     QSortFilterProxyModel *cameraDefaultSettingsProxyModel;
     QSortFilterProxyModel *cameraPresetsProxyModel;
+    QSortFilterProxyModel *cameraLockPropertiesProxyModel;
 };
 
 FSCameraUserSettingsDialogPrivate::FSCameraUserSettingsDialogPrivate()
@@ -59,9 +63,11 @@ FSCameraUserSettingsDialogPrivate::FSCameraUserSettingsDialogPrivate()
     , cameraUserSettingsModel(nullptr)
     , cameraDefaultSettingsModel(nullptr)
     , cameraPresetsModel(nullptr)
+    , cameraLockPropertiesModel(nullptr)
     , cameraUserSettingsProxyModel(nullptr)
     , cameraDefaultSettingsProxyModel(nullptr)
     , cameraPresetsProxyModel(nullptr)
+    , cameraLockPropertiesProxyModel(nullptr)
 {
 
 }
@@ -80,10 +86,12 @@ FSCameraUserSettingsDialog::~FSCameraUserSettingsDialog()
     delete d->cameraUserSettingsProxyModel;
     delete d->cameraDefaultSettingsProxyModel;
     delete d->cameraPresetsProxyModel;
+    delete d->cameraLockPropertiesProxyModel;
 
     delete d->cameraUserSettingsModel;
     delete d->cameraDefaultSettingsModel;
     delete d->cameraPresetsModel;
+    delete d->cameraLockPropertiesModel;
 
     delete d;
     d = nullptr;
@@ -96,11 +104,23 @@ void FSCameraUserSettingsDialog::setCamerasStorage(FSCamerasStorage *camerasStor
     d->cameraUserSettingsModel->setCamerasStorage(camerasStorage);
     d->cameraDefaultSettingsModel->setCamerasStorage(camerasStorage);
     d->cameraPresetsModel->setCamerasStorage(camerasStorage);
+    d->cameraLockPropertiesModel->setCamerasStorage(camerasStorage);
 }
 
 FSCamerasStorage *FSCameraUserSettingsDialog::camerasStorage() const
 {
     return d->camerasStorage;
+}
+
+void FSCameraUserSettingsDialog::setLockPropertiesManager(FSLockPropertiesManager *lockPropertiesManager)
+{
+    d->cameraLockPropertiesModel->setLockPropertiesManager(lockPropertiesManager);
+    ui->tabWidget->setTabEnabled(ui->tabWidget->indexOf(ui->tabLockProperties), lockPropertiesManager != nullptr);
+}
+
+FSLockPropertiesManager *FSCameraUserSettingsDialog::lockPropertiesManager() const
+{
+    return d->cameraLockPropertiesModel->lockPropertiesManager();
 }
 
 void FSCameraUserSettingsDialog::init()
@@ -122,6 +142,8 @@ void FSCameraUserSettingsDialog::init()
             this,                                  SLOT(on_pushButtonChangeDefaultSettings()));
     connect(ui->pushButtonChangePresets, SIGNAL(clicked()),
             this,                          SLOT(on_pushButtonChangePresets()));
+    connect(ui->pushButtonChangeLockProperties, SIGNAL(clicked()),
+            this,                                 SLOT(on_pushButtonChangeLockProperties()));
 
     connect(ui->pushButtonClearCameraUserSettings, SIGNAL(clicked()),
             this,                                    SLOT(on_pushButtonClearCameraUserSettings()));
@@ -129,11 +151,14 @@ void FSCameraUserSettingsDialog::init()
             this,                                 SLOT(on_pushButtonClearDefaultSettings()));
     connect(ui->pushButtonClearPresets, SIGNAL(clicked()),
             this,                         SLOT(on_pushButtonClearPresets()));
+    connect(ui->pushButtonClearLockProperties, SIGNAL(clicked()),
+            this,                                SLOT(on_pushButtonClearLockProperties()));
 
     FSItemDelegate *itemDelegate = new FSItemDelegate(this);
     ui->treeViewCameraUserSettings->setItemDelegate(itemDelegate);
     ui->treeViewDefaultSettings->setItemDelegate(itemDelegate);
     ui->treeViewPresets->setItemDelegate(itemDelegate);
+    ui->treeViewLockProperties->setItemDelegate(itemDelegate);
 
     d->cameraUserSettingsModel = new FSCameraUserSettingsModel(this);
     d->cameraUserSettingsProxyModel = new QSortFilterProxyModel(d->cameraUserSettingsModel);
@@ -175,18 +200,35 @@ void FSCameraUserSettingsDialog::init()
     connect(ui->treeViewPresets->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)),
             this,                                    SLOT(updateButtonsChangePresets()));
 
+    d->cameraLockPropertiesModel = new FSCameraLockPropertiesModel(this);
+    d->cameraLockPropertiesProxyModel = new QSortFilterProxyModel(d->cameraLockPropertiesModel);
+    d->cameraLockPropertiesProxyModel->setSourceModel(d->cameraLockPropertiesModel);
+    ui->treeViewLockProperties->setModel(d->cameraLockPropertiesProxyModel);
+    ui->treeViewLockProperties->setSortingEnabled(true);
+    ui->treeViewLockProperties->setTreePosition(d->cameraLockPropertiesModel->columnCount()); // Skip tree offset
+    ui->treeViewLockProperties->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->treeViewLockProperties->sortByColumn(1, Qt::DescendingOrder);
+
+    connect(ui->treeViewLockProperties->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)),
+            this,                                           SLOT(updateButtonsLockProperties()));
+
     connect(ui->treeViewCameraUserSettings, SIGNAL(doubleClicked(QModelIndex)),
             this,                             SLOT(execCameraUserSettingsDialog(QModelIndex)));
     connect(ui->treeViewDefaultSettings, SIGNAL(doubleClicked(QModelIndex)),
             this,                          SLOT(execDefaultSettingsDialog(QModelIndex)));
     connect(ui->treeViewPresets, SIGNAL(doubleClicked(QModelIndex)),
             this,                  SLOT(execPresetSettingsDialog(QModelIndex)));
+    connect(ui->treeViewLockProperties, SIGNAL(doubleClicked(QModelIndex)),
+            this,                         SLOT(execLockPropertiesDialog(QModelIndex)));
 
     updateButtonsChangeCameraUserSettings();
     updateButtonsChangeDefaultSettings();
     updateButtonsChangePresets();
+    updateButtonsLockProperties();
 
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
+    ui->tabWidget->setTabEnabled(ui->tabWidget->indexOf(ui->tabLockProperties), false);
 }
 
 void FSCameraUserSettingsDialog::retranslate()
@@ -207,6 +249,8 @@ void FSCameraUserSettingsDialog::updateTabData(int index)
         d->cameraDefaultSettingsModel->updateDevices();
     } else if (widget == ui->tabPresets) {
         d->cameraPresetsModel->updateDevices();
+    } else if (widget == ui->tabLockProperties) {
+        d->cameraLockPropertiesModel->updateDevices();
     }
 }
 
@@ -276,6 +320,28 @@ void FSCameraUserSettingsDialog::updateButtonsChangePresets()
     ui->pushButtonClearPresets->setEnabled(false);
 }
 
+void FSCameraUserSettingsDialog::updateButtonsLockProperties()
+{
+    if (d->camerasStorage) {
+        QModelIndex currentIndex = ui->treeViewLockProperties->currentIndex();
+
+        if (currentIndex.isValid()) {
+            currentIndex = d->cameraLockPropertiesProxyModel->mapToSource(currentIndex);
+        }
+
+        if (currentIndex.isValid()) {
+            const QString currentDevicePath = d->cameraLockPropertiesModel->devicePath(currentIndex);
+
+            ui->pushButtonChangeLockProperties->setEnabled(ui->treeViewLockProperties->currentIndex().isValid());
+            ui->pushButtonClearLockProperties->setEnabled(d->camerasStorage->isCameraUserPresetsUsed(currentDevicePath));
+            return;
+        }
+    }
+
+    ui->pushButtonChangeLockProperties->setEnabled(false);
+    ui->pushButtonClearLockProperties->setEnabled(false);
+}
+
 void FSCameraUserSettingsDialog::on_pushButtonChangeCameraUserSettings()
 {
     execCameraUserSettingsDialog(ui->treeViewCameraUserSettings->currentIndex());
@@ -289,6 +355,11 @@ void FSCameraUserSettingsDialog::on_pushButtonChangeDefaultSettings()
 void FSCameraUserSettingsDialog::on_pushButtonChangePresets()
 {
     execPresetSettingsDialog(ui->treeViewPresets->currentIndex());
+}
+
+void FSCameraUserSettingsDialog::on_pushButtonChangeLockProperties()
+{
+    execLockPropertiesDialog(ui->treeViewLockProperties->currentIndex());
 }
 
 void FSCameraUserSettingsDialog::on_pushButtonClearCameraUserSettings()
@@ -309,7 +380,7 @@ void FSCameraUserSettingsDialog::on_pushButtonClearCameraUserSettings()
 
     if (!currentDevicePath.isEmpty()) {
         d->camerasStorage->cameraUserNameRemove(currentDevicePath);
-        d->cameraUserSettingsModel->updateRow(currentDevicePath);
+        d->cameraUserSettingsModel->emitDataByRow(currentDevicePath);
     }
 }
 
@@ -331,7 +402,7 @@ void FSCameraUserSettingsDialog::on_pushButtonClearDefaultSettings()
 
     if (!currentDevicePath.isEmpty()) {
         d->camerasStorage->userDefaultValuesRemove(currentDevicePath);
-        d->cameraDefaultSettingsModel->updateRow(currentDevicePath);
+        d->cameraDefaultSettingsModel->emitDataByRow(currentDevicePath);
     }
 }
 
@@ -353,7 +424,36 @@ void FSCameraUserSettingsDialog::on_pushButtonClearPresets()
 
     if (!currentDevicePath.isEmpty()) {
         d->camerasStorage->cameraUserPresetsRemove(currentDevicePath);
-        d->cameraPresetsModel->updateRow(currentDevicePath);
+        d->cameraPresetsModel->emitDataByRow(currentDevicePath);
+    }
+}
+
+void FSCameraUserSettingsDialog::on_pushButtonClearLockProperties()
+{
+    FSLockPropertiesManager *lockPropertiesManager = d->cameraLockPropertiesModel->lockPropertiesManager();
+
+    if (!lockPropertiesManager)
+        return;
+
+    QModelIndex currentIndex = ui->treeViewLockProperties->currentIndex();
+
+    if (currentIndex.isValid()) {
+        currentIndex = d->cameraLockPropertiesProxyModel->mapToSource(currentIndex);
+    }
+
+    if (!currentIndex.isValid())
+        return;
+
+    const QString currentDevicePath = d->cameraLockPropertiesModel->devicePath(currentIndex);
+
+    if (!currentDevicePath.isEmpty()) {
+        if (lockPropertiesManager->isContaintsPresetLock(currentDevicePath))
+            lockPropertiesManager->presetUnlockProperies(currentDevicePath);
+
+        if (lockPropertiesManager->isContaintsManualLockProperties(currentDevicePath))
+            lockPropertiesManager->manualUnlockProperties(currentDevicePath);
+
+        d->cameraPresetsModel->emitDataByRow(currentDevicePath);
     }
 }
 
@@ -449,4 +549,22 @@ void FSCameraUserSettingsDialog::execPresetSettingsDialog(const QModelIndex &ind
         dialog.sendValuesToCameraStorage();
         updateButtonsChangePresets();
     }
+}
+
+void FSCameraUserSettingsDialog::execLockPropertiesDialog(const QModelIndex &index)
+{
+    if (!index.isValid())
+        return;
+
+    const QModelIndex sourceIndex = d->cameraLockPropertiesProxyModel->mapToSource(index);
+
+    if (!sourceIndex.isValid())
+        return;
+
+    const DevicePath devicePath = d->cameraLockPropertiesModel->devicePath(sourceIndex);
+
+    if (devicePath.isEmpty())
+        return;
+
+    emit showCameraSettingsDialog(devicePath);
 }

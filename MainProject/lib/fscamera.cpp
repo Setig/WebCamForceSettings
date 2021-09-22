@@ -40,6 +40,9 @@
 #include <WebCamFS/Settings>
 #include <WebCamFS/CoreCamerasStorage>
 
+#define INFORMATIVE_IUNKNOWN_RELEASE(object) \
+    FSCameraPrivate::informativeIUnknownRelease(object, __LINE__)
+
 class FSCameraPrivate
 {
 public:
@@ -68,6 +71,8 @@ public:
     static DevicePath getDevicePath(IPropertyBag *pPropBag);
 
     static bool propertiesIsAvailable(IGraphBuilder *pGraph, IBaseFilter *pCap);
+
+    static inline void informativeIUnknownRelease(IUnknown *object, uint line);
 };
 
 FSCameraPrivate::FSCameraPrivate()
@@ -185,8 +190,8 @@ HRESULT FSCameraPrivate::initCaptureGraphBuilder(IGraphBuilder **ppGraph,
             } else {
                 qWarning("Unexpected return value (%ld) for \"ICaptureGraphBuilder2::SetFiltergraph(IGraphBuilder *)\" function!", hr);
 
-                pBuild->Release();
-                pGraph->Release();
+                INFORMATIVE_IUNKNOWN_RELEASE(pBuild);
+                INFORMATIVE_IUNKNOWN_RELEASE(pGraph);
             }
 
             return hr;
@@ -194,7 +199,7 @@ HRESULT FSCameraPrivate::initCaptureGraphBuilder(IGraphBuilder **ppGraph,
         else {
             qWarning("Unexpected return value (%ld) for \"CoCreateInstance(CLSID_FilterGraph, LPUNKNOWN, DWORD, IID_IGraphBuilder, LPVOID *)\" function!", hr);
 
-            pBuild->Release();
+            INFORMATIVE_IUNKNOWN_RELEASE(pBuild);
         }
     } else {
         qWarning("Unexpected return value (%ld) for \"CoCreateInstance(CLSID_CaptureGraphBuilder2, LPUNKNOWN, DWORD, IID_ICaptureGraphBuilder2, LPVOID *)\" function!", hr);
@@ -214,7 +219,7 @@ HRESULT FSCameraPrivate::enumerateDevices(IEnumMoniker **ppEnum)
 
     if (hr == S_OK) {
         hr = pDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, ppEnum, 0);
-        pDevEnum->Release();
+        INFORMATIVE_IUNKNOWN_RELEASE(pDevEnum);
 
         if (hr != S_OK && hr != S_FALSE) {
             qWarning("Unexpected return value (%ld) for \"ICreateDevEnum::CreateClassEnumerator(CLSID_VideoInputDeviceCategory, IEnumMoniker **, DWORD)\" function!", hr);
@@ -277,13 +282,14 @@ bool FSCameraPrivate::propertiesIsAvailable(IGraphBuilder *pGraph, IBaseFilter *
         hr = pCap->QueryInterface(IID_IAMVideoProcAmp, (void**)&pProcAmp);
         if (hr == S_OK) {
             propertiesIsAvailable = true;
-            pProcAmp->Release();
+
+            INFORMATIVE_IUNKNOWN_RELEASE(pProcAmp);
         } else {
             IAMCameraControl *pCameraControl = nullptr;
             hr = pCap->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
             if (hr == S_OK) {
                 propertiesIsAvailable = true;
-                pCameraControl->Release();
+                INFORMATIVE_IUNKNOWN_RELEASE(pCameraControl);
             }
         }
     } else {
@@ -291,6 +297,20 @@ bool FSCameraPrivate::propertiesIsAvailable(IGraphBuilder *pGraph, IBaseFilter *
     }
 
     return propertiesIsAvailable;
+}
+
+void FSCameraPrivate::informativeIUnknownRelease(IUnknown *object, uint line)
+{
+    const ULONG count = object->Release();
+
+#ifdef SHOW_IUNKNOW_RELEASE_INFO
+    if (count != 0) {
+        qInfo("Failed to free IUnknown resources at address \"%p\", count=\'%ld\', line=\'%d\'!", object, count, line);
+    }
+#else
+    Q_UNUSED(line);
+    Q_UNUSED(count);
+#endif // SHOW_IUNKNOW_RELEASE_INFO
 }
 
 FSCamera::FSCamera(const FSCameraData &cameraData)
@@ -369,7 +389,7 @@ void FSCamera::printCamerasInfo()
 
                 hr = pMoniker->BindToStorage(nullptr, nullptr, IID_PPV_ARGS(&pPropBag));
                 if (hr != S_OK) {
-                    pMoniker->Release();
+                    INFORMATIVE_IUNKNOWN_RELEASE(pMoniker);
                     continue;
                 }
 
@@ -433,7 +453,7 @@ void FSCamera::printCamerasInfo()
                                 }
                             }
 
-                            pProcAmp->Release();
+                            INFORMATIVE_IUNKNOWN_RELEASE(pProcAmp);
                         } else {
                             printf("No video proc amp properties!\n");
                         }
@@ -484,7 +504,7 @@ void FSCamera::printCamerasInfo()
                                 }
                             }
 
-                            pCameraControl->Release();
+                            INFORMATIVE_IUNKNOWN_RELEASE(pCameraControl);
                         }
                         else {
                             printf("No camera control properties!\n");
@@ -493,24 +513,24 @@ void FSCamera::printCamerasInfo()
                         printf("Cannot add capture filter!\n");
                     }
 
-                    pCap->Release();
+                    INFORMATIVE_IUNKNOWN_RELEASE(pCap);
                 } else {
                     printf("Cannot create base filter!\n");
                 }
 
                 printf("\n");
 
-                pPropBag->Release();
-                pMoniker->Release();
+                INFORMATIVE_IUNKNOWN_RELEASE(pPropBag);
+                INFORMATIVE_IUNKNOWN_RELEASE(pMoniker);
             }
 
-            pGraph->Release();
-            pBuild->Release();
+            INFORMATIVE_IUNKNOWN_RELEASE(pGraph);
+            INFORMATIVE_IUNKNOWN_RELEASE(pBuild);
         } else {
             printf("Cannot create capture graph builder!\n");
         }
 
-        pEnumMoniker->Release();
+        INFORMATIVE_IUNKNOWN_RELEASE(pEnumMoniker);
     } else {
         if (hr == S_FALSE) {
             printf("No video input devices available!\n");
@@ -535,7 +555,7 @@ FSCamera *FSCamera::findCameraByDevicePath(const DevicePath &devicePath)
 
                 hr = pMoniker->BindToStorage(nullptr, nullptr, IID_PPV_ARGS(&pPropBag));
                 if (hr != S_OK) {
-                    pMoniker->Release();
+                    INFORMATIVE_IUNKNOWN_RELEASE(pMoniker);
                     continue;
                 }
 
@@ -548,28 +568,28 @@ FSCamera *FSCamera::findCameraByDevicePath(const DevicePath &devicePath)
                                                     devicePath,
                                                     pCap);
 
-                            pPropBag->Release();
-                            pMoniker->Release();
-                            pGraph->Release();
-                            pBuild->Release();
-                            pEnumMoniker->Release();
+                            INFORMATIVE_IUNKNOWN_RELEASE(pPropBag);
+                            INFORMATIVE_IUNKNOWN_RELEASE(pMoniker);
+                            INFORMATIVE_IUNKNOWN_RELEASE(pGraph);
+                            INFORMATIVE_IUNKNOWN_RELEASE(pBuild);
+                            INFORMATIVE_IUNKNOWN_RELEASE(pEnumMoniker);
 
                             return new FSCamera(cameraData);
                         } else {
-                            pCap->Release();
+                            INFORMATIVE_IUNKNOWN_RELEASE(pCap);
                         }
                     }
                 }
 
-                pPropBag->Release();
-                pMoniker->Release();
+                INFORMATIVE_IUNKNOWN_RELEASE(pPropBag);
+                INFORMATIVE_IUNKNOWN_RELEASE(pMoniker);
             }
 
-            pGraph->Release();
-            pBuild->Release();
+            INFORMATIVE_IUNKNOWN_RELEASE(pGraph);
+            INFORMATIVE_IUNKNOWN_RELEASE(pBuild);
         }
 
-        pEnumMoniker->Release();
+        INFORMATIVE_IUNKNOWN_RELEASE(pEnumMoniker);
     }
 
     return nullptr;
@@ -595,7 +615,7 @@ FSCamerasDataUMap FSCamera::availableCamerasDataUMap()
 
                 hr = pMoniker->BindToStorage(nullptr, nullptr, IID_PPV_ARGS(&pPropBag));
                 if (hr != S_OK) {
-                    pMoniker->Release();
+                    INFORMATIVE_IUNKNOWN_RELEASE(pMoniker);
                     continue;
                 }
 
@@ -608,19 +628,19 @@ FSCamerasDataUMap FSCamera::availableCamerasDataUMap()
                                                 pCap);
                         result.insert_or_assign(cameraData.devicePath(), cameraData);
                     } else {
-                        pCap->Release();
+                        INFORMATIVE_IUNKNOWN_RELEASE(pCap);
                     }
                 }
 
-                pPropBag->Release();
-                pMoniker->Release();
+                INFORMATIVE_IUNKNOWN_RELEASE(pPropBag);
+                INFORMATIVE_IUNKNOWN_RELEASE(pMoniker);
             }
 
-            pGraph->Release();
-            pBuild->Release();
+            INFORMATIVE_IUNKNOWN_RELEASE(pGraph);
+            INFORMATIVE_IUNKNOWN_RELEASE(pBuild);
         }
 
-        pEnumMoniker->Release();
+        INFORMATIVE_IUNKNOWN_RELEASE(pEnumMoniker);
     }
 
     return result;
@@ -629,7 +649,7 @@ FSCamerasDataUMap FSCamera::availableCamerasDataUMap()
 void FSCamera::releaseCameraData(FSCameraData &cameraData)
 {
     if (cameraData.m_pCap) {
-        cameraData.m_pCap->Release();
+        INFORMATIVE_IUNKNOWN_RELEASE(cameraData.m_pCap);
         cameraData.m_pCap = nullptr;
     }
 }
@@ -729,7 +749,7 @@ bool FSCamera::getRange(FSCameraProperty property, FSRangeParams &rangeParam) co
             }
         }
 
-        pPropertyInterface->Release();
+        INFORMATIVE_IUNKNOWN_RELEASE(pPropertyInterface);
     }
 
     return result;
@@ -770,7 +790,7 @@ bool FSCamera::get(FSCameraProperty property, FSValueParams &valueParams) const
             result = true;
         }
 
-        pPropertyInterface->Release();
+        INFORMATIVE_IUNKNOWN_RELEASE(pPropertyInterface);
     }
 
     return result;
@@ -813,7 +833,7 @@ bool FSCamera::set(FSCameraProperty property, const FSValueParams &valueParams)
             result = true;
         }
 
-        pPropertyInterface->Release();
+        INFORMATIVE_IUNKNOWN_RELEASE(pPropertyInterface);
     }
 
     return result;

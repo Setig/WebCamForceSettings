@@ -26,6 +26,8 @@
 
 #include <unordered_set>
 
+#include <QMutexLocker>
+
 #include <WebCamFS/Settings>
 
 #define MAX_FREE_CAM_NUMBER 1000
@@ -36,6 +38,8 @@ class FSCoreCamerasStoragePrivate
 {
 public:
     FSCoreCamerasStoragePrivate();
+
+    QRecursiveMutex cameraMutex;
 
     FSCameraPathsUMap umapCameraPaths;
     FSCameraNamesUMap umapCameraNames;
@@ -94,6 +98,8 @@ DeviceName FSCoreCamerasStorage::getFreeDeviceName(const DeviceName &deviceName)
 
 std::vector<DevicePath> FSCoreCamerasStorage::availableDevicePaths() const
 {
+    QMutexLocker(&d->cameraMutex);
+
     std::vector<DevicePath> result;
     result.reserve(d->umapCameraPaths.size());
 
@@ -105,6 +111,8 @@ std::vector<DevicePath> FSCoreCamerasStorage::availableDevicePaths() const
 
 std::vector<FSCamera *> FSCoreCamerasStorage::availableCameras() const
 {
+    QMutexLocker(&d->cameraMutex);
+
     std::vector<FSCamera *> result;
     result.reserve(d->umapCameraPaths.size());
 
@@ -116,6 +124,8 @@ std::vector<FSCamera *> FSCoreCamerasStorage::availableCameras() const
 
 DeviceName FSCoreCamerasStorage::getCameraName(const DevicePath &devicePath) const
 {
+    QMutexLocker(&d->cameraMutex);
+
     FSCameraPathsUMap::iterator iterator = d->umapCameraPaths.find(devicePath);
     if (iterator != d->umapCameraPaths.end())
         return iterator->second->name();
@@ -128,6 +138,8 @@ DeviceName FSCoreCamerasStorage::getCameraDisplayName(const DevicePath &devicePa
     if (isCameraUserNameUsed(devicePath))
         return getCameraUserName(devicePath);
 
+    QMutexLocker(&d->cameraMutex);
+
     FSCameraPathsUMap::iterator iterator = d->umapCameraPaths.find(devicePath);
     if (iterator != d->umapCameraPaths.end())
         return iterator->second->name();
@@ -137,6 +149,8 @@ DeviceName FSCoreCamerasStorage::getCameraDisplayName(const DevicePath &devicePa
 
 void FSCoreCamerasStorage::registerCamera(FSCamera *camera)
 {
+    QMutexLocker(&d->cameraMutex);
+
     const DevicePath &devicePath = camera->devicePath();
 
     if (d->umapCameraPaths.find(devicePath) != d->umapCameraPaths.end())
@@ -152,6 +166,8 @@ void FSCoreCamerasStorage::registerCamera(FSCamera *camera)
 
 void FSCoreCamerasStorage::unregisterCamera(FSCamera *camera)
 {
+    QMutexLocker(&d->cameraMutex);
+
     const DevicePath &devicePath = camera->devicePath();
 
     FSCameraPathsUMap::const_iterator iterator = d->umapCameraPaths.find(devicePath);
@@ -167,8 +183,22 @@ void FSCoreCamerasStorage::unregisterCamera(FSCamera *camera)
     emit removedCamera(devicePath);
 }
 
+bool FSCoreCamerasStorage::isCameraConnected(const DevicePath &devicePath) const
+{
+    QMutexLocker(&d->cameraMutex);
+
+    return (d->umapCameraPaths.find(devicePath) != d->umapCameraPaths.end());
+}
+
+QRecursiveMutex *FSCoreCamerasStorage::cameraRecursiveMutex() const
+{
+    return &d->cameraMutex;
+}
+
 FSCamera *FSCoreCamerasStorage::findCameraByDevicePath(const DevicePath &devicePath) const
 {
+    QMutexLocker(&d->cameraMutex);
+
     FSCameraPathsUMap::const_iterator iterator = d->umapCameraPaths.find(devicePath);
 
     if (iterator == d->umapCameraPaths.end())
@@ -179,6 +209,8 @@ FSCamera *FSCoreCamerasStorage::findCameraByDevicePath(const DevicePath &deviceP
 
 FSCameraPathsUMap FSCoreCamerasStorage::getCameraPathUMap() const
 {
+    QMutexLocker(&d->cameraMutex);
+
     return d->umapCameraPaths;
 }
 

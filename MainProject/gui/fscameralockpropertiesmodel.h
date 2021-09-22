@@ -26,36 +26,52 @@
 
 #include <WebCamFS/AbstractCameraSettingsModel>
 
-class FSCameraUserSettingsModel : public FSAbstractCameraSettingsModel
+class FSLockPropertiesManager;
+
+class FSCameraLockPropertiesModelPrivate;
+
+class FSCameraLockPropertiesModel : public FSAbstractCameraSettingsModel
 {
     Q_OBJECT
 
 public:
-    explicit FSCameraUserSettingsModel(QObject *parent = nullptr);
+    explicit FSCameraLockPropertiesModel(QObject *parent = nullptr);
+    ~FSCameraLockPropertiesModel() override;
 
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    void setLockPropertiesManager(FSLockPropertiesManager *lockPropertiesManager);
+    FSLockPropertiesManager *lockPropertiesManager() const;
 
     QVariant getDeviceData(const DevicePath &devicePath,
                            int column,
                            int role = Qt::DisplayRole) const override;
 
-    bool setDeviceData(const DevicePath &devicePath,
-                       int column,
-                       const QVariant &value,
-                       int role = Qt::EditRole) const override;
-
 protected:
     std::vector<DevicePath> getDevicesFromStorage() const override;
-
-    void connectByCamerasStorage(FSCamerasStorage *camerasStorage) override;
-    void disconnectByCamerasStorage(FSCamerasStorage *camerasStorage) override;
 
 protected slots:
     void addCamera(const DevicePath &devicePath) override;
     void removeCamera(const DevicePath &devicePath) override;
 
-    void updateUserSettingsColumns(const DevicePath &devicePath);
+    void updateLockCameraColumns(const DevicePath &devicePath);
+    void updateUnlockCameraColumns(const DevicePath &devicePath);
+
+    void updateLockPropertyColumns(const DevicePath &devicePath,
+                                   FSCameraProperty property);
+    void updateUnlockPropertyColumns(const DevicePath &devicePath,
+                                       FSCameraProperty property);
+
+    void updateSwitchToManualModeColumns(const DevicePath &devicePath);
+
+    void updateLockPresetColumns(const DevicePath &devicePath,
+                                 const QString &presetName);
+    void updateUnlockPresetColumns(const DevicePath &devicePath);
+
+private:
+    FSCameraLockPropertiesModelPrivate *d;
+
+    void init();
 
 private slots:
     void retranslate();
 };
+

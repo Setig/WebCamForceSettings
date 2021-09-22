@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>WebCam Force Settings</Name>
+    <Version>1.0.0</Version>
+    <Title>WebCam Force Settings</Title>
+    <StartMenuDir>WebCam Force Settings</StartMenuDir>
+    <TargetDir>@ApplicationsDir@/WebCam Force Settings</TargetDir>
+	<AllowSpaceInPath>true</AllowSpaceInPath>
+	<ControlScript>controlscript.js</ControlScript>
+</Installer>

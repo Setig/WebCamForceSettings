@@ -29,6 +29,7 @@
 #include <vector>
 
 #include <QString>
+#include <QMetaType>
 
 typedef QString DeviceName;
 typedef QString DevicePath;
@@ -63,6 +64,7 @@ private:
 
     friend class FSCamera;
 };
+Q_DECLARE_METATYPE(FSCameraData);
 
 
 struct FS_LIB_EXPORT FSRangeParams

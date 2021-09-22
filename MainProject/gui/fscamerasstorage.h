@@ -96,6 +96,8 @@ public slots:
     void loadAll() override;
 
 signals:
+    void userDefaultValuesChanged(const DevicePath &devicePath);
+
     void cameraUserPresetNamesChanged(const DevicePath &devicePath);
 
 private:

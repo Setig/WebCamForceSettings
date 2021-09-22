@@ -35,11 +35,11 @@
 #ifdef BUILD_WITH_Q_EASY_SETTINGS
 #include "qeasysettings.hpp"
 
-#define AUTO_STYLE_NAME         tr("Auto")
-#define VISTA_STYLE_NAME        tr("Vista")
-#define CLASSIC_STYLE_NAME      tr("Classic")
-#define LIGHT_FUSION_STYLE_NAME tr("LightFusion")
-#define DARK_FUSION_STYLE_NAME  tr("DarkFusion")
+#define AUTO_STYLE_NAME         FSSettingsDialog::tr("Auto")
+#define VISTA_STYLE_NAME        FSSettingsDialog::tr("Vista")
+#define CLASSIC_STYLE_NAME      FSSettingsDialog::tr("Classic")
+#define LIGHT_FUSION_STYLE_NAME FSSettingsDialog::tr("LightFusion")
+#define DARK_FUSION_STYLE_NAME  FSSettingsDialog::tr("DarkFusion")
 #endif // BUILD_WITH_Q_EASY_SETTINGS
 
 class FSSettingsDialogPrivate
@@ -314,6 +314,13 @@ int FSSettingsDialog::getCustomStyleIndex(const QString &styleName)
 void FSSettingsDialog::retranslate()
 {
     ui->retranslateUi(this);
+
+    if (ui->comboBoxStyle->count() != 0) {
+        const QStringList customStyleNames = getCustomStyleNames();
+        for (int i = 0; i < customStyleNames.count() && i < ui->comboBoxStyle->count(); i++) {
+            ui->comboBoxStyle->setItemText(i, customStyleNames.at(i));
+        }
+    }
 }
 
 void FSSettingsDialog::restoreDefaultValues()
@@ -322,6 +329,10 @@ void FSSettingsDialog::restoreDefaultValues()
 
     if (isAutoStartEnable())
         setAutoStart(true);
+
+#ifdef BUILD_WITH_Q_EASY_SETTINGS
+    setCustomStyleIndex(FSSettings::defaultCustomStyleIndex());
+#endif // BUILD_WITH_Q_EASY_SETTINGS
 
     setCameraDetectionEnable(FSSettings::defaultIsCameraDetectionEnable());
     setCameraDetectionInterval(FSSettings::defaultCameraDetectionInterval());

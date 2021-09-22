@@ -56,7 +56,7 @@ QVariant FSCameraDefaultSettingsModel::getDeviceData(const DevicePath &devicePat
 
     switch (column) {
     case 0: return camerasStorage()->getCameraDisplayName(devicePath);
-    case 1: return (camerasStorage()->findCameraByDevicePath(devicePath) != nullptr);
+    case 1: return camerasStorage()->isCameraConnected(devicePath);
     case 2: return camerasStorage()->isUserDefaultValuesUsed(devicePath);
     case 3: return camerasStorage()->getUserDefaultValues(devicePath).size();
     default:
@@ -72,7 +72,7 @@ std::vector<DevicePath> FSCameraDefaultSettingsModel::getDevicesFromStorage() co
 
     FSCamerasStorage *camerasStorage = this->camerasStorage();
     if (camerasStorage) {
-        const FSCameraPathValuesUMap umapCameraPathValues = camerasStorage->getUserDefaultValues();
+        const FSCameraPathValuesUMap umapCameraPathValues     = camerasStorage->getUserDefaultValues();
         const std::vector<DevicePath> vecAvailableDevicePaths = camerasStorage->availableDevicePaths();
 
         result.reserve(umapCameraPathValues.size() + vecAvailableDevicePaths.size());
@@ -92,7 +92,27 @@ std::vector<DevicePath> FSCameraDefaultSettingsModel::getDevicesFromStorage() co
     return result;
 }
 
-void FSCameraDefaultSettingsModel::addedCamera(const DevicePath &devicePath)
+void FSCameraDefaultSettingsModel::connectByCamerasStorage(FSCamerasStorage *camerasStorage)
+{
+    if (camerasStorage) {
+        connect(camerasStorage, SIGNAL(userDefaultValuesChanged(DevicePath)),
+                this,             SLOT(updateDefaultSettingsColumns(DevicePath)));
+    }
+
+    FSAbstractCameraSettingsModel::connectByCamerasStorage(camerasStorage);
+}
+
+void FSCameraDefaultSettingsModel::disconnectByCamerasStorage(FSCamerasStorage *camerasStorage)
+{
+    if (camerasStorage) {
+        disconnect(camerasStorage, SIGNAL(userDefaultValuesChanged(DevicePath)),
+                   this,             SLOT(updateDefaultSettingsColumns(DevicePath)));
+    }
+
+    FSAbstractCameraSettingsModel::disconnectByCamerasStorage(camerasStorage);
+}
+
+void FSCameraDefaultSettingsModel::addCamera(const DevicePath &devicePath)
 {
     FSCamerasStorage *camerasStorage = this->camerasStorage();
     if ( camerasStorage &&
@@ -103,7 +123,7 @@ void FSCameraDefaultSettingsModel::addedCamera(const DevicePath &devicePath)
     }
 }
 
-void FSCameraDefaultSettingsModel::removedCamera(const DevicePath &devicePath)
+void FSCameraDefaultSettingsModel::removeCamera(const DevicePath &devicePath)
 {
     FSCamerasStorage *camerasStorage = this->camerasStorage();
     if ( camerasStorage &&
@@ -112,6 +132,11 @@ void FSCameraDefaultSettingsModel::removedCamera(const DevicePath &devicePath)
     } else {
         emitDataChanged(devicePath, { 0, 1 });
     }
+}
+
+void FSCameraDefaultSettingsModel::updateDefaultSettingsColumns(const DevicePath &devicePath)
+{
+    emitDataChanged(devicePath, { 2, 3 });
 }
 
 void FSCameraDefaultSettingsModel::retranslate()

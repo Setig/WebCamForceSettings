@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>The base WebCam Force Settings component</DisplayName>
+	<DisplayName xml:lang="ru">Базовый компонент WebCam Force Settings</DisplayName>
+    <Description>Base WebCam Force Settings Application</Description>
+	<Description xml:lang="ru">Базовое приложение WebCam Force Settings</Description>
+    <Version>1.0.0</Version>
+    <ReleaseDate>2021-09-03</ReleaseDate>
+    <ForcedInstallation>true</ForcedInstallation>
+    <Script>installscript.qs</Script>
+</Package>

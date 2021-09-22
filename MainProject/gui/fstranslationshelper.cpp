@@ -192,7 +192,7 @@ bool FSTranslationsHelper::installFSTranslation(const QLocale &locale)
 {
     QFileInfoList translationFileInfoList = d->fsTranslationFileInfoList();
     foreach (const QFileInfo &fileInfo, translationFileInfoList) {
-        if (locale == getLocaleFromTranslatorFileName(fileInfo.filePath())) {
+        if (compareLocale(locale, getLocaleFromTranslatorFileName(fileInfo.filePath()))) {
             QTranslator *translator = new QTranslator(this);
 
             if (!translator->load(fileInfo.baseName(), fileInfo.dir().absolutePath())) {
@@ -221,7 +221,7 @@ void FSTranslationsHelper::installQtTranslations(const QLocale &locale)
 {
     QFileInfoList translationFileInfoList = d->qtTranslationFileInfoList();
     foreach (const QFileInfo &fileInfo, translationFileInfoList) {
-        if (locale == getLocaleFromTranslatorFileName(fileInfo.filePath())) {
+        if (compareLocale(locale, getLocaleFromTranslatorFileName(fileInfo.filePath()))) {
             QTranslator *translator = new QTranslator(this);
 
             if ( translator->load(fileInfo.baseName(), fileInfo.dir().absolutePath()) &&
@@ -254,6 +254,13 @@ QVector<QTranslator *> FSTranslationsHelper::loadFSTranslations()
     }
 
     return result.toVector();
+}
+
+bool FSTranslationsHelper::compareLocale(const QLocale &locale1,
+                                         const QLocale &locale2)
+{
+    return (locale1.language() == locale2.language() &&
+            locale1.country() == locale2.country());
 }
 
 QLocale FSTranslationsHelper::getLocaleFromTranslatorFileName(QTranslator *translator)

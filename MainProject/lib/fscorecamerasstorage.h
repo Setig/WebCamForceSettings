@@ -33,6 +33,8 @@
 
 #include <unordered_map>
 
+class QRecursiveMutex;
+
 typedef std::unordered_map<DevicePath, FSCamera *> FSCameraPathsUMap;
 typedef std::unordered_map<DeviceName, FSCamera *> FSCameraNamesUMap;
 typedef std::unordered_map<DevicePath, DeviceName> FSCameraPathNamesUMap;
@@ -59,9 +61,12 @@ public:
     void registerCamera(FSCamera *cameraData);
     void unregisterCamera(FSCamera *camera);
 
+    bool isCameraConnected(const DevicePath &devicePath) const;
+
+    QRecursiveMutex *cameraRecursiveMutex() const;
+
     FSCamera *findCameraByDevicePath(const DevicePath &devicePath) const;
     FSCameraPathsUMap getCameraPathUMap() const;
-
 
     // Camera user names
     DevicePath findCameraPathByUserName(const DeviceName &userName);

@@ -46,9 +46,6 @@ private:
     void init();
     void initMainMenu();
 
-    void registerCamera(const FSCameraData &cameraData);
-    void unregisterCamera(FSCamera *camera);
-
     void createCameraMenuObjects(FSCamera *camera);
     void deleteCameraMenuObjects(FSCamera *camera);
 
@@ -59,6 +56,8 @@ private:
     void updateSettingsDialogs();
     void updateLockPropertiesManager();
 
+    void showCameraSettingsDialog(FSCamera *camera);
+
     QMenu *createPresetMenu(FSCamera *camera, QAction *cameraAction);
 
     void updatePresetsMenu(FSCamera *camera,
@@ -66,18 +65,20 @@ private:
                            const std::vector<QString> &presetNames);
 
 private slots:
+    void registerCamera(const FSCameraData &cameraData);
+    void unregisterCamera(FSCamera *camera);
+
     void retranslate();
 
     void about();
-    void execSettingsDialog();
-    void execUserSettingsDialog();
+    void showSettingsDialog();
+    void showUserSettingsDialog();
 
     void onShowAvailableCamerasMenu();
     void checkAvailableCameras();
 
     void updateActionsByBlackList(const DevicePath &devicePath);
 
-    void updatePresetsMenuByCamera(FSCamera *camera);
     void updatePresetsMenuByDevicePath(const DevicePath &devicePath);
 
     void updateLockPropertiesPauseMenu();
@@ -94,6 +95,7 @@ private slots:
     void lockProperiesPauseRestore();
 
     void showCameraSettingsDialog();
+    void showCameraSettingsDialog(const DevicePath &devicePath);
 
     void removeOpenedCameraSettingsDialog(QObject *object);
     void removeUserSettingsDialog(QObject *object);

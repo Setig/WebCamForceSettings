@@ -17,6 +17,7 @@ SOURCES += \
         fsabstractcamerasettingsmodel.cpp \
         fsautostart.cpp \
         fscameradefaultsettingsmodel.cpp \
+        fscameralockpropertiesmodel.cpp \
         fscamerapresetsmodel.cpp \
         fscamerausersettingsdialog.cpp \
         fscamerausersettingsmodel.cpp \
@@ -37,6 +38,7 @@ HEADERS += \
     fsabstractcamerasettingsmodel.h \
     fsautostart.h \
     fscameradefaultsettingsmodel.h \
+    fscameralockpropertiesmodel.h \
     fscamerapresetsmodel.h \
     fscamerausersettingsdialog.h \
     fscamerausersettingsmodel.h \
@@ -52,6 +54,7 @@ HEADERS += \
     fssystemtrayicon.h \
     ../include/WebCamFS/AbstractCameraSettingsModel \
     ../include/WebCamFS/CameraDefaultSettingsModel \
+    ../include/WebCamFS/CameraLockPropertiesModel \
     ../include/WebCamFS/CameraPresetsModel \
     ../include/WebCamFS/CameraSettingsDialog \
     ../include/WebCamFS/CameraUserSettingsDialog \

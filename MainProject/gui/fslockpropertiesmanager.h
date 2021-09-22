@@ -27,6 +27,7 @@
 #include <QObject>
 
 #include <WebCamFS/Camera>
+#include <WebCamFS/CamerasStorage>
 
 class FSCamerasStorage;
 
@@ -48,12 +49,18 @@ public:
     bool isLockPropertiesEnable() const;
     void setLockPropertiesEnable(bool isEnable);
 
-    bool isLockedLeastOneProperty(FSCamera *camera) const;
-    bool isLockedProperty(FSCamera *camera, FSCameraProperty property) const;
-    FSValueParams lockedValueParams(FSCamera *camera, FSCameraProperty property) const;
+    bool isLockedLeastOneProperty(const DevicePath &devicePath) const;
+    bool isLockedProperty(const DevicePath &devicePath,
+                          FSCameraProperty property) const;
+    FSValueParams lockedValueParams(const DevicePath &devicePath,
+                                    FSCameraProperty property) const;
 
-    bool isContaintsManualLockProperties(FSCamera *camera) const;
-    bool isContaintsPresetLock(FSCamera *camera) const;
+    bool isContaintsManualLockProperties(const DevicePath &devicePath) const;
+    bool isContaintsPresetLock(const DevicePath &devicePath) const;
+
+    std::vector<DevicePath> lockedDevicePaths() const;
+
+    FSCameraPropertyValuesUMap lockedProperties(const DevicePath &devicePath) const;
 
     enum LockMode {
         NoneLockMode = 0,
@@ -61,12 +68,9 @@ public:
         PresetLockMode
     };
 
-    LockMode currentLockMode(FSCamera *camera) const;
+    LockMode currentLockMode(const DevicePath &devicePath) const;
 
-    QString lockPresetName(FSCamera *camera) const;
-
-    void setLockPropertiesInterval(int msec);
-    int lockPropertiesInterval() const;
+    QString lockPresetName(const DevicePath &devicePath) const;
 
     void loadLockSettings();
     void saveLockSettings();
@@ -78,31 +82,38 @@ public:
 public slots:
     void lockProperiesPauseFinish();
 
-    bool manualLockProperty(FSCamera *camera, FSCameraProperty property);
-    bool manualLockProperties(FSCamera *camera, const std::vector<FSCameraProperty> &vecProperties);
+    bool manualLockProperty(const DevicePath &devicePath,
+                            FSCameraProperty property);
+    bool manualLockProperties(const DevicePath &devicePath,
+                              const std::vector<FSCameraProperty> &vecProperties);
 
-    void manualLockProperty(FSCamera *camera,
+    void manualLockProperty(const DevicePath &devicePath,
                             FSCameraProperty property,
                             const FSValueParams &valueParams);
 
-    void manualUnlockProperty(FSCamera *camera, FSCameraProperty property);
-    void manualUnlockProperties(FSCamera *camera, const std::vector<FSCameraProperty> &vecProperties);
-    void manualUnlockProperties(FSCamera *camera);
+    void manualUnlockProperty(const DevicePath &devicePath,
+                              FSCameraProperty property);
+    void manualUnlockProperties(const DevicePath &devicePath,
+                                const std::vector<FSCameraProperty> &vecProperties);
+    void manualUnlockProperties(const DevicePath &devicePath);
 
-    void presetLockProperties(FSCamera *camera, const QString &presetName);
-    void presetUnlockProperies(FSCamera *camera);
+    void presetLockProperties(const DevicePath &devicePath,
+                              const QString &presetName);
+    void presetUnlockProperies(const DevicePath &devicePath);
+
+    void updateTimerStatus();
 
 signals:
-    void lockedCamera(FSCamera *camera);
-    void unlockedCamera(FSCamera *camera);
+    void lockedCamera(const DevicePath &devicePath);
+    void unlockedCamera(const DevicePath &devicePath);
 
-    void lockedProperty(FSCamera *camera, FSCameraProperty property);
-    void unlockedProperty(FSCamera *camera, FSCameraProperty property);
+    void lockedProperty(const DevicePath &devicePath, FSCameraProperty property);
+    void unlockedProperty(const DevicePath &devicePath, FSCameraProperty property);
 
-    void switchedToManualMode(FSCamera *camera);
+    void switchedToManualMode(const DevicePath &devicePath);
 
-    void lockedPreset(FSCamera *camera, const QString &presetName);
-    void unlockedPreset(FSCamera *camera);
+    void lockedPreset(const DevicePath &devicePath, const QString &presetName);
+    void unlockedPreset(const DevicePath &devicePath);
 
     void lockPropertiesEnableChanged(bool isEnable);
 
@@ -111,22 +122,23 @@ private:
 
     void init();
 
-    void updateTimerStatus();
-
     void copyCurrentPresetToManualPropertyValues(const DevicePath &devicePath);
 
-    void trySwitchToManualMode(FSCamera *camera);
-    void switchToManualMode(FSCamera *camera);
+    void trySwitchToManualMode(const DevicePath &devicePath);
+    void switchToManualMode(const DevicePath &devicePath);
 
-    bool setLockValueParams(FSCamera *camera,
+    bool setLockValueParams(const DevicePath &devicePath,
                             FSCameraProperty property,
                             const FSValueParams &lockedValueParams);
+
+    void restoreDefaultPropertyValue(const DevicePath &devicePath,
+                                     FSCameraProperty property);
 
     friend class FSLockPropertiesManagerPrivate;
 
 private slots:
-    void addedCamera(const DevicePath &devicePath);
-    void removedCamera(const DevicePath &devicePath);
+    void addCamera(const DevicePath &devicePath);
+    void removeCamera(const DevicePath &devicePath);
 
     void updateCurrentPreset(const DevicePath &devicePath);
 

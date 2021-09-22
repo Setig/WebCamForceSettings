@@ -26,7 +26,10 @@
 
 #include <QDialog>
 
+#include <WebCamFS/Structs>
+
 class FSCamerasStorage;
+class FSLockPropertiesManager;
 
 namespace Ui { class FSCameraUserSettingsDialog; }
 
@@ -43,6 +46,12 @@ public:
     void setCamerasStorage(FSCamerasStorage *camerasStorage);
     FSCamerasStorage *camerasStorage() const;
 
+    void setLockPropertiesManager(FSLockPropertiesManager *lockPropertiesManager);
+    FSLockPropertiesManager *lockPropertiesManager() const;
+
+signals:
+    void showCameraSettingsDialog(const DevicePath &devicePath);
+
 private:
     FSCameraUserSettingsDialogPrivate *d;
     Ui::FSCameraUserSettingsDialog *ui;
@@ -57,16 +66,20 @@ private slots:
     void updateButtonsChangeCameraUserSettings();
     void updateButtonsChangeDefaultSettings();
     void updateButtonsChangePresets();
+    void updateButtonsLockProperties();
 
     void on_pushButtonChangeCameraUserSettings();
     void on_pushButtonChangeDefaultSettings();
     void on_pushButtonChangePresets();
+    void on_pushButtonChangeLockProperties();
 
     void on_pushButtonClearCameraUserSettings();
     void on_pushButtonClearDefaultSettings();
     void on_pushButtonClearPresets();
+    void on_pushButtonClearLockProperties();
 
     void execCameraUserSettingsDialog(const QModelIndex &index);
     void execDefaultSettingsDialog(const QModelIndex &index);
     void execPresetSettingsDialog(const QModelIndex &index);
+    void execLockPropertiesDialog(const QModelIndex &index);
 };

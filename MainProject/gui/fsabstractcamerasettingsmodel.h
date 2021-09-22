@@ -81,7 +81,8 @@ public:
                                const QVariant &value,
                                int role = Qt::EditRole) const;
 
-    void updateRow(const DevicePath &devicePath);
+    void emitDataByRow(int row);
+    void emitDataByRow(const DevicePath &devicePath);
 
     bool isSupportRole(int role) const;
 
@@ -102,9 +103,12 @@ protected:
     void setSupportRoles(std::vector<int> supportRoles);
     std::vector<int> supportRoles() const;
 
+    virtual void connectByCamerasStorage(FSCamerasStorage *camerasStorage);
+    virtual void disconnectByCamerasStorage(FSCamerasStorage *camerasStorage);
+
 protected slots:
-    virtual void addedCamera(const DevicePath &devicePath);
-    virtual void removedCamera(const DevicePath &devicePath);
+    virtual void addCamera(const DevicePath &devicePath);
+    virtual void removeCamera(const DevicePath &devicePath);
 
 private:
     FSAbstractCameraSettingsModelPrivate *d;

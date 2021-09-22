@@ -58,8 +58,6 @@ private:
 
     void init();
 
-    void loadAvailableLanguages();
-
     void resetCurrentTranslations();
 
     void resetCurrentFSTranslation();
@@ -69,6 +67,8 @@ private:
     void installQtTranslations(const QLocale &locale);
 
     QVector<QTranslator *> loadFSTranslations();
+
+    static bool compareLocale(const QLocale &locale1, const QLocale &locale2);
 
     static QLocale getLocaleFromTranslatorFileName(QTranslator *translator);
     static QLocale getLocaleFromTranslatorFileName(const QString &filePath);

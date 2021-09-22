@@ -40,9 +40,14 @@ public:
 protected:
     std::vector<DevicePath> getDevicesFromStorage() const override;
 
+    void connectByCamerasStorage(FSCamerasStorage *camerasStorage) override;
+    void disconnectByCamerasStorage(FSCamerasStorage *camerasStorage) override;
+
 protected slots:
-    void addedCamera(const DevicePath &devicePath) override;
-    void removedCamera(const DevicePath &devicePath) override;
+    void addCamera(const DevicePath &devicePath) override;
+    void removeCamera(const DevicePath &devicePath) override;
+
+    void updatePresetsColumns(const DevicePath &devicePath);
 
 private slots:
     void retranslate();

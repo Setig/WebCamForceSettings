@@ -64,22 +64,9 @@ FSAbstractCameraSettingsModel::~FSAbstractCameraSettingsModel()
 void FSAbstractCameraSettingsModel::setCamerasStorage(FSCamerasStorage *camerasStorage)
 {
     if (d->camerasStorage != camerasStorage) {
-        if (d->camerasStorage) {
-            disconnect(d->camerasStorage, &FSCamerasStorage::addedCamera,
-                       this,              &FSAbstractCameraSettingsModel::addedCamera);
-            disconnect(d->camerasStorage, &FSCamerasStorage::removedCamera,
-                       this,              &FSAbstractCameraSettingsModel::removedCamera);
-        }
-
+        disconnectByCamerasStorage(d->camerasStorage);
         d->camerasStorage = camerasStorage;
-
-        if (d->camerasStorage) {
-            connect(d->camerasStorage, &FSCamerasStorage::addedCamera,
-                    this,              &FSAbstractCameraSettingsModel::addedCamera);
-            connect(d->camerasStorage, &FSCamerasStorage::removedCamera,
-                    this,              &FSAbstractCameraSettingsModel::removedCamera);
-        }
-
+        connectByCamerasStorage(d->camerasStorage);
         updateDevices();
     }
 }
@@ -244,7 +231,20 @@ bool FSAbstractCameraSettingsModel::setDeviceData(const DevicePath &devicePath,
     return false;
 }
 
-void FSAbstractCameraSettingsModel::updateRow(const DevicePath &devicePath)
+void FSAbstractCameraSettingsModel::emitDataByRow(int row)
+{
+    const int columnCount = this->columnCount();
+
+    std::vector<int> columns;
+    columns.reserve(columnCount);
+
+    for (int i = 0; i < columnCount; i++)
+        columns.push_back(i);
+
+    emitDataChanged(row, columns);
+}
+
+void FSAbstractCameraSettingsModel::emitDataByRow(const DevicePath &devicePath)
 {
     std::vector<int> columns;
 
@@ -374,14 +374,36 @@ std::vector<int> FSAbstractCameraSettingsModel::supportRoles() const
     return result;
 }
 
-void FSAbstractCameraSettingsModel::addedCamera(const DevicePath &devicePath)
+void FSAbstractCameraSettingsModel::connectByCamerasStorage(FSCamerasStorage *camerasStorage)
+{
+    if (!camerasStorage)
+        return;
+
+    connect(camerasStorage, &FSCamerasStorage::addedCamera,
+            this,           &FSAbstractCameraSettingsModel::addCamera);
+    connect(camerasStorage, &FSCamerasStorage::removedCamera,
+            this,           &FSAbstractCameraSettingsModel::removeCamera);
+}
+
+void FSAbstractCameraSettingsModel::disconnectByCamerasStorage(FSCamerasStorage *camerasStorage)
+{
+    if (!camerasStorage)
+        return;
+
+    disconnect(camerasStorage, &FSCamerasStorage::addedCamera,
+               this,           &FSAbstractCameraSettingsModel::addCamera);
+    disconnect(camerasStorage, &FSCamerasStorage::removedCamera,
+               this,           &FSAbstractCameraSettingsModel::removeCamera);
+}
+
+void FSAbstractCameraSettingsModel::addCamera(const DevicePath &devicePath)
 {
     Q_UNUSED(devicePath);
 
     // do nothing
 }
 
-void FSAbstractCameraSettingsModel::removedCamera(const DevicePath &devicePath)
+void FSAbstractCameraSettingsModel::removeCamera(const DevicePath &devicePath)
 {
     Q_UNUSED(devicePath);
 

@@ -78,7 +78,7 @@ QVariant FSCameraUserSettingsModel::getDeviceData(const DevicePath &devicePath,
     switch (column) {
     case 0: return devicePath;
     case 1: return camerasStorage()->getCameraName(devicePath);
-    case 2: return (camerasStorage()->findCameraByDevicePath(devicePath) != nullptr);
+    case 2: return camerasStorage()->isCameraConnected(devicePath);
     case 3: return camerasStorage()->isContaintsBlackList(devicePath);
     case 4: return camerasStorage()->getCameraUserName(devicePath);
     default:
@@ -121,7 +121,7 @@ std::vector<DevicePath> FSCameraUserSettingsModel::getDevicesFromStorage() const
 
     FSCamerasStorage *camerasStorage = this->camerasStorage();
     if (camerasStorage) {
-        const FSCameraPathNamesUMap umapCameraUserNames = camerasStorage->getCameraUserNames();
+        const FSCameraPathNamesUMap umapCameraUserNames       = camerasStorage->getCameraUserNames();
         const std::vector<DevicePath> vecAvailableDevicePaths = camerasStorage->availableDevicePaths();
 
         result.reserve(umapCameraUserNames.size() + vecAvailableDevicePaths.size());
@@ -140,7 +140,35 @@ std::vector<DevicePath> FSCameraUserSettingsModel::getDevicesFromStorage() const
     return result;
 }
 
-void FSCameraUserSettingsModel::addedCamera(const DevicePath &devicePath)
+void FSCameraUserSettingsModel::connectByCamerasStorage(FSCamerasStorage *camerasStorage)
+{
+    if (camerasStorage) {
+        connect(camerasStorage, SIGNAL(cameraUserNameChanged(DevicePath)),
+                this,             SLOT(updateUserSettingsColumns(DevicePath)));
+        connect(camerasStorage, SIGNAL(addedBlacklistCamera(DevicePath)),
+                this,             SLOT(updateUserSettingsColumns(DevicePath)));
+        connect(camerasStorage, SIGNAL(removedBlacklistCamera(DevicePath)),
+                this,             SLOT(updateUserSettingsColumns(DevicePath)));
+    }
+
+    FSAbstractCameraSettingsModel::connectByCamerasStorage(camerasStorage);
+}
+
+void FSCameraUserSettingsModel::disconnectByCamerasStorage(FSCamerasStorage *camerasStorage)
+{
+    if (camerasStorage) {
+        disconnect(camerasStorage, SIGNAL(cameraUserNameChanged(DevicePath)),
+                   this,             SLOT(updateUserSettingsColumns(DevicePath)));
+        disconnect(camerasStorage, SIGNAL(addedBlacklistCamera(DevicePath)),
+                   this,             SLOT(updateUserSettingsColumns(DevicePath)));
+        disconnect(camerasStorage, SIGNAL(removedBlacklistCamera(DevicePath)),
+                   this,             SLOT(updateUserSettingsColumns(DevicePath)));
+    }
+
+    FSAbstractCameraSettingsModel::disconnectByCamerasStorage(camerasStorage);
+}
+
+void FSCameraUserSettingsModel::addCamera(const DevicePath &devicePath)
 {
     FSCamerasStorage *camerasStorage = this->camerasStorage();
     if ( camerasStorage &&
@@ -151,7 +179,7 @@ void FSCameraUserSettingsModel::addedCamera(const DevicePath &devicePath)
     }
 }
 
-void FSCameraUserSettingsModel::removedCamera(const DevicePath &devicePath)
+void FSCameraUserSettingsModel::removeCamera(const DevicePath &devicePath)
 {
     FSCamerasStorage *camerasStorage = this->camerasStorage();
     if ( camerasStorage &&
@@ -160,6 +188,11 @@ void FSCameraUserSettingsModel::removedCamera(const DevicePath &devicePath)
     } else {
         emitDataChanged(devicePath, { 1, 2 });
     }
+}
+
+void FSCameraUserSettingsModel::updateUserSettingsColumns(const DevicePath &devicePath)
+{
+    emitDataChanged(devicePath, { 3, 4 });
 }
 
 void FSCameraUserSettingsModel::retranslate()

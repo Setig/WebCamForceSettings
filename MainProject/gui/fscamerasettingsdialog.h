@@ -97,9 +97,11 @@ private:
 
     void updateWidgetsByMode();
 
-    void setLockProperty(FSCamera *camera,
+    void setLockProperty(const DevicePath &devicePath,
                          FSCameraProperty property,
                          bool isLock);
+
+    void updateCurrentLockPresetIndex();
 
     void saveCurrentPresetValues();
     void restorePresetValues(const QString &presetName);
@@ -124,11 +126,13 @@ private slots:
     void updateValues();
     void restoreDefaultValues();
 
-    void lockedProperty(FSCamera *camera, FSCameraProperty property);
-    void unlockedProperty(FSCamera *camera, FSCameraProperty property);
+    void lockedProperty(const DevicePath &devicePath, FSCameraProperty property);
+    void unlockedProperty(const DevicePath &devicePath, FSCameraProperty property);
 
     void applyCurrentValueParams(int editorTypeProperty);
     void sendLockCameraProperty(int property);
+
+    void updateCurrentLockPresetIndex(const DevicePath &devicePath);
 
     void updateCurrentPresetRemoveButton();
     void restorePresetValues(int comboBoxIndex);

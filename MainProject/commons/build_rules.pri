@@ -10,10 +10,8 @@ UI_DIR      = ./ui
 
 DESTDIR = $$clean_path($$OUT_PWD/..)
 
-FS_LIBRARY_DIR=$$DESTDIR
-
 equals(TEMPLATE, app)|equals(TEMPLATE, lib) {
-    isEmpty(VERSION) VERSION = 0.9.9 # Global project version
+    isEmpty(VERSION) VERSION = 1.0.0 # Global project version
     DEFINES += "FS_PROJECT_GLOBAL_VERSION=\\\"$${VERSION}\\\""
 }
 
@@ -25,6 +23,7 @@ FS_GUI_NAME = WebCamForceSettings
 DEFINES += "FS_GUI_NAME=\\\"$${FS_GUI_NAME}\\\""
 
 FS_LIB_NAME = libWebCamForceSettings
+FS_LIB_DIR_PATH = $$DESTDIR
 DEFINES += "FS_LIB_NAME=\\\"$${FS_LIB_NAME}\\\""
 
 

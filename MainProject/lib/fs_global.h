@@ -27,7 +27,7 @@
 #include <QtCore/qglobal.h>
 
 #if defined(FS_LIB_LIBRARY)
-#  define FS_LIB_EXPORT Q_DECL_EXPORT
+#define FS_LIB_EXPORT Q_DECL_EXPORT
 #else
-#  define FS_LIB_EXPORT Q_DECL_IMPORT
+#define FS_LIB_EXPORT Q_DECL_IMPORT
 #endif

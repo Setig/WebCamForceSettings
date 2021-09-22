@@ -57,7 +57,14 @@ FSCamerasStorage::~FSCamerasStorage()
 
 void FSCamerasStorage::setUserDefaultValues(const FSCameraPathValuesUMap &umapCameraPathValues)
 {
-    d->umapCameraUserDefaultValues = umapCameraPathValues;
+    for (const auto &[devicePath, umapCameraPropertyValues] : d->umapCameraUserDefaultValues) {
+        if (umapCameraPathValues.find(devicePath) == umapCameraPathValues.end())
+            userDefaultValuesRemove(devicePath);
+    }
+
+    for (const auto &[devicePath, umapCameraPropertyValues] : umapCameraPathValues) {
+        setUserDefaultValues(devicePath, umapCameraPropertyValues);
+    }
 }
 
 void FSCamerasStorage::setUserDefaultValues(const DevicePath &devicePath,
@@ -65,8 +72,46 @@ void FSCamerasStorage::setUserDefaultValues(const DevicePath &devicePath,
 {
     if (umapCameraPropertyValues.empty())
         userDefaultValuesRemove(devicePath);
-    else
-        d->umapCameraUserDefaultValues.insert_or_assign(devicePath, umapCameraPropertyValues);
+    else {
+        FSCameraPathValuesUMap::iterator devicePathIterator = d->umapCameraUserDefaultValues.find(devicePath);
+        if (devicePathIterator != d->umapCameraUserDefaultValues.end()) {
+            bool isChanged = false;
+            const FSCameraPropertyValuesUMap &currentUMapCameraPropertyValues = devicePathIterator->second;
+
+            for (const auto &[property, valueParams] : umapCameraPropertyValues) {
+                FSCameraPropertyValuesUMap::const_iterator propertyIterator = currentUMapCameraPropertyValues.find(property);
+                if (propertyIterator != currentUMapCameraPropertyValues.end()) {
+                    const FSValueParams &currentValueParams = propertyIterator->second;
+
+                    if (currentValueParams != valueParams) {
+                        isChanged = true;
+                        break;
+                    }
+                } else {
+                    isChanged = true;
+                    break;
+                }
+            }
+
+            if (!isChanged) {
+                for (const auto &[property, valueParams] : currentUMapCameraPropertyValues) {
+                    FSCameraPropertyValuesUMap::const_iterator propertyIterator = umapCameraPropertyValues.find(property);
+                    if (propertyIterator == umapCameraPropertyValues.end()) {
+                        isChanged = true;
+                        break;
+                    }
+                }
+            }
+
+            if (isChanged) {
+                devicePathIterator->second = umapCameraPropertyValues;
+                emit userDefaultValuesChanged(devicePath);
+            }
+        } else {
+            d->umapCameraUserDefaultValues.insert( { devicePath, umapCameraPropertyValues } );
+            emit userDefaultValuesChanged(devicePath);
+        }
+    }
 }
 
 void FSCamerasStorage::setUserDefaultValue(const DevicePath &devicePath,
@@ -79,9 +124,21 @@ void FSCamerasStorage::setUserDefaultValue(const DevicePath &devicePath,
         FSCameraPathValuesUMap::iterator devicePathIterator = d->umapCameraUserDefaultValues.find(devicePath);
         if (devicePathIterator != d->umapCameraUserDefaultValues.end()) {
             FSCameraPropertyValuesUMap &umapCameraPropertyValues = devicePathIterator->second;
-            umapCameraPropertyValues.insert_or_assign(property, valueParams);
+            FSCameraPropertyValuesUMap::iterator propertyIterator = umapCameraPropertyValues.find(property);
+            if (propertyIterator != umapCameraPropertyValues.end()) {
+                FSValueParams &currentValueParams = propertyIterator->second;
+
+                if (currentValueParams != valueParams) {
+                    currentValueParams = valueParams;
+                    emit userDefaultValuesChanged(devicePath);
+                }
+            } else {
+                umapCameraPropertyValues.insert( { property, valueParams } );
+                emit userDefaultValuesChanged(devicePath);
+            }
         } else {
             d->umapCameraUserDefaultValues.insert( { devicePath, { { property, valueParams } } } );
+            emit userDefaultValuesChanged(devicePath);
         }
     }
 }
@@ -144,7 +201,11 @@ FSValueParams FSCamerasStorage::getUserDefaultValue(const DevicePath &devicePath
 
 void FSCamerasStorage::userDefaultValuesRemove(const DevicePath &devicePath)
 {
-    d->umapCameraUserDefaultValues.erase(devicePath);
+    FSCameraPathValuesUMap::iterator iterator = d->umapCameraUserDefaultValues.find(devicePath);
+    if (iterator != d->umapCameraUserDefaultValues.end()) {
+        d->umapCameraUserDefaultValues.erase(iterator);
+        emit userDefaultValuesChanged(devicePath);
+    }
 }
 
 void FSCamerasStorage::userDefaultValueRemove(const DevicePath &devicePath,
@@ -156,6 +217,7 @@ void FSCamerasStorage::userDefaultValueRemove(const DevicePath &devicePath,
         FSCameraPropertyValuesUMap::iterator propertyIterator = umapCameraPropertyValues.find(property);
         if (propertyIterator != umapCameraPropertyValues.end()) {
             umapCameraPropertyValues.erase(propertyIterator);
+            emit userDefaultValuesChanged(devicePath);
         }
 
         if (umapCameraPropertyValues.empty()) {
@@ -166,7 +228,16 @@ void FSCamerasStorage::userDefaultValueRemove(const DevicePath &devicePath,
 
 void FSCamerasStorage::userDefaultValuesClear()
 {
-    d->umapCameraUserDefaultValues.clear();
+    if (d->umapCameraUserDefaultValues.empty()) {
+        std::list<DevicePath> listDevicePaths;
+        for (const auto &[devicePath, umapCameraPropertyValues] : d->umapCameraUserDefaultValues)
+            listDevicePaths.push_back(devicePath);
+
+        d->umapCameraUserDefaultValues.clear();
+
+        for (const DevicePath &devicePath: listDevicePaths)
+            emit userDefaultValuesChanged(devicePath);
+    }
 }
 
 void FSCamerasStorage::saveDefaultValueParams()
@@ -229,7 +300,6 @@ void FSCamerasStorage::loadDefaultValueParams()
 
     setUserDefaultValues(umapCameraPathValues);
 }
-
 
 void FSCamerasStorage::setCameraUserPresets(const FSCameraPathUserPresetsUMap &umapCameraUserPresets)
 {
