@@ -93,7 +93,7 @@ void FSSettingsDialog::updateLocales()
     QList<QLocale> locales = fsTH->availableFSLocales();
     d->hashItemTextLocales.reserve(locales.count());
 
-    foreach (const QLocale &locale, locales) {
+    for (const QLocale &locale : locales) {
         const QString itemText = genLocaleName(locale);
         d->hashItemTextLocales.insert(itemText, locale);
         items.push_back(itemText);

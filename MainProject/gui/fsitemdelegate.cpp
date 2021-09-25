@@ -39,7 +39,11 @@ void FSItemDelegate::paint(QPainter *painter,
     if (index.isValid()) {
         QVariant value = index.data(Qt::DisplayRole);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         if (value.type() == QVariant::Bool) {
+#else
+        if (value.typeId() == QMetaType::Bool) {
+#endif
             Qt::CheckState state = Qt::PartiallyChecked;
 
             if (!value.isNull()) {
@@ -67,8 +71,13 @@ QWidget *FSItemDelegate::createEditor(QWidget *parent,
                                       const QStyleOptionViewItem &option,
                                       const QModelIndex &index) const
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     if (index.isValid() && index.data(Qt::DisplayRole).type() == QVariant::Bool)
         return nullptr;
+#else
+    if (index.isValid() && index.data(Qt::DisplayRole).typeId() == QMetaType::Bool)
+        return nullptr;
+#endif
 
     return QItemDelegate::createEditor(parent, option, index);
 }
@@ -80,19 +89,19 @@ QRect FSItemDelegate::doCheck(const QStyleOptionViewItem &option,
 
     // Horizontal
     if (option.displayAlignment & Qt::AlignLeft)
-        rect.moveLeft(bounding.x() + QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1);
+        rect.moveLeft(bounding.left());
     else if (option.displayAlignment & Qt::AlignHCenter)
-        rect.moveLeft(bounding.center().x() - rect.width() / 2);
+        rect.moveCenter(QPoint(bounding.center().x(), rect.center().y()));
     else if (option.displayAlignment & Qt::AlignRight)
-        rect.moveLeft(bounding.right() - rect.width() - QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) - 1);
+        rect.moveRight(bounding.right());
 
     // Vertical
     if (option.displayAlignment & Qt::AlignTop)
-        rect.moveTop(bounding.y() + QApplication::style()->pixelMetric(QStyle::PM_FocusFrameVMargin) + 1);
+        rect.moveTop(bounding.top());
     else if (option.displayAlignment & Qt::AlignVCenter)
-        rect.moveTop(bounding.center().y() - rect.height() / 2);
+        rect.moveCenter(QPoint(rect.center().x(), bounding.center().y()));
     else if (option.displayAlignment & Qt::AlignBottom)
-        rect.moveTop(bounding.bottom() - rect.height() - QApplication::style()->pixelMetric(QStyle::PM_FocusFrameVMargin) - 1);
+        rect.moveBottom(bounding.bottom());
 
     return rect;
 }
@@ -104,7 +113,11 @@ bool FSItemDelegate::editorEvent(QEvent *event,
 {
     if (index.isValid()) {
         const QVariant value = index.data(Qt::DisplayRole);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         if (value.type() == QVariant::Bool) {
+#else
+        if (value.typeId() == QMetaType::Bool) {
+#endif
             if (event && model) {
                 const Qt::ItemFlags flags = model->flags(index);
                 if ((flags & Qt::ItemIsUserCheckable) || (flags & Qt::ItemIsEnabled)) {

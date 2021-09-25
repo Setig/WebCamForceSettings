@@ -24,6 +24,7 @@
 
 #include "fs_structs.h"
 
+#include <QIODevice>
 #include <QDataStream>
 
 #include <windows.h>

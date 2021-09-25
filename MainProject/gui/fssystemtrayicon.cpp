@@ -31,6 +31,7 @@
 #include <QThread>
 #include <QMessageBox>
 #include <QApplication>
+#include <QActionGroup>
 
 #ifdef BUILD_WITH_Q_EASY_SETTINGS
 #include "qeasysettings.hpp"
@@ -270,7 +271,7 @@ void FSSystemTrayIcon::deleteCameraMenuObjects(FSCamera *camera)
 QAction *FSSystemTrayIcon::beforeActionForListActions(const QList<QAction *> &listActions,
                                                       const QString &newActionText)
 {
-    foreach (QAction *action, listActions) {
+    for (QAction *action : listActions) {
         if (action->text() > newActionText) {
             return action;
         }
@@ -415,7 +416,7 @@ void FSSystemTrayIcon::updatePresetsMenu(FSCamera *camera,
 
             QActionGroup *presetActionGroup = nullptr;
 
-            foreach (QAction *action, listAction) {
+            for (QAction *action : listAction) {
                 QActionGroup *tmpPresetActionGroup = action->actionGroup();
 
                 presetMenu->removeAction(action);

@@ -1367,7 +1367,7 @@ void FSCameraSettingsDialog::sendValuesToCameraStorage()
     if (d->mode == FSCameraSettingsDialog::ChangeDefaultValuesMode) {
         camerasStorage->userDefaultValuesRemove(devicePath);
 
-        foreach (const FSCameraProperty &property, fsAllCameraProperties()) {
+        for (const FSCameraProperty &property : fsAllCameraProperties()) {
             const FSValueParams currentValue = this->valueParams(property);
 
             if (!currentValue.isNull()) {
@@ -1541,7 +1541,7 @@ void FSCameraSettingsDialog::initEditorsConnections()
             this,                            SLOT(applyCurrentValueParams(int)),
             Qt::QueuedConnection);
 
-    foreach (const FSCameraProperty &property, fsAllCameraProperties())
+    for (const FSCameraProperty &property : fsAllCameraProperties())
         d->connectingEditors(ui, property);
 
     d->lockSignalMapper = new QSignalMapper(this);
@@ -1550,13 +1550,13 @@ void FSCameraSettingsDialog::initEditorsConnections()
             this,                  SLOT(sendLockCameraProperty(int)),
             Qt::QueuedConnection);
 
-    foreach (const FSCameraProperty &property, fsAllCameraProperties())
+    for (const FSCameraProperty &property : fsAllCameraProperties())
         d->connectingLockCheckBox(ui, property);
 }
 
 void FSCameraSettingsDialog::retranslatePropertyNames()
 {
-    foreach (const FSCameraProperty &property, fsAllCameraProperties()) {
+    for (const FSCameraProperty &property : fsAllCameraProperties()) {
         QLabel *label = FSCameraSettingsDialogPrivate::getLabel(ui, property);
         if (label) { label->setText(fsGetTrEnumName(property)); }
     }
@@ -1606,7 +1606,7 @@ void FSCameraSettingsDialog::updateModeParams()
         ui->lineVideoProcAmpLockWidgets->setVisible(isLockEnabled);
         ui->lineCameraControlLockWidgets->setVisible(isLockEnabled);
 
-        foreach (const FSCameraProperty &property, fsAllCameraProperties()) {
+        for (const FSCameraProperty &property : fsAllCameraProperties()) {
             QCheckBox *lockCheckBox = d->getLockCheckBox(ui, property);
 
             if (lockCheckBox) {
@@ -1627,7 +1627,7 @@ void FSCameraSettingsDialog::updateWidgetsByMode()
 
     updateValues();
 
-    foreach (const FSCameraProperty &property, fsAllCameraProperties()) {
+    for (const FSCameraProperty &property : fsAllCameraProperties()) {
         QCheckBox *lockCheckBox = d->getLockCheckBox(ui, property);
 
         if (lockCheckBox) {
@@ -1691,7 +1691,7 @@ void FSCameraSettingsDialog::saveCurrentPresetValues()
 
     umapCameraPropertyValues.clear();
 
-    foreach (const FSCameraProperty &property, fsAllCameraProperties()) {
+    for (const FSCameraProperty &property : fsAllCameraProperties()) {
         const FSValueParams currentValue = this->valueParams(property);
 
         if (!currentValue.isNull()) {
@@ -1917,7 +1917,7 @@ void FSCameraSettingsDialog::retranslate()
 
 void FSCameraSettingsDialog::updateMinimumWidthLabels()
 {
-    foreach (const FSCameraProperty &property, fsAllCameraProperties()) {
+    for (const FSCameraProperty &property : fsAllCameraProperties()) {
         QLabel *label = d->getLabel(ui, property);
 
         if (label) {
@@ -1936,7 +1936,7 @@ void FSCameraSettingsDialog::updateMinimumWidthLabels()
 
 void FSCameraSettingsDialog::updateMinimumWidthSpinBox()
 {
-    foreach (const FSCameraProperty &property, fsAllCameraProperties()) {
+    for (const FSCameraProperty &property : fsAllCameraProperties()) {
         QSpinBox *spinBox = d->getSpinBox(ui, property);
 
         if (spinBox) {
@@ -1956,7 +1956,7 @@ void FSCameraSettingsDialog::updateMinimumWidthSpinBox()
 
 void FSCameraSettingsDialog::readRangesFromDevice()
 {
-    foreach (const FSCameraProperty &property, fsAllCameraProperties())
+    for (const FSCameraProperty &property : fsAllCameraProperties())
         d->readRangesFromDevice(ui, property);
 }
 

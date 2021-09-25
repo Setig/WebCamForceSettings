@@ -457,7 +457,7 @@ void FSCoreCamerasStorage::loadBlackList()
     const QVariantList varList = FSSettings::blackList();
     std::vector<DevicePath> devicePaths;
 
-    foreach (const QVariant &varDevicePath, varList) {
+    for (const QVariant &varDevicePath : varList) {
         if (!varDevicePath.isNull()) {
             const DevicePath devicePath = varDevicePath.toString();
 

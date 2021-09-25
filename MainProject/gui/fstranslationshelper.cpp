@@ -95,7 +95,7 @@ void FSTranslationsHelper::updateAvailableFSLocales()
     QList<QLocale> availableFSLocales;
 
     QVector<QTranslator *> translators = const_cast<FSTranslationsHelper *>(this)->loadFSTranslations();
-    foreach (QTranslator *translator, translators) {
+    for (QTranslator *translator : translators) {
         availableFSLocales.push_back(getLocaleFromTranslatorFileName(translator));
         delete translator;
     }
@@ -174,7 +174,7 @@ void FSTranslationsHelper::resetCurrentFSTranslation()
 
 void FSTranslationsHelper::resetCurrentQtTranslations()
 {
-    foreach (QTranslator *translator, d->qtInstalledTranslators) {
+    for (QTranslator *translator : d->qtInstalledTranslators) {
         if (qApp->removeTranslator(translator)) {
             delete translator;
             sendEmitCurrentLanguageChanged();
@@ -191,7 +191,7 @@ void FSTranslationsHelper::resetCurrentQtTranslations()
 bool FSTranslationsHelper::installFSTranslation(const QLocale &locale)
 {
     QFileInfoList translationFileInfoList = d->fsTranslationFileInfoList();
-    foreach (const QFileInfo &fileInfo, translationFileInfoList) {
+    for (const QFileInfo &fileInfo : translationFileInfoList) {
         if (compareLocale(locale, getLocaleFromTranslatorFileName(fileInfo.filePath()))) {
             QTranslator *translator = new QTranslator(this);
 
@@ -220,7 +220,7 @@ bool FSTranslationsHelper::installFSTranslation(const QLocale &locale)
 void FSTranslationsHelper::installQtTranslations(const QLocale &locale)
 {
     QFileInfoList translationFileInfoList = d->qtTranslationFileInfoList();
-    foreach (const QFileInfo &fileInfo, translationFileInfoList) {
+    for (const QFileInfo &fileInfo : translationFileInfoList) {
         if (compareLocale(locale, getLocaleFromTranslatorFileName(fileInfo.filePath()))) {
             QTranslator *translator = new QTranslator(this);
 
@@ -242,7 +242,7 @@ QVector<QTranslator *> FSTranslationsHelper::loadFSTranslations()
     QList<QTranslator *> result;
 
     QFileInfoList translationFileInfoList = d->fsTranslationFileInfoList();
-    foreach (const QFileInfo &fileInfo, translationFileInfoList) {
+    for (const QFileInfo &fileInfo : translationFileInfoList) {
         QTranslator *translator = new QTranslator(this);
 
         if (!translator->load(fileInfo.baseName(), fileInfo.dir().absolutePath())) {

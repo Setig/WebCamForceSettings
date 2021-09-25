@@ -120,7 +120,10 @@ int main(int argc, char *argv[])
 {
     qInstallMessageHandler(fsMessageOutput);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
+#endif
+
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::RoundPreferFloor);
 
 #ifdef BUILD_WITH_QT_SINGLE_APPLICATION
