@@ -97,10 +97,10 @@ protected:
     void removeDevice(int deviceIndex);
 
     void emitDataChanged(const DevicePath &devicePath, int column);
-    void emitDataChanged(const DevicePath &devicePath, std::vector<int> columns);
-    void emitDataChanged(int row, std::vector<int> columns);
+    void emitDataChanged(const DevicePath &devicePath, const std::vector<int> &columns);
+    void emitDataChanged(int row, const std::vector<int> &columns);
 
-    void setSupportRoles(std::vector<int> supportRoles);
+    void setSupportRoles(const std::vector<int> &supportRoles);
     std::vector<int> supportRoles() const;
 
     virtual void connectByCamerasStorage(FSCamerasStorage *camerasStorage);

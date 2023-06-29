@@ -38,6 +38,14 @@ public:
     explicit FSCameraLockPropertiesModel(QObject *parent = nullptr);
     ~FSCameraLockPropertiesModel() override;
 
+    enum Column {
+        NameColumn = 0,
+        IsConnectedColumn,
+        CurrentPresetColumn,
+        ManualPropertiesCountColumn,
+        PresetsCountColumn
+    };
+
     void setLockPropertiesManager(FSLockPropertiesManager *lockPropertiesManager);
     FSLockPropertiesManager *lockPropertiesManager() const;
 

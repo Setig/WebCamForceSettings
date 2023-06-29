@@ -26,5 +26,5 @@
 
 QString fsLibraryVersion()
 {
-    return FS_PROJECT_GLOBAL_VERSION;
+    return QStringLiteral(FS_PROJECT_GLOBAL_VERSION);
 }

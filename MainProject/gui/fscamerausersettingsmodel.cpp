@@ -42,7 +42,7 @@ Qt::ItemFlags FSCameraUserSettingsModel::flags(const QModelIndex &index) const
     Qt::ItemFlags result = FSAbstractCameraSettingsModel::flags(index);
 
     if ( index.isValid() &&
-         (index.column() == 3 || index.column() == 4) &&
+         (index.column() == BlacklistedColumn || index.column() == UserNameColumn) &&
          camerasStorage() &&
          index.row() >= 0 &&
          index.row() < rowCount() ) {
@@ -58,11 +58,16 @@ QVariant FSCameraUserSettingsModel::getDeviceData(const DevicePath &devicePath,
 {    
     if (role == Qt::TextAlignmentRole) {
         switch (column) {
-        case 0: return Qt::AlignLeft;
-        case 1: return Qt::AlignLeft;
-        case 2: return Qt::AlignCenter;
-        case 3: return Qt::AlignCenter;
-        case 4: return Qt::AlignLeft;
+        case PathColumn:
+            return Qt::AlignLeft;
+        case NameColumn:
+            return Qt::AlignLeft;
+        case IsConnectedColumn:
+            return Qt::AlignCenter;
+        case BlacklistedColumn:
+            return Qt::AlignCenter;
+        case UserNameColumn:
+            return Qt::AlignLeft;
         default:
             break;
         }
@@ -71,16 +76,21 @@ QVariant FSCameraUserSettingsModel::getDeviceData(const DevicePath &devicePath,
     }
 
     if ( role == Qt::EditRole &&
-         column != 3 &&
-         column != 4 )
+         column != BlacklistedColumn &&
+         column != UserNameColumn )
         return QVariant();
 
     switch (column) {
-    case 0: return devicePath;
-    case 1: return camerasStorage()->getCameraName(devicePath);
-    case 2: return camerasStorage()->isCameraConnected(devicePath);
-    case 3: return camerasStorage()->isContaintsBlackList(devicePath);
-    case 4: return camerasStorage()->getCameraUserName(devicePath);
+    case PathColumn:
+        return devicePath;
+    case NameColumn:
+        return camerasStorage()->getCameraName(devicePath);
+    case IsConnectedColumn:
+        return camerasStorage()->isCameraConnected(devicePath);
+    case BlacklistedColumn:
+        return camerasStorage()->isContaintsBlackList(devicePath);
+    case UserNameColumn:
+        return camerasStorage()->getCameraUserName(devicePath);
     default:
         break;
     }
@@ -93,10 +103,10 @@ bool FSCameraUserSettingsModel::setDeviceData(const DevicePath &devicePath,
                                               const QVariant &value,
                                               int role) const
 {
-    if (devicePath.isEmpty() || role != Qt::EditRole || (column != 3 && column != 4))
+    if (devicePath.isEmpty() || role != Qt::EditRole || (column != BlacklistedColumn && column != UserNameColumn))
         return false;
 
-    if (column == 4) {
+    if (column == UserNameColumn) {
         const DeviceName &newUserName = value.toString().trimmed();
 
         if (!newUserName.isEmpty())
@@ -131,7 +141,7 @@ std::vector<DevicePath> FSCameraUserSettingsModel::getDevicesFromStorage() const
         }
 
         for (const DevicePath &devicePath : vecAvailableDevicePaths) {
-            if (umapCameraUserNames.find(devicePath) == umapCameraUserNames.end()) {
+            if (umapCameraUserNames.find(devicePath) == umapCameraUserNames.cend()) {
                 result.push_back(devicePath);
             }
         }
@@ -143,12 +153,12 @@ std::vector<DevicePath> FSCameraUserSettingsModel::getDevicesFromStorage() const
 void FSCameraUserSettingsModel::connectByCamerasStorage(FSCamerasStorage *camerasStorage)
 {
     if (camerasStorage) {
-        connect(camerasStorage, SIGNAL(cameraUserNameChanged(DevicePath)),
-                this,             SLOT(updateUserSettingsColumns(DevicePath)));
-        connect(camerasStorage, SIGNAL(addedBlacklistCamera(DevicePath)),
-                this,             SLOT(updateUserSettingsColumns(DevicePath)));
-        connect(camerasStorage, SIGNAL(removedBlacklistCamera(DevicePath)),
-                this,             SLOT(updateUserSettingsColumns(DevicePath)));
+        connect(camerasStorage, &FSCamerasStorage::cameraUserNameChanged,
+                this,           &FSCameraUserSettingsModel::updateUserSettingsColumns);
+        connect(camerasStorage, &FSCamerasStorage::addedBlacklistCamera,
+                this,           &FSCameraUserSettingsModel::updateUserSettingsColumns);
+        connect(camerasStorage, &FSCamerasStorage::removedBlacklistCamera,
+                this,           &FSCameraUserSettingsModel::updateUserSettingsColumns);
     }
 
     FSAbstractCameraSettingsModel::connectByCamerasStorage(camerasStorage);
@@ -157,12 +167,12 @@ void FSCameraUserSettingsModel::connectByCamerasStorage(FSCamerasStorage *camera
 void FSCameraUserSettingsModel::disconnectByCamerasStorage(FSCamerasStorage *camerasStorage)
 {
     if (camerasStorage) {
-        disconnect(camerasStorage, SIGNAL(cameraUserNameChanged(DevicePath)),
-                   this,             SLOT(updateUserSettingsColumns(DevicePath)));
-        disconnect(camerasStorage, SIGNAL(addedBlacklistCamera(DevicePath)),
-                   this,             SLOT(updateUserSettingsColumns(DevicePath)));
-        disconnect(camerasStorage, SIGNAL(removedBlacklistCamera(DevicePath)),
-                   this,             SLOT(updateUserSettingsColumns(DevicePath)));
+        disconnect(camerasStorage, &FSCamerasStorage::cameraUserNameChanged,
+                   this,           &FSCameraUserSettingsModel::updateUserSettingsColumns);
+        disconnect(camerasStorage, &FSCamerasStorage::addedBlacklistCamera,
+                   this,           &FSCameraUserSettingsModel::updateUserSettingsColumns);
+        disconnect(camerasStorage, &FSCamerasStorage::removedBlacklistCamera,
+                   this,           &FSCameraUserSettingsModel::updateUserSettingsColumns);
     }
 
     FSAbstractCameraSettingsModel::disconnectByCamerasStorage(camerasStorage);
@@ -175,7 +185,7 @@ void FSCameraUserSettingsModel::addCamera(const DevicePath &devicePath)
          !camerasStorage->isCameraUserNameUsed(devicePath) ) {
         addDevice(devicePath);
     } else {
-        emitDataChanged(devicePath, { 1, 2 });
+        emitDataChanged(devicePath, { NameColumn, IsConnectedColumn });
     }
 }
 
@@ -186,13 +196,13 @@ void FSCameraUserSettingsModel::removeCamera(const DevicePath &devicePath)
          !camerasStorage->isCameraUserNameUsed(devicePath) ) {
         removeDevice(devicePath);
     } else {
-        emitDataChanged(devicePath, { 1, 2 });
+        emitDataChanged(devicePath, { NameColumn, IsConnectedColumn });
     }
 }
 
 void FSCameraUserSettingsModel::updateUserSettingsColumns(const DevicePath &devicePath)
 {
-    emitDataChanged(devicePath, { 3, 4 });
+    emitDataChanged(devicePath, { BlacklistedColumn, UserNameColumn });
 }
 
 void FSCameraUserSettingsModel::retranslate()

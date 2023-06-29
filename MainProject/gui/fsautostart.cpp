@@ -185,10 +185,10 @@ bool FSAutoStart::isAutoStart(FSAutoStartLastError *lastError)
 
 FSAutoStart::FSAutoStart()
 {
-
+    // do nothing
 }
 
 FSAutoStart::~FSAutoStart()
 {
-
+    // do nothing
 }

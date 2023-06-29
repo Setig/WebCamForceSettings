@@ -43,7 +43,7 @@ public:
 
     static void setUsuallyAvailableCamerasCount(uint count);
     static uint usuallyAvailableCamerasCount();
-    static uint defaultUsuallyAvailableCamerasCount();
+    static constexpr uint defaultUsuallyAvailableCamerasCount();
 
     static void setMaxLockProperties(uint count);
     static uint maxLockProperties();

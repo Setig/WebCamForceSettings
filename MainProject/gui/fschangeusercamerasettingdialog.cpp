@@ -41,7 +41,7 @@ public:
 FSChangeUserCameraSettingDialogPrivate::FSChangeUserCameraSettingDialogPrivate()
     : camera(nullptr)
 {
-
+    // do nothing
 }
 
 FSChangeUserCameraSettingDialog::FSChangeUserCameraSettingDialog(QWidget *parent)
@@ -70,7 +70,7 @@ void FSChangeUserCameraSettingDialog::setCamera(FSCamera *camera,
                 setUserName(d->camera->userName());
                 setBlacklisted(d->camera->isBlackListed());
             } else {
-                setUserName("");
+                setUserName(QString());
                 setBlacklisted(false);
             }
         }
@@ -120,7 +120,7 @@ void FSChangeUserCameraSettingDialog::init()
 void FSChangeUserCameraSettingDialog::updateWindowTitle()
 {
     if (d->camera && !d->camera->name().isEmpty())
-        setWindowTitle(d->origWindowTitle + " \"" + d->camera->name() + "\"");
+        setWindowTitle(QStringLiteral("%1 \"%2\"").arg(d->origWindowTitle, d->camera->name()));
     else
         setWindowTitle(d->origWindowTitle);
 }

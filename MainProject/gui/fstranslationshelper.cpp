@@ -53,20 +53,20 @@ FSTranslationsHelperPrivate::FSTranslationsHelperPrivate()
     : fsInstalledTranslator(nullptr)
     , isSendEmitCurrentLanguageChanged(false)
 {
-
+    // do nothing
 }
 
 QFileInfoList FSTranslationsHelperPrivate::qtTranslationFileInfoList()
 {
-    return QDir(qApp->applicationDirPath() + "/translations/qt")
-            .entryInfoList(QStringList() << "qt_*.qm" << "qtbase_*.qm",
+    return QDir(qApp->applicationDirPath() + QStringLiteral("/translations/qt"))
+            .entryInfoList(QStringList() << QStringLiteral("qt_*.qm") << QStringLiteral("qtbase_*.qm"),
                            QDir::Files);
 }
 
 QFileInfoList FSTranslationsHelperPrivate::fsTranslationFileInfoList()
 {
-    return QDir(qApp->applicationDirPath() + "/translations")
-            .entryInfoList(QStringList() << "wcfs_*.qm",
+    return QDir(qApp->applicationDirPath() + QStringLiteral("/translations"))
+            .entryInfoList(QStringList() << QStringLiteral("wcfs_*.qm"),
                            QDir::Files);
 }
 
@@ -94,7 +94,7 @@ void FSTranslationsHelper::updateAvailableFSLocales()
 {
     QList<QLocale> availableFSLocales;
 
-    QVector<QTranslator *> translators = const_cast<FSTranslationsHelper *>(this)->loadFSTranslations();
+    const QVector<QTranslator *> translators = const_cast<FSTranslationsHelper *>(this)->loadFSTranslations();
     for (QTranslator *translator : translators) {
         availableFSLocales.push_back(getLocaleFromTranslatorFileName(translator));
         delete translator;
@@ -174,7 +174,7 @@ void FSTranslationsHelper::resetCurrentFSTranslation()
 
 void FSTranslationsHelper::resetCurrentQtTranslations()
 {
-    for (QTranslator *translator : d->qtInstalledTranslators) {
+    for (QTranslator *translator : qAsConst(d->qtInstalledTranslators)) {
         if (qApp->removeTranslator(translator)) {
             delete translator;
             sendEmitCurrentLanguageChanged();
@@ -190,7 +190,7 @@ void FSTranslationsHelper::resetCurrentQtTranslations()
 
 bool FSTranslationsHelper::installFSTranslation(const QLocale &locale)
 {
-    QFileInfoList translationFileInfoList = d->fsTranslationFileInfoList();
+    const QFileInfoList translationFileInfoList = d->fsTranslationFileInfoList();
     for (const QFileInfo &fileInfo : translationFileInfoList) {
         if (compareLocale(locale, getLocaleFromTranslatorFileName(fileInfo.filePath()))) {
             QTranslator *translator = new QTranslator(this);
@@ -219,7 +219,7 @@ bool FSTranslationsHelper::installFSTranslation(const QLocale &locale)
 
 void FSTranslationsHelper::installQtTranslations(const QLocale &locale)
 {
-    QFileInfoList translationFileInfoList = d->qtTranslationFileInfoList();
+    const QFileInfoList translationFileInfoList = d->qtTranslationFileInfoList();
     for (const QFileInfo &fileInfo : translationFileInfoList) {
         if (compareLocale(locale, getLocaleFromTranslatorFileName(fileInfo.filePath()))) {
             QTranslator *translator = new QTranslator(this);
@@ -241,7 +241,7 @@ QVector<QTranslator *> FSTranslationsHelper::loadFSTranslations()
 {
     QList<QTranslator *> result;
 
-    QFileInfoList translationFileInfoList = d->fsTranslationFileInfoList();
+    const QFileInfoList translationFileInfoList = d->fsTranslationFileInfoList();
     for (const QFileInfo &fileInfo : translationFileInfoList) {
         QTranslator *translator = new QTranslator(this);
 
@@ -294,7 +294,7 @@ void FSTranslationsHelper::sendEmitCurrentLanguageChanged()
 {
     if (!d->isSendEmitCurrentLanguageChanged) {
         d->isSendEmitCurrentLanguageChanged = true;
-        QTimer::singleShot(0, this, SLOT(emitCurrentLanguageChanged()));
+        QTimer::singleShot(0, this, &FSTranslationsHelper::emitCurrentLanguageChanged);
     }
 }
 

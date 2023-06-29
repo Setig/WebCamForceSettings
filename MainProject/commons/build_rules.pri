@@ -11,7 +11,7 @@ UI_DIR      = ./ui
 DESTDIR = $$clean_path($$OUT_PWD/..)
 
 equals(TEMPLATE, app)|equals(TEMPLATE, lib) {
-    isEmpty(VERSION) VERSION = 1.0.1 # Global project version
+    isEmpty(VERSION) VERSION = 1.0.2 # Global project version
     DEFINES += "FS_PROJECT_GLOBAL_VERSION=\\\"$${VERSION}\\\""
 }
 

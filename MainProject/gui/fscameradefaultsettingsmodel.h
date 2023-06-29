@@ -33,6 +33,13 @@ class FSCameraDefaultSettingsModel : public FSAbstractCameraSettingsModel
 public:
     explicit FSCameraDefaultSettingsModel(QObject *parent = nullptr);
 
+    enum Column {
+        NameColumn = 0,
+        IsConnectedColumn,
+        IsExistDefaultSettingsColumn,
+        DefaultSettingsCountColumn
+    };
+
     QVariant getDeviceData(const DevicePath &devicePath,
                            int column,
                            int role = Qt::DisplayRole) const override;

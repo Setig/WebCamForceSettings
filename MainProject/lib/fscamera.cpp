@@ -78,7 +78,7 @@ public:
 FSCameraPrivate::FSCameraPrivate()
     : coreCamerasStorage(nullptr)
 {
-
+    // do nothing
 }
 
 FSCameraPrivate::PropertyInterface FSCameraPrivate::getPropertyInterface(FSCameraProperty property)
@@ -408,7 +408,7 @@ void FSCamera::printCamerasInfo()
                         if (hr == S_OK) {
                             LONG vMin, vMax, vStep, vDefault, vFlags, vVal;
 
-                            std::map<LONG, std::string> mapVideoProcAmpProperties {
+                            const std::map<LONG, std::string> mapVideoProcAmpProperties {
                                 { VideoProcAmp_Brightness,                     "Brightness"},
                                 { VideoProcAmp_Contrast,                       "Contrast"},
                                 { VideoProcAmp_Hue,                            "Hue"},
@@ -424,7 +424,7 @@ void FSCamera::printCamerasInfo()
 
                             for (const auto& [key, name] : mapVideoProcAmpProperties) {
                                 QString spaces;
-                                spaces.fill(' ', (25 - int(name.length())));
+                                spaces.fill(QChar::Space, (25 - int(name.length())));
 
                                 printf("%s%s: ", spaces.toLatin1().constData(), name.c_str());
 
@@ -463,7 +463,7 @@ void FSCamera::printCamerasInfo()
                         if (hr == S_OK) {
                             LONG vMin, vMax, vStep, vDefault, vFlags, vVal;
 
-                            std::map<LONG, std::string> mapCameraControlProperty {
+                            const std::map<LONG, std::string> mapCameraControlProperty {
                                 { CameraControl_Pan,      "Pan"},
                                 { CameraControl_Tilt,     "Tilt"},
                                 { CameraControl_Roll,     "Roll"},
@@ -475,7 +475,7 @@ void FSCamera::printCamerasInfo()
 
                             for (const auto& [key, name] : mapCameraControlProperty) {
                                 QString spaces;
-                                spaces.fill(' ', (25 - int(name.length())));
+                                spaces.fill(QChar::Space, (25 - int(name.length())));
 
                                 printf("%s%s: ", spaces.toLatin1().constData(), name.c_str());
 

@@ -47,7 +47,7 @@ public:
 FSAbstractCameraSettingsModelPrivate::FSAbstractCameraSettingsModelPrivate()
     : camerasStorage(nullptr)
 {
-
+    // do nothing
 }
 
 FSAbstractCameraSettingsModel::FSAbstractCameraSettingsModel(QObject *parent) : QAbstractItemModel(parent)
@@ -84,7 +84,7 @@ std::vector<DevicePath> FSAbstractCameraSettingsModel::cachedVectorDevicePaths()
 int FSAbstractCameraSettingsModel::row(const DevicePath &devicePath)
 {
     DevicePathsAndRowsUMap::const_iterator iterator = d->umapDevicePathsAndRows.find(devicePath);
-    if (iterator != d->umapDevicePathsAndRows.end())
+    if (iterator != d->umapDevicePathsAndRows.cend())
         return iterator->second;
 
     return -1;
@@ -337,13 +337,13 @@ void FSAbstractCameraSettingsModel::emitDataChanged(const DevicePath &devicePath
 }
 
 void FSAbstractCameraSettingsModel::emitDataChanged(const DevicePath &devicePath,
-                                                    std::vector<int> columns)
+                                                    const std::vector<int> &columns)
 {
     emitDataChanged(row(devicePath), columns);
 }
 
 void FSAbstractCameraSettingsModel::emitDataChanged(int row,
-                                                    std::vector<int> columns)
+                                                    const std::vector<int> &columns)
 {
     if (row != -1) {
         for (int column : columns) {
@@ -353,7 +353,7 @@ void FSAbstractCameraSettingsModel::emitDataChanged(int row,
     }
 }
 
-void FSAbstractCameraSettingsModel::setSupportRoles(std::vector<int> supportRoles)
+void FSAbstractCameraSettingsModel::setSupportRoles(const std::vector<int> &supportRoles)
 {
     d->supportRoles.clear();
 
@@ -367,7 +367,7 @@ std::vector<int> FSAbstractCameraSettingsModel::supportRoles() const
     std::vector<int> result;
     result.reserve(d->supportRoles.size());
 
-    for (int role : d->supportRoles) {
+    for (int role : qAsConst(d->supportRoles)) {
         result.push_back(role);
     }
 

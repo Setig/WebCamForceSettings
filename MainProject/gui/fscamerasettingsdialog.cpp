@@ -882,13 +882,13 @@ void FSCameraSettingsDialogPrivate::setComboBoxPowerlineFrequencyValueParams(Ui:
 
 bool FSCameraSettingsDialogPrivate::isEditorValueEnable(FSCameraProperty property) const
 {
-    return (umapCameraPropertyRangeParams.find(property) != umapCameraPropertyRangeParams.end());
+    return (umapCameraPropertyRangeParams.find(property) != umapCameraPropertyRangeParams.cend());
 }
 
 FSRangeParams FSCameraSettingsDialogPrivate::getRangeParams(FSCameraProperty property) const
 {
     FSCameraPropertyRangesUMap::const_iterator iterator = umapCameraPropertyRangeParams.find(property);
-    if (iterator != umapCameraPropertyRangeParams.end()) {
+    if (iterator != umapCameraPropertyRangeParams.cend()) {
         return iterator->second;
     }
 
@@ -955,7 +955,7 @@ FSValueParams FSCameraSettingsDialogPrivate::getDefaultValue(FSCameraProperty pr
 FSValueParams FSCameraSettingsDialogPrivate::getDefaultValueFromRange(FSCameraProperty property) const
 {
     FSCameraPropertyRangesUMap::const_iterator iterator = umapCameraPropertyRangeParams.find(property);
-    if (iterator != umapCameraPropertyRangeParams.end()) {
+    if (iterator != umapCameraPropertyRangeParams.cend()) {
         const FSRangeParams &rangeParams = iterator->second;
 
         if (rangeParams.isSupportManualControl())
@@ -1102,24 +1102,24 @@ void FSCameraSettingsDialogPrivate::connectingStandartEditors(Ui::FSCameraSettin
     if (slider) {
         propertyChangeSignalMapper->setMapping(slider, genEditorTypeProperty(SliderEditorType, property));
 
-        QObject::connect(slider,                   SIGNAL(valueChanged(int)),
-                         propertyChangeSignalMapper, SLOT(map()));
+        QObject::connect(slider,                     qOverload<int>(&QAbstractSlider::valueChanged),
+                         propertyChangeSignalMapper, qOverload<>(&QSignalMapper::map));
     }
 
     QSpinBox *spinBox = getSpinBox(ui, property);
     if (spinBox) {
         propertyChangeSignalMapper->setMapping(spinBox, genEditorTypeProperty(SpinBoxEditorType, property));
 
-        QObject::connect(spinBox,                  SIGNAL(valueChanged(int)),
-                         propertyChangeSignalMapper, SLOT(map()));
+        QObject::connect(spinBox,                    qOverload<int>(&QSpinBox::valueChanged),
+                         propertyChangeSignalMapper, qOverload<>(&QSignalMapper::map));
     }
 
     QCheckBox *checkBox = getAutoCheckBox(ui, property);
     if (checkBox) {
         propertyChangeSignalMapper->setMapping(checkBox, genEditorTypeProperty(AutoCheckBoxEditorType, property));
 
-        QObject::connect(checkBox,                 SIGNAL(stateChanged(int)),
-                         propertyChangeSignalMapper, SLOT(map()));
+        QObject::connect(checkBox,                   qOverload<int>(&QCheckBox::stateChanged),
+                         propertyChangeSignalMapper, qOverload<>(&QSignalMapper::map));
     }
 }
 
@@ -1127,16 +1127,16 @@ void FSCameraSettingsDialogPrivate::connectingColorEnableEditor(Ui::FSCameraSett
 {
     propertyChangeSignalMapper->setMapping(ui->checkBoxColorEnable, genEditorTypeProperty(NoneEditorType, FSCameraProperty::ColorEnable));
 
-    QObject::connect(ui->checkBoxColorEnable,  SIGNAL(stateChanged(int)),
-                     propertyChangeSignalMapper, SLOT(map()));
+    QObject::connect(ui->checkBoxColorEnable,    qOverload<int>(&QCheckBox::stateChanged),
+                     propertyChangeSignalMapper, qOverload<>(&QSignalMapper::map));
 }
 
 void FSCameraSettingsDialogPrivate::connectingPowerlineFrequencyEditor(Ui::FSCameraSettingsDialog *ui)
 {
     propertyChangeSignalMapper->setMapping(ui->comboBoxPowerlineFrequency, genEditorTypeProperty(NoneEditorType, FSCameraProperty::PowerlineFrequency));
 
-    QObject::connect(ui->comboBoxPowerlineFrequency, SIGNAL(currentIndexChanged(int)),
-                     propertyChangeSignalMapper,       SLOT(map()));
+    QObject::connect(ui->comboBoxPowerlineFrequency, qOverload<int>(&QComboBox::currentIndexChanged),
+                     propertyChangeSignalMapper,     qOverload<>(&QSignalMapper::map));
 }
 
 void FSCameraSettingsDialogPrivate::connectingLockCheckBox(Ui::FSCameraSettingsDialog *ui,
@@ -1146,8 +1146,8 @@ void FSCameraSettingsDialogPrivate::connectingLockCheckBox(Ui::FSCameraSettingsD
     if (checkBox) {
         lockSignalMapper->setMapping(checkBox, property);
 
-        QObject::connect(checkBox,       SIGNAL(stateChanged(int)),
-                         lockSignalMapper, SLOT(map()));
+        QObject::connect(checkBox,         qOverload<int>(&QCheckBox::stateChanged),
+                         lockSignalMapper, qOverload<>(&QSignalMapper::map));
     }
 }
 
@@ -1159,8 +1159,8 @@ void FSCameraSettingsDialogPrivate::readRangesFromDevice(Ui::FSCameraSettingsDia
     if (!rangeParams.isNull()) {
         umapCameraPropertyRangeParams.insert_or_assign(property, rangeParams);
     } else {
-        FSCameraPropertyRangesUMap::iterator iterator = umapCameraPropertyRangeParams.find(property);
-        if (iterator != umapCameraPropertyRangeParams.end()) {
+        FSCameraPropertyRangesUMap::const_iterator iterator = umapCameraPropertyRangeParams.find(property);
+        if (iterator != umapCameraPropertyRangeParams.cend()) {
             umapCameraPropertyRangeParams.erase(iterator);
         }
     }
@@ -1252,33 +1252,33 @@ void FSCameraSettingsDialog::setLockPropertiesManager(FSLockPropertiesManager *l
 {
     if (d->lockPropertiesManager != lockPropertiesManager) {
         if (d->lockPropertiesManager) {
-            disconnect(d->lockPropertiesManager, SIGNAL(lockedProperty(DevicePath,FSCameraProperty)),
-                       this,                       SLOT(lockedProperty(DevicePath,FSCameraProperty)));
-            disconnect(d->lockPropertiesManager, SIGNAL(unlockedProperty(DevicePath,FSCameraProperty)),
-                       this,                       SLOT(unlockedProperty(DevicePath,FSCameraProperty)));
+            disconnect(d->lockPropertiesManager, &FSLockPropertiesManager::lockedProperty,
+                       this,                     &FSCameraSettingsDialog::lockedProperty);
+            disconnect(d->lockPropertiesManager, &FSLockPropertiesManager::unlockedProperty,
+                       this,                     &FSCameraSettingsDialog::unlockedProperty);
 
-            disconnect(d->lockPropertiesManager, SIGNAL(switchedToManualMode(DevicePath)),
-                       this,                       SLOT(updateCurrentLockPresetIndex(DevicePath)));
-            disconnect(d->lockPropertiesManager, SIGNAL(lockedPreset(DevicePath,QString)),
-                       this,                       SLOT(updateCurrentLockPresetIndex(DevicePath)));
-            disconnect(d->lockPropertiesManager, SIGNAL(unlockedPreset(DevicePath)),
-                       this,                       SLOT(updateCurrentLockPresetIndex(DevicePath)));
+            disconnect(d->lockPropertiesManager, &FSLockPropertiesManager::switchedToManualMode,
+                       this,                     qOverload<const DevicePath &>(&FSCameraSettingsDialog::updateCurrentLockPresetIndex));
+            disconnect(d->lockPropertiesManager, &FSLockPropertiesManager::lockedPreset,
+                       this,                     qOverload<const DevicePath &>(&FSCameraSettingsDialog::updateCurrentLockPresetIndex));
+            disconnect(d->lockPropertiesManager, &FSLockPropertiesManager::unlockedPreset,
+                       this,                     qOverload<const DevicePath &>(&FSCameraSettingsDialog::updateCurrentLockPresetIndex));
         }
 
         d->lockPropertiesManager = lockPropertiesManager;
 
         if (d->lockPropertiesManager) {
-            connect(d->lockPropertiesManager, SIGNAL(lockedProperty(DevicePath,FSCameraProperty)),
-                    this,                       SLOT(lockedProperty(DevicePath,FSCameraProperty)));
-            connect(d->lockPropertiesManager, SIGNAL(unlockedProperty(DevicePath,FSCameraProperty)),
-                    this,                       SLOT(unlockedProperty(DevicePath,FSCameraProperty)));
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::lockedProperty,
+                    this,                     &FSCameraSettingsDialog::lockedProperty);
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::unlockedProperty,
+                    this,                     &FSCameraSettingsDialog::unlockedProperty);
 
-            connect(d->lockPropertiesManager, SIGNAL(switchedToManualMode(DevicePath)),
-                    this,                       SLOT(updateCurrentLockPresetIndex(DevicePath)));
-            connect(d->lockPropertiesManager, SIGNAL(lockedPreset(DevicePath,QString)),
-                    this,                       SLOT(updateCurrentLockPresetIndex(DevicePath)));
-            connect(d->lockPropertiesManager, SIGNAL(unlockedPreset(DevicePath)),
-                    this,                       SLOT(updateCurrentLockPresetIndex(DevicePath)));
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::switchedToManualMode,
+                    this,                     qOverload<const DevicePath &>(&FSCameraSettingsDialog::updateCurrentLockPresetIndex));
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::lockedPreset,
+                    this,                     qOverload<const DevicePath &>(&FSCameraSettingsDialog::updateCurrentLockPresetIndex));
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::unlockedPreset,
+                    this,                     qOverload<const DevicePath &>(&FSCameraSettingsDialog::updateCurrentLockPresetIndex));
         }
 
         updateModeParams();
@@ -1328,7 +1328,7 @@ bool FSCameraSettingsDialog::isCameraValueSendEnable() const
 
 void FSCameraSettingsDialog::updateWindowTitle()
 {
-    setWindowTitle(d->origWindowTitle + " \"" + d->camera->displayName() + "\"");
+    setWindowTitle(QStringLiteral("%1 \"%2\"").arg(d->origWindowTitle, d->camera->displayName()));
 }
 
 void FSCameraSettingsDialog::updateValueParams(FSCameraProperty property)
@@ -1367,7 +1367,8 @@ void FSCameraSettingsDialog::sendValuesToCameraStorage()
     if (d->mode == FSCameraSettingsDialog::ChangeDefaultValuesMode) {
         camerasStorage->userDefaultValuesRemove(devicePath);
 
-        for (const FSCameraProperty &property : fsAllCameraProperties()) {
+        const std::vector<FSCameraProperty> allCameraProperties = fsAllCameraProperties();
+        for (const FSCameraProperty &property : allCameraProperties) {
             const FSValueParams currentValue = this->valueParams(property);
 
             if (!currentValue.isNull()) {
@@ -1387,7 +1388,7 @@ void FSCameraSettingsDialog::sendValuesToCameraStorage()
 
         FSCameraUserPresetsUMap umapCameraUserPresets;
 
-        for (const auto &[presetName, propertyValues] : d->umapCameraUserPresets) {
+        for (const auto &[presetName, propertyValues] : qAsConst(d->umapCameraUserPresets)) {
             if (!presetName.isEmpty() && !propertyValues.empty()) {
                 umapCameraUserPresets.insert( { presetName, propertyValues } );
             }
@@ -1405,7 +1406,7 @@ void FSCameraSettingsDialog::done(int r)
 
             bool isContaintsEmptyPresets = false;
 
-            for (const auto &[presetName, propertyValues] : d->umapCameraUserPresets) {
+            for (const auto &[presetName, propertyValues] : qAsConst(d->umapCameraUserPresets)) {
                 if (!presetName.isEmpty() && propertyValues.empty()) {
                     isContaintsEmptyPresets = true;
                     break;
@@ -1421,9 +1422,9 @@ void FSCameraSettingsDialog::done(int r)
 
                 QString emptyPresetText;
 
-                for (const auto &[presetName, propertyValues] : d->umapCameraUserPresets) {
+                for (const auto &[presetName, propertyValues] : qAsConst(d->umapCameraUserPresets)) {
                     if (!presetName.isEmpty() && propertyValues.empty()) {
-                        emptyPresetText += QString("\n\"%1\"").arg(presetName);
+                        emptyPresetText += QStringLiteral("\n\"%1\"").arg(presetName);
                     }
                 }
 
@@ -1469,11 +1470,11 @@ bool FSCameraSettingsDialog::eventFilter(QObject *object, QEvent *event)
 
         if (spinBox) {
             if (event->type() == QEvent::FocusIn) {
-                disconnect(spinBox,                     SIGNAL(valueChanged(int)),
-                           d->propertyChangeSignalMapper, SLOT(map()));
+                disconnect(spinBox,                       qOverload<int>(&QSpinBox::valueChanged),
+                           d->propertyChangeSignalMapper, qOverload<>(&QSignalMapper::map));
             } else {
-                connect(spinBox,                     SIGNAL(valueChanged(int)),
-                        d->propertyChangeSignalMapper, SLOT(map()));
+                connect(spinBox,                       qOverload<int>(&QSpinBox::valueChanged),
+                        d->propertyChangeSignalMapper, qOverload<>(&QSignalMapper::map));
                 emit spinBox->valueChanged(spinBox->value());
             }
         }
@@ -1494,16 +1495,16 @@ void FSCameraSettingsDialog::init(FSCamera *camera)
     connect(fsTH, &FSTranslationsHelper::currentLanguageChanged,
             this, &FSCameraSettingsDialog::retranslate);
 
-    connect(ui->comboBoxPresets, SIGNAL(currentIndexChanged(int)),
-            this,                  SLOT(updateCurrentPresetRemoveButton()));
-    connect(ui->comboBoxPresets, SIGNAL(currentIndexChanged(int)),
-            this,                  SLOT(restorePresetValues(int)));
+    connect(ui->comboBoxPresets, qOverload<int>(&QComboBox::currentIndexChanged),
+            this,                &FSCameraSettingsDialog::updateCurrentPresetRemoveButton);
+    connect(ui->comboBoxPresets, qOverload<int>(&QComboBox::currentIndexChanged),
+            this,                qOverload<int>(&FSCameraSettingsDialog::restorePresetValues));
 
-    connect(ui->toolButtonRenameCurrentPreset, SIGNAL(clicked()),
-            this,                                SLOT(execRenameCurrentPresetName()));
+    connect(ui->toolButtonRenameCurrentPreset, &QAbstractButton::clicked,
+            this,                              &FSCameraSettingsDialog::execRenameCurrentPresetName);
 
-    connect(ui->toolButtonRemoveCurrentPreset, SIGNAL(clicked()),
-            this,                                SLOT(removeCurrentPreset()));
+    connect(ui->toolButtonRemoveCurrentPreset, &QAbstractButton::clicked,
+            this,                              &FSCameraSettingsDialog::removeCurrentPreset);
 
     updateMinimumWidthSpinBox();
 
@@ -1513,8 +1514,8 @@ void FSCameraSettingsDialog::init(FSCamera *camera)
 
     d->valueUpdateTimer = new QTimer(this);
     d->valueUpdateTimer->setInterval(FSSettings::cameraValueUpdateInterval());
-    connect(d->valueUpdateTimer, SIGNAL(timeout()),
-            this,                  SLOT(updateValues()));
+    connect(d->valueUpdateTimer, &QTimer::timeout,
+            this,                &FSCameraSettingsDialog::updateValues);
 
     d->origWindowTitle = windowTitle();
     updateWindowTitle();
@@ -1522,7 +1523,8 @@ void FSCameraSettingsDialog::init(FSCamera *camera)
 
     initEditorsConnections();
 
-    for (FSCameraProperty property: fsAllCameraProperties()) {
+    const std::vector<FSCameraProperty> allCameraProperties = fsAllCameraProperties();
+    for (FSCameraProperty property: allCameraProperties) {
         QSpinBox *spinBox = d->getSpinBox(ui, property);
 
         if (spinBox)
@@ -1537,26 +1539,35 @@ void FSCameraSettingsDialog::initEditorsConnections()
 {
     d->propertyChangeSignalMapper = new QSignalMapper(this);
 
-    connect(d->propertyChangeSignalMapper, SIGNAL(mappedInt(int)),
-            this,                            SLOT(applyCurrentValueParams(int)),
+    connect(d->propertyChangeSignalMapper, &QSignalMapper::mappedInt,
+            this,                          &FSCameraSettingsDialog::applyCurrentValueParams,
             Qt::QueuedConnection);
 
-    for (const FSCameraProperty &property : fsAllCameraProperties())
-        d->connectingEditors(ui, property);
+    {
+        const std::vector<FSCameraProperty> allCameraProperties = fsAllCameraProperties();
+        for (const FSCameraProperty &property : allCameraProperties) {
+            d->connectingEditors(ui, property);
+        }
+    }
 
     d->lockSignalMapper = new QSignalMapper(this);
 
-    connect(d->lockSignalMapper, SIGNAL(mappedInt(int)),
-            this,                  SLOT(sendLockCameraProperty(int)),
+    connect(d->lockSignalMapper, &QSignalMapper::mappedInt,
+            this,                &FSCameraSettingsDialog::sendLockCameraProperty,
             Qt::QueuedConnection);
 
-    for (const FSCameraProperty &property : fsAllCameraProperties())
-        d->connectingLockCheckBox(ui, property);
+    {
+        const std::vector<FSCameraProperty> allCameraProperties = fsAllCameraProperties();
+        for (const FSCameraProperty &property : allCameraProperties) {
+            d->connectingLockCheckBox(ui, property);
+        }
+    }
 }
 
 void FSCameraSettingsDialog::retranslatePropertyNames()
 {
-    for (const FSCameraProperty &property : fsAllCameraProperties()) {
+    const std::vector<FSCameraProperty> allCameraProperties = fsAllCameraProperties();
+    for (const FSCameraProperty &property : allCameraProperties) {
         QLabel *label = FSCameraSettingsDialogPrivate::getLabel(ui, property);
         if (label) { label->setText(fsGetTrEnumName(property)); }
     }
@@ -1584,8 +1595,8 @@ void FSCameraSettingsDialog::updateModeParams()
 
     QPushButton *restoreDefaultsButton = ui->buttonBox->button(QDialogButtonBox::RestoreDefaults);
     if (restoreDefaultsButton) {
-        connect(restoreDefaultsButton, SIGNAL(clicked(bool)),
-                this,                    SLOT(restoreDefaultValues()));
+        connect(restoreDefaultsButton, &QAbstractButton::clicked,
+                this,                  &FSCameraSettingsDialog::restoreDefaultValues);
     }
 
     ui->widgetPresets->setVisible(d->mode != FSCameraSettingsDialog::ChangeDefaultValuesMode);
@@ -1606,7 +1617,8 @@ void FSCameraSettingsDialog::updateModeParams()
         ui->lineVideoProcAmpLockWidgets->setVisible(isLockEnabled);
         ui->lineCameraControlLockWidgets->setVisible(isLockEnabled);
 
-        for (const FSCameraProperty &property : fsAllCameraProperties()) {
+        const std::vector<FSCameraProperty> allCameraProperties = fsAllCameraProperties();
+        for (const FSCameraProperty &property : allCameraProperties) {
             QCheckBox *lockCheckBox = d->getLockCheckBox(ui, property);
 
             if (lockCheckBox) {
@@ -1621,13 +1633,14 @@ void FSCameraSettingsDialog::updateWidgetsByMode()
     if (!d->camera)
         return;
 
-    for (const auto& [property, rangeParams] : d->umapCameraPropertyRangeParams) {
+    for (const auto& [property, rangeParams] : qAsConst(d->umapCameraPropertyRangeParams)) {
         d->setEditorsRange(ui, property, rangeParams);
     }
 
     updateValues();
 
-    for (const FSCameraProperty &property : fsAllCameraProperties()) {
+    const std::vector<FSCameraProperty> allCameraProperties = fsAllCameraProperties();
+    for (const FSCameraProperty &property : allCameraProperties) {
         QCheckBox *lockCheckBox = d->getLockCheckBox(ui, property);
 
         if (lockCheckBox) {
@@ -1691,7 +1704,8 @@ void FSCameraSettingsDialog::saveCurrentPresetValues()
 
     umapCameraPropertyValues.clear();
 
-    for (const FSCameraProperty &property : fsAllCameraProperties()) {
+    const std::vector<FSCameraProperty> allCameraProperties = fsAllCameraProperties();
+    for (const FSCameraProperty &property : allCameraProperties) {
         const FSValueParams currentValue = this->valueParams(property);
 
         if (!currentValue.isNull()) {
@@ -1711,9 +1725,9 @@ void FSCameraSettingsDialog::restorePresetValues(const QString &presetName)
 
     restoreDefaultValues();
 
-    FSCameraUserPresetsUMap::iterator iterator = d->umapCameraUserPresets.find(presetName);
-    if (iterator != d->umapCameraUserPresets.end()) {
-        for (const auto &[property, valueParams] : iterator->second) {
+    FSCameraUserPresetsUMap::const_iterator iterator = d->umapCameraUserPresets.find(presetName);
+    if (iterator != d->umapCameraUserPresets.cend()) {
+        for (const auto &[property, valueParams] : qAsConst(iterator->second)) {
             d->setEditorsValue(ui, property, valueParams);
         }
     }
@@ -1798,7 +1812,7 @@ void FSCameraSettingsDialog::updatePresetsFromCameraStorage()
                 dequePresetNames.push_front(MANUAL_PRESET);
         }
 
-        for (const QString &presetName : dequePresetNames) {
+        for (const QString &presetName : qAsConst(dequePresetNames)) {
             ui->comboBoxPresets->addItem(presetName);
         }
 
@@ -1818,14 +1832,14 @@ void FSCameraSettingsDialog::updatePresetsFromCameraStorage()
         std::vector<QString> vectorPresetNames;
         vectorPresetNames.reserve(d->umapCameraUserPresets.size());
         for (FSCameraUserPresetsUMap::const_iterator iterator = d->umapCameraUserPresets.begin();
-             iterator != d->umapCameraUserPresets.end();
+             iterator != d->umapCameraUserPresets.cend();
              ++iterator) {
             vectorPresetNames.push_back(iterator->first);
         }
 
         sort(vectorPresetNames.begin(), vectorPresetNames.end());
 
-        for (const QString &presetName : vectorPresetNames) {
+        for (const QString &presetName : qAsConst(vectorPresetNames)) {
             ui->comboBoxPresets->addItem(presetName);
         }
 
@@ -1917,7 +1931,8 @@ void FSCameraSettingsDialog::retranslate()
 
 void FSCameraSettingsDialog::updateMinimumWidthLabels()
 {
-    for (const FSCameraProperty &property : fsAllCameraProperties()) {
+    const std::vector<FSCameraProperty> allCameraProperties = fsAllCameraProperties();
+    for (const FSCameraProperty &property : allCameraProperties) {
         QLabel *label = d->getLabel(ui, property);
 
         if (label) {
@@ -1936,7 +1951,8 @@ void FSCameraSettingsDialog::updateMinimumWidthLabels()
 
 void FSCameraSettingsDialog::updateMinimumWidthSpinBox()
 {
-    for (const FSCameraProperty &property : fsAllCameraProperties()) {
+    const std::vector<FSCameraProperty> allCameraProperties = fsAllCameraProperties();
+    for (const FSCameraProperty &property : allCameraProperties) {
         QSpinBox *spinBox = d->getSpinBox(ui, property);
 
         if (spinBox) {
@@ -1956,19 +1972,20 @@ void FSCameraSettingsDialog::updateMinimumWidthSpinBox()
 
 void FSCameraSettingsDialog::readRangesFromDevice()
 {
-    for (const FSCameraProperty &property : fsAllCameraProperties())
+    const std::vector<FSCameraProperty> allCameraProperties = fsAllCameraProperties();
+    for (const FSCameraProperty &property : allCameraProperties)
         d->readRangesFromDevice(ui, property);
 }
 
 void FSCameraSettingsDialog::updateValues()
 {
-    for (const auto& [property, rangeParams] : d->umapCameraPropertyRangeParams)
+    for (const auto& [property, rangeParams] : qAsConst(d->umapCameraPropertyRangeParams))
         d->updateValue(ui, property);
 }
 
 void FSCameraSettingsDialog::restoreDefaultValues()
 {
-    for (const auto& [property, rangeParams] : d->umapCameraPropertyRangeParams) {
+    for (const auto& [property, rangeParams] : qAsConst(d->umapCameraPropertyRangeParams)) {
         FSValueParams defaultValueParams = d->getDefaultValue(property);
 
         if (defaultValueParams.isNull())
@@ -2132,7 +2149,7 @@ void FSCameraSettingsDialog::removeCurrentPreset()
         createNewPreset();
 
     FSCameraUserPresetsUMap::const_iterator iterator = d->umapCameraUserPresets.find(currentPresetName);
-    if (iterator != d->umapCameraUserPresets.end()) {
+    if (iterator != d->umapCameraUserPresets.cend()) {
         d->umapCameraUserPresets.erase(iterator);
     }
 

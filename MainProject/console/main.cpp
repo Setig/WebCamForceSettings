@@ -83,8 +83,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    a.setApplicationName(FS_CONSOLE_APPLICATION_NAME);
-    a.setApplicationVersion(FS_PROJECT_GLOBAL_VERSION);
+    a.setApplicationName(QStringLiteral(FS_CONSOLE_APPLICATION_NAME));
+    a.setApplicationVersion(QStringLiteral(FS_PROJECT_GLOBAL_VERSION));
 
     // Application arguments parsing
     {
@@ -95,18 +95,18 @@ int main(int argc, char *argv[])
         for (int i = 0; i < appArgs.count(); i++) {
             const QString &arg = appArgs.at(i);
 
-            if ( arg == HELP_SHORT_ARG_NAME ||
-                 arg == HELP_LONG_ARG_NAME ) {
+            if ( arg == QLatin1String(HELP_SHORT_ARG_NAME) ||
+                 arg == QLatin1String(HELP_LONG_ARG_NAME) ) {
                 printHelp();
                 return 1;
-            } else if (arg == HELP_GUI_ARG_NAME) {
+            } else if (arg == QLatin1String(HELP_GUI_ARG_NAME)) {
                 printGUIHelp();
                 return 1;
-            } else if (arg == VERSION_LONG_ARG_NAME) {
+            } else if (arg == QLatin1String(VERSION_LONG_ARG_NAME)) {
                 printVersion();
                 return 1;
-            } else if ( arg == SHOW_CAMERAS_INFO_SHORT_ARG_NAME ||
-                        arg == SHOW_CAMERAS_INFO_LONG_ARG_NAME ) {
+            } else if ( arg == QLatin1String(SHOW_CAMERAS_INFO_SHORT_ARG_NAME) ||
+                        arg == QLatin1String(SHOW_CAMERAS_INFO_LONG_ARG_NAME) ) {
                 isShowCamerasInfo = true;
                 break;
             } else {

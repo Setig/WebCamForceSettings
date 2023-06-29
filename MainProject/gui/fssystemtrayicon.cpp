@@ -130,13 +130,16 @@ FSSystemTrayIcon::~FSSystemTrayIcon()
 
     d->camerasStorage->saveAll();
 
-    QMetaObject::invokeMethod(d->camerasDetectionTimer, &QTimer::stop, Qt::BlockingQueuedConnection);
+    QMetaObject::invokeMethod(d->camerasDetectionTimer, [this]() {
+        d->camerasDetectionTimer->stop();
+    }, Qt::BlockingQueuedConnection);
+
     d->parallelThread->quit();
     d->parallelThread->wait();
     delete d->camerasDetectionTimer;
     delete d->parallelThread;
 
-    for (const auto &[camera, cameraSettingsDialog] : d->umapCameraAndOpenedCameraSettingsDialog) {
+    for (const auto &[camera, cameraSettingsDialog] : qAsConst(d->umapCameraAndOpenedCameraSettingsDialog)) {
         delete cameraSettingsDialog;
     }
 
@@ -163,6 +166,9 @@ void FSSystemTrayIcon::init()
 {
     d = new FSSystemTrayIconPrivate();
 
+    connect(this, &QSystemTrayIcon::activated,
+            this, &FSSystemTrayIcon::activateProc);
+
     d->parallelThread = new QThread();
     d->parallelThread->start();
 
@@ -188,8 +194,8 @@ void FSSystemTrayIcon::init()
 
     d->camerasDetectionTimer = new QTimer();
     d->camerasDetectionTimer->moveToThread(d->parallelThread);
-    connect(d->camerasDetectionTimer, SIGNAL(timeout()),
-            this,                       SLOT(checkAvailableCameras()));
+    connect(d->camerasDetectionTimer, &QTimer::timeout,
+            this,                     &FSSystemTrayIcon::checkAvailableCameras);
     updateCamerasDetectionTimer();
 
     updateLockPropertiesManager();
@@ -203,18 +209,18 @@ void FSSystemTrayIcon::initMainMenu()
 {
     d->mainMenu = new QMenu(tr("Main menu"), nullptr);
 
-    d->mainMenu->addAction(tr("About..."), this, SLOT(about()));
-    d->mainMenu->addAction(tr("About Qt..."), qApp, SLOT(aboutQt()));
+    d->mainMenu->addAction(tr("About..."), this, &FSSystemTrayIcon::about);
+    d->mainMenu->addAction(tr("About Qt..."), qApp, &QApplication::aboutQt);
     d->mainMenu->addSeparator();
     d->cameraSettingsMenu = new QMenu(tr("Camera settings"), d->mainMenu);
     connect(d->cameraSettingsMenu, &QMenu::aboutToShow,
             this,                  &FSSystemTrayIcon::onShowAvailableCamerasMenu);
     d->mainMenu->addMenu(d->cameraSettingsMenu);
     d->mainMenu->addSeparator();
-    d->mainMenu->addAction(tr("Application settings..."), this, SLOT(showSettingsDialog()));
-    d->mainMenu->addAction(tr("User settings..."),        this, SLOT(showUserSettingsDialog()));
+    d->mainMenu->addAction(tr("Application settings..."), this, &FSSystemTrayIcon::showSettingsDialog);
+    d->mainMenu->addAction(tr("User settings..."),        this, &FSSystemTrayIcon::showUserSettingsDialog);
     d->mainMenu->addSeparator();
-    d->mainMenu->addAction(tr("Exit"), qApp, SLOT(quit()));
+    d->mainMenu->addAction(tr("Exit"), qApp, &QCoreApplication::quit);
     setContextMenu(d->mainMenu);
 
     setToolTip(tr("WebCam force settings"));
@@ -224,8 +230,8 @@ void FSSystemTrayIcon::createCameraMenuObjects(FSCamera *camera)
 {
     QAction *cameraAction = new QAction(camera->displayName(), d->cameraSettingsMenu);
     cameraAction->setVisible(!d->camerasStorage->isContaintsBlackList(camera->devicePath()));
-    connect(cameraAction, SIGNAL(triggered(bool)),
-            this,           SLOT(showCameraSettingsDialog()));
+    connect(cameraAction, qOverload<bool>(&QAction::triggered),
+            this,         qOverload<>(&FSSystemTrayIcon::showCameraSettingsDialog));
 
     d->cameraSettingsMenu->insertAction(beforeActionForListActions(d->cameraSettingsMenu->actions(),
                                                                    cameraAction->text()),
@@ -244,7 +250,7 @@ void FSSystemTrayIcon::createCameraMenuObjects(FSCamera *camera)
 void FSSystemTrayIcon::deleteCameraMenuObjects(FSCamera *camera)
 {
     FSCamerasAndActionsUMap::const_iterator actionIterator = d->umapCamerasAndActions.find(camera);
-    if (actionIterator != d->umapCamerasAndActions.end()) {
+    if (actionIterator != d->umapCamerasAndActions.cend()) {
         QAction *cameraAction = actionIterator->second;
         d->cameraSettingsMenu->removeAction(cameraAction);
         delete cameraAction;
@@ -254,7 +260,7 @@ void FSSystemTrayIcon::deleteCameraMenuObjects(FSCamera *camera)
     }
 
     FSCamerasAndMenuUMap::const_iterator presetMenuIterator = d->umapCamerasAndPresetMenu.find(camera);
-    if (presetMenuIterator != d->umapCamerasAndPresetMenu.end()) {
+    if (presetMenuIterator != d->umapCamerasAndPresetMenu.cend()) {
         QMenu *presetMenu = presetMenuIterator->second;
         delete presetMenu;
 
@@ -263,7 +269,7 @@ void FSSystemTrayIcon::deleteCameraMenuObjects(FSCamera *camera)
     }
 
     FSCameraAndOpenedCameraSettingsDialogUMap::const_iterator dialogIterator = d->umapCameraAndOpenedCameraSettingsDialog.find(camera);
-    if (dialogIterator != d->umapCameraAndOpenedCameraSettingsDialog.end()) {
+    if (dialogIterator != d->umapCameraAndOpenedCameraSettingsDialog.cend()) {
         dialogIterator->second->close();
     }
 }
@@ -283,20 +289,19 @@ QAction *FSSystemTrayIcon::beforeActionForListActions(const QList<QAction *> &li
 void FSSystemTrayIcon::updateCamerasDetectionTimer()
 {
     if (FSSettings::isCameraDetectionEnable()) {
-        QMetaObject::invokeMethod(d->camerasDetectionTimer,
-                                  "start",
-                                  Qt::QueuedConnection,
-                                  Q_ARG(int, FSSettings::cameraDetectionInterval()));
+        QMetaObject::invokeMethod(d->camerasDetectionTimer, [this]() {
+            d->camerasDetectionTimer->start(FSSettings::cameraDetectionInterval());
+        }, Qt::QueuedConnection);
     } else {
-        QMetaObject::invokeMethod(d->camerasDetectionTimer,
-                                  &QTimer::stop,
-                                  Qt::QueuedConnection);
+        QMetaObject::invokeMethod(d->camerasDetectionTimer, [this]() {
+            d->camerasDetectionTimer->stop();
+        }, Qt::QueuedConnection);
     }
 }
 
 void FSSystemTrayIcon::updateSettingsDialogs()
 {
-    for (const auto &[camera, cameraSettingsDialog] : d->umapCameraAndOpenedCameraSettingsDialog) {
+    for (const auto &[camera, cameraSettingsDialog] : qAsConst(d->umapCameraAndOpenedCameraSettingsDialog)) {
         cameraSettingsDialog->setCameraValueUpdateInterval(FSSettings::cameraValueUpdateInterval());
         cameraSettingsDialog->setCameraValueUpdateEnable(FSSettings::isCameraValueUpdateEnable());
     }
@@ -309,25 +314,25 @@ void FSSystemTrayIcon::updateLockPropertiesManager()
             d->lockPropertiesManager = new FSLockPropertiesManager();
             d->lockPropertiesManager->setCamerasStorage(d->camerasStorage);
             d->lockPropertiesManager->loadLockSettings();
-            connect(d->lockPropertiesManager, SIGNAL(lockedCamera(DevicePath)),
-                    this,                       SLOT(updatePresetsMenuByDevicePath(DevicePath)));
-            connect(d->lockPropertiesManager, SIGNAL(unlockedCamera(DevicePath)),
-                    this,                       SLOT(updatePresetsMenuByDevicePath(DevicePath)));
-            connect(d->lockPropertiesManager, SIGNAL(switchedToManualMode(DevicePath)),
-                    this,                       SLOT(updatePresetsMenuByDevicePath(DevicePath)));
-            connect(d->lockPropertiesManager, SIGNAL(lockedPreset(DevicePath,QString)),
-                    this,                       SLOT(updatePresetsMenuByDevicePath(DevicePath)));
-            connect(d->lockPropertiesManager, SIGNAL(unlockedPreset(DevicePath)),
-                    this,                       SLOT(updatePresetsMenuByDevicePath(DevicePath)));
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::lockedCamera,
+                    this,                     &FSSystemTrayIcon::updatePresetsMenuByDevicePath);
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::unlockedCamera,
+                    this,                     &FSSystemTrayIcon::updatePresetsMenuByDevicePath);
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::switchedToManualMode,
+                    this,                     &FSSystemTrayIcon::updatePresetsMenuByDevicePath);
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::lockedPreset,
+                    this,                     &FSSystemTrayIcon::updatePresetsMenuByDevicePath);
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::unlockedPreset,
+                    this,                     &FSSystemTrayIcon::updatePresetsMenuByDevicePath);
 
-            connect(d->lockPropertiesManager, SIGNAL(lockedCamera(DevicePath)),
-                    this,                       SLOT(updateLockPropertiesPauseMenu()));
-            connect(d->lockPropertiesManager, SIGNAL(unlockedCamera(DevicePath)),
-                    this,                       SLOT(updateLockPropertiesPauseMenu()));
-            connect(d->lockPropertiesManager, SIGNAL(lockPropertiesEnableChanged(bool)),
-                    this,                       SLOT(updateLockPropertiesPauseMenu()));
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::lockedCamera,
+                    this,                     &FSSystemTrayIcon::updateLockPropertiesPauseMenu);
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::unlockedCamera,
+                    this,                     &FSSystemTrayIcon::updateLockPropertiesPauseMenu);
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::lockPropertiesEnableChanged,
+                    this,                     &FSSystemTrayIcon::updateLockPropertiesPauseMenu);
 
-            for (const auto &[camera, cameraSettingsDialog] : d->umapCameraAndOpenedCameraSettingsDialog) {
+            for (const auto &[camera, cameraSettingsDialog] : qAsConst(d->umapCameraAndOpenedCameraSettingsDialog)) {
                 cameraSettingsDialog->setLockPropertiesManager(d->lockPropertiesManager);
             }
 
@@ -338,7 +343,7 @@ void FSSystemTrayIcon::updateLockPropertiesManager()
         }
     } else {
         if (d->lockPropertiesManager) {
-            for (const auto &[camera, cameraSettingsDialog] : d->umapCameraAndOpenedCameraSettingsDialog) {
+            for (const auto &[camera, cameraSettingsDialog] : qAsConst(d->umapCameraAndOpenedCameraSettingsDialog)) {
                 cameraSettingsDialog->setLockPropertiesManager(nullptr);
             }
 
@@ -362,7 +367,7 @@ void FSSystemTrayIcon::showCameraSettingsDialog(FSCamera *camera)
 
     FSCameraAndOpenedCameraSettingsDialogUMap::const_iterator dialogIterator = d->umapCameraAndOpenedCameraSettingsDialog.find(camera);
 
-    if (dialogIterator != d->umapCameraAndOpenedCameraSettingsDialog.end()) {
+    if (dialogIterator != d->umapCameraAndOpenedCameraSettingsDialog.cend()) {
         FSCameraSettingsDialog *existDialog = dialogIterator->second;
         existDialog->show();
         existDialog->raise();
@@ -373,8 +378,8 @@ void FSSystemTrayIcon::showCameraSettingsDialog(FSCamera *camera)
         dialog->setMode(FSCameraSettingsDialog::LockPropertiesMode);
         dialog->setLockPropertiesManager(d->lockPropertiesManager);
 
-        connect(dialog, SIGNAL(destroyed(QObject*)),
-                this,     SLOT(removeOpenedCameraSettingsDialog(QObject*)));
+        connect(dialog, &QObject::destroyed,
+                this,   &FSSystemTrayIcon::removeOpenedCameraSettingsDialog);
 
         dialog->show();
 
@@ -389,8 +394,8 @@ QMenu *FSSystemTrayIcon::createPresetMenu(FSCamera *camera, QAction *cameraActio
     cameraAction->setMenu(presetMenu);
 
     QAction *action = new QAction(tr("Show current settings"), presetMenu);
-    connect(action, SIGNAL(triggered(bool)),
-            this,     SLOT(showCameraSettingsDialog()));
+    connect(action, qOverload<bool>(&QAction::triggered),
+            this,   qOverload<>(&FSSystemTrayIcon::showCameraSettingsDialog));
     presetMenu->addAction(action);
 
     d->umapCamerasAndPresetMenu.insert( { camera, presetMenu } );
@@ -416,7 +421,7 @@ void FSSystemTrayIcon::updatePresetsMenu(FSCamera *camera,
 
             QActionGroup *presetActionGroup = nullptr;
 
-            for (QAction *action : listAction) {
+            for (QAction *action : qAsConst(listAction)) {
                 QActionGroup *tmpPresetActionGroup = action->actionGroup();
 
                 presetMenu->removeAction(action);
@@ -451,7 +456,7 @@ void FSSystemTrayIcon::updatePresetsMenu(FSCamera *camera,
     }
 
     FSMenuAndCamerasUMap::const_iterator iterator = d->umapPresetMenuAndCameras.find(presetMenu);
-    if (iterator != d->umapPresetMenuAndCameras.end()) {
+    if (iterator != d->umapPresetMenuAndCameras.cend()) {
         if (!presetNames.empty()) {
             // Create action group for preset menu (The action group will be deleted when the preset menu is deleted)
             QActionGroup *presetActionGroup = new QActionGroup(presetMenu);
@@ -472,7 +477,7 @@ void FSSystemTrayIcon::updatePresetsMenu(FSCamera *camera,
             std::vector<QString> tmpPresetNames = presetNames;
             sort(tmpPresetNames.begin(), tmpPresetNames.end());
 
-            for (const QString &presetName : tmpPresetNames) {
+            for (const QString &presetName : qAsConst(tmpPresetNames)) {
                 QAction *presetAction = new QAction(presetName, presetMenu);
                 presetAction->setActionGroup(presetActionGroup);
                 connect(presetAction, &QAction::triggered,
@@ -493,9 +498,23 @@ void FSSystemTrayIcon::updatePresetsMenu(FSCamera *camera,
 
     delete presetMenu;
 
-    if (iterator != d->umapPresetMenuAndCameras.end()) {
+    if (iterator != d->umapPresetMenuAndCameras.cend()) {
         d->umapCamerasAndPresetMenu.erase(iterator->second);
         d->umapPresetMenuAndCameras.erase(iterator);
+    }
+}
+
+void FSSystemTrayIcon::activateProc(ActivationReason reason)
+{
+    switch (reason) {
+    case QSystemTrayIcon::MiddleClick:
+        showSettingsDialog();
+        break;
+    case QSystemTrayIcon::DoubleClick:
+        showUserSettingsDialog();
+        break;
+    default:
+        break;
     }
 }
 
@@ -567,11 +586,11 @@ void FSSystemTrayIcon::about()
         QStringList projectsNames;
 
 #ifdef BUILD_WITH_QT_SINGLE_APPLICATION
-        projectsNames += "QtSingleApplication(Digia Plc and/or its subsidiary(-ies))";
+        projectsNames += QStringLiteral("QtSingleApplication(Digia Plc and/or its subsidiary(-ies))");
 #endif // BUILD_WITH_QT_SINGLE_APPLICATION
 
 #ifdef BUILD_WITH_Q_EASY_SETTINGS
-        projectsNames += "QEasySettings(mguludag)";
+        projectsNames += QStringLiteral("QEasySettings(mguludag)");
 #endif // BUILD_WITH_Q_EASY_SETTINGS
 
         if (!projectsNames.isEmpty())
@@ -682,16 +701,16 @@ void FSSystemTrayIcon::showUserSettingsDialog()
     d->cameraSettingsDialog->setCamerasStorage(d->camerasStorage);
     d->cameraSettingsDialog->setLockPropertiesManager(d->lockPropertiesManager);
 
-    connect(d->cameraSettingsDialog, SIGNAL(showCameraSettingsDialog(DevicePath)),
-            this,                      SLOT(showCameraSettingsDialog(DevicePath)));
+    connect(d->cameraSettingsDialog, &FSCameraUserSettingsDialog::showCameraSettingsDialog,
+            this,                    qOverload<const DevicePath &>(&FSSystemTrayIcon::showCameraSettingsDialog));
 
-    connect(d->cameraSettingsDialog, SIGNAL(destroyed(QObject*)),
-            this,                      SLOT(removeUserSettingsDialog(QObject*)));
+    connect(d->cameraSettingsDialog, &QObject::destroyed,
+            this,                    &FSSystemTrayIcon::removeUserSettingsDialog);
 
     d->cameraSettingsDialog->show();
 
-    connect(d->cameraSettingsDialog, SIGNAL(finished(int)),
-            d->camerasStorage,         SLOT(saveAll()));
+    connect(d->cameraSettingsDialog, &QDialog::finished,
+            d->camerasStorage,       &FSCamerasStorage::saveAll);
 }
 
 void FSSystemTrayIcon::onShowAvailableCamerasMenu()
@@ -707,10 +726,10 @@ void FSSystemTrayIcon::checkAvailableCameras()
     // Checking new cameras
     for (auto &[devicePath, cameraData] : umapAvailableCamerasData) {
         if (!d->camerasStorage->isCameraConnected(devicePath)) {
-            QMetaObject::invokeMethod(this,
-                                      "registerCamera",
-                                      Qt::QueuedConnection,
-                                      Q_ARG(FSCameraData, cameraData));
+            const FSCameraData &tmpCameraData = cameraData;
+            QMetaObject::invokeMethod(this, [this, tmpCameraData]() {
+                registerCamera(tmpCameraData);
+            }, Qt::QueuedConnection);
         } else {
             // Release cap pointer which will no longer be used.
             cameraData.release();
@@ -721,10 +740,10 @@ void FSSystemTrayIcon::checkAvailableCameras()
     const FSCameraPathsUMap cameraPathsUMap = d->camerasStorage->getCameraPathUMap();
     for (const auto &[devicePath, camera] : cameraPathsUMap) {
         if (umapAvailableCamerasData.find(devicePath) == umapAvailableCamerasData.end()) {
-            QMetaObject::invokeMethod(this,
-                                      "unregisterCamera",
-                                      Qt::QueuedConnection,
-                                      Q_ARG(FSCamera*, camera));
+            FSCamera *tmpCamera = camera;
+            QMetaObject::invokeMethod(this, [this, tmpCamera]() {
+                unregisterCamera(tmpCamera);
+            }, Qt::QueuedConnection);
         }
     }
 }
@@ -738,7 +757,7 @@ void FSSystemTrayIcon::updateActionsByBlackList(const DevicePath &devicePath)
 
     FSCamerasAndActionsUMap::const_iterator iterator = d->umapCamerasAndActions.find(camera);
 
-    if (iterator == d->umapCamerasAndActions.end())
+    if (iterator == d->umapCamerasAndActions.cend())
         return;
 
     iterator->second->setVisible(!camera->isBlackListed());
@@ -756,14 +775,14 @@ void FSSystemTrayIcon::updatePresetsMenuByDevicePath(const DevicePath &devicePat
     FSCamerasAndMenuUMap::const_iterator presetMenuIterator = d->umapCamerasAndPresetMenu.find(camera);
 
     QMenu *presetMenu = nullptr;
-    if (presetMenuIterator == d->umapCamerasAndPresetMenu.end()) {
+    if (presetMenuIterator == d->umapCamerasAndPresetMenu.cend()) {
         if (vectorPresetNames.empty()) {
             return;
         }
 
         FSCamerasAndActionsUMap::const_iterator actionIterator = d->umapCamerasAndActions.find(camera);
 
-        if (actionIterator == d->umapCamerasAndActions.end())
+        if (actionIterator == d->umapCamerasAndActions.cend())
             return;
 
         presetMenu = createPresetMenu(camera, actionIterator->second);
@@ -790,14 +809,14 @@ void FSSystemTrayIcon::updateLockPropertiesPauseMenu()
 
             if (!d->lockPropertiesPauseMenu) {
                 d->lockPropertiesPauseMenu = new QMenu(tr("Lock properties pause"), d->mainMenu);
-                d->lockPropertiesPauseMenu->addAction(tr("for 5 minutes"),  this, SLOT(lockPropetries5MinPause()));
-                d->lockPropertiesPauseMenu->addAction(tr("for 15 minutes"), this, SLOT(lockPropetries15MinPause()));
-                d->lockPropertiesPauseMenu->addAction(tr("for 30 minutes"), this, SLOT(lockPropetries30MinPause()));
-                d->lockPropertiesPauseMenu->addAction(tr("for 1 hour"),     this, SLOT(lockPropetries1HourPause()));
-                d->lockPropertiesPauseMenu->addAction(tr("for 2 hours"),    this, SLOT(lockPropetries2HoursPause()));
-                d->lockPropertiesPauseMenu->addAction(tr("for 4 hours"),    this, SLOT(lockPropetries4HoursPause()));
-                d->lockPropertiesPauseMenu->addAction(tr("for 12 hours"),   this, SLOT(lockPropetries12HoursPause()));
-                d->lockPropertiesPauseMenu->addAction(tr("for 24 hours"),   this, SLOT(lockPropetries24HoursPause()));
+                d->lockPropertiesPauseMenu->addAction(tr("for 5 minutes"),  this, &FSSystemTrayIcon::lockPropetries5MinPause);
+                d->lockPropertiesPauseMenu->addAction(tr("for 15 minutes"), this, &FSSystemTrayIcon::lockPropetries15MinPause);
+                d->lockPropertiesPauseMenu->addAction(tr("for 30 minutes"), this, &FSSystemTrayIcon::lockPropetries30MinPause);
+                d->lockPropertiesPauseMenu->addAction(tr("for 1 hour"),     this, &FSSystemTrayIcon::lockPropetries1HourPause);
+                d->lockPropertiesPauseMenu->addAction(tr("for 2 hours"),    this, &FSSystemTrayIcon::lockPropetries2HoursPause);
+                d->lockPropertiesPauseMenu->addAction(tr("for 4 hours"),    this, &FSSystemTrayIcon::lockPropetries4HoursPause);
+                d->lockPropertiesPauseMenu->addAction(tr("for 12 hours"),   this, &FSSystemTrayIcon::lockPropetries12HoursPause);
+                d->lockPropertiesPauseMenu->addAction(tr("for 24 hours"),   this, &FSSystemTrayIcon::lockPropetries24HoursPause);
                 d->mainMenu->insertMenu(d->lockPropertiesPauseBeforeSeparator, d->lockPropertiesPauseMenu);
             }
         } else {
@@ -913,7 +932,7 @@ void FSSystemTrayIcon::showCameraSettingsDialog()
     // Find camera pointer
     {
         FSActionsAndCamerasUMap::const_iterator cameraActionIterator = d->umapActionsAndCameras.find(action);
-        if (cameraActionIterator != d->umapActionsAndCameras.end()) {
+        if (cameraActionIterator != d->umapActionsAndCameras.cend()) {
             camera = cameraActionIterator->second;
         } else {
             QWidget *menuWidget = action->parentWidget();
@@ -923,7 +942,7 @@ void FSSystemTrayIcon::showCameraSettingsDialog()
 
                 if (menu) {
                     FSMenuAndCamerasUMap::const_iterator cameraPresetMenuIterator = d->umapPresetMenuAndCameras.find(menu);
-                    if (cameraPresetMenuIterator != d->umapPresetMenuAndCameras.end()) {
+                    if (cameraPresetMenuIterator != d->umapPresetMenuAndCameras.cend()) {
                         camera = cameraPresetMenuIterator->second;
                     }
                 }
@@ -946,9 +965,9 @@ void FSSystemTrayIcon::removeOpenedCameraSettingsDialog(QObject *object)
 {
     FSCameraSettingsDialog *dialog = static_cast<FSCameraSettingsDialog *>(object);
 
-    FSOpenedCameraSettingsDialogAndCameraUMap::iterator iterator = d->umapOpenedCameraSettingsDialogAndCamera.find(dialog);
+    FSOpenedCameraSettingsDialogAndCameraUMap::const_iterator iterator = d->umapOpenedCameraSettingsDialogAndCamera.find(dialog);
 
-    if (iterator == d->umapOpenedCameraSettingsDialogAndCamera.end())
+    if (iterator == d->umapOpenedCameraSettingsDialogAndCamera.cend())
         return;
 
     FSCamera *camera = iterator->second;
@@ -970,8 +989,8 @@ void FSSystemTrayIcon::updateDisplayName(const DevicePath &devicePath)
     if (!camera)
         return;
 
-    const auto &actionIterator = d->umapCamerasAndActions.find(camera);
-    if (actionIterator != d->umapCamerasAndActions.end()) {
+    const FSCamerasAndActionsUMap::const_iterator &actionIterator = d->umapCamerasAndActions.find(camera);
+    if (actionIterator != d->umapCamerasAndActions.cend()) {
         QAction *action = actionIterator->second;
 
         if (!action)
@@ -985,8 +1004,8 @@ void FSSystemTrayIcon::updateDisplayName(const DevicePath &devicePath)
                                             action);
     }
 
-    const auto &dialogIterator = d->umapCameraAndOpenedCameraSettingsDialog.find(camera);
-    if (dialogIterator != d->umapCameraAndOpenedCameraSettingsDialog.end()) {
+    const FSCameraAndOpenedCameraSettingsDialogUMap::const_iterator &dialogIterator = d->umapCameraAndOpenedCameraSettingsDialog.find(camera);
+    if (dialogIterator != d->umapCameraAndOpenedCameraSettingsDialog.cend()) {
         FSCameraSettingsDialog *dialog = dialogIterator->second;
 
         if (!dialog)
@@ -1017,7 +1036,7 @@ void FSSystemTrayIcon::switchCameraPreset()
 
             if (presetMenu) {
                 FSMenuAndCamerasUMap::const_iterator cameraPresetMenuIterator = d->umapPresetMenuAndCameras.find(presetMenu);
-                if (cameraPresetMenuIterator != d->umapPresetMenuAndCameras.end()) {
+                if (cameraPresetMenuIterator != d->umapPresetMenuAndCameras.cend()) {
                     camera = cameraPresetMenuIterator->second;
                 }
             }
@@ -1038,7 +1057,7 @@ void FSSystemTrayIcon::switchCameraPreset()
                     return;
                 }
             } else {
-                FSCameraPropertyValuesUMap umapPropertyValues = d->camerasStorage->getCameraUserPreset(camera->devicePath(), presetName);
+                const FSCameraPropertyValuesUMap umapPropertyValues = d->camerasStorage->getCameraUserPreset(camera->devicePath(), presetName);
                 for (const auto &[property, valueParams] : umapPropertyValues) {
                     if (!camera->set(property, valueParams)) {
                         qCritical("%s: Failed to set preset(\"%s\") values(value:\"%ld\", flags:\"%ld\") for property \"%s\", cameraDevicePath=\"%s\"!",

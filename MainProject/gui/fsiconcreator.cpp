@@ -117,12 +117,10 @@ QPixmap FSIconCreator::generate(int size)
 
 FSIconCreator::FSIconCreator()
 {
-
+    // do nothing
 }
 
 FSIconCreator::~FSIconCreator()
 {
-
+    // do nothing
 }
-
-

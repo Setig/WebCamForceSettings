@@ -447,41 +447,41 @@ QString fsGetEnumName(FSCameraProperty property)
     case FSCameraProperty::None:
         return QString();
     case FSCameraProperty::Brightness:
-        return "Brightness";
+        return QStringLiteral("Brightness");
     case FSCameraProperty::Contrast:
-        return "Contrast";
+        return QStringLiteral("Contrast");
     case FSCameraProperty::Hue:
-        return "Hue";
+        return QStringLiteral("Hue");
     case FSCameraProperty::Saturation:
-        return "Saturation";
+        return QStringLiteral("Saturation");
     case FSCameraProperty::Sharpness:
-        return "Sharpness";
+        return QStringLiteral("Sharpness");
     case FSCameraProperty::Gamma:
-        return "Gamma";
+        return QStringLiteral("Gamma");
     case FSCameraProperty::ColorEnable:
-        return "Color enable";
+        return QStringLiteral("Color enable");
     case FSCameraProperty::WhiteBalance:
-        return "White balance";
+        return QStringLiteral("White balance");
     case FSCameraProperty::BacklightCompensation:
-        return "Backlight compensation";
+        return QStringLiteral("Backlight compensation");
     case FSCameraProperty::Gain:
-        return "Gain";
+        return QStringLiteral("Gain");
     case FSCameraProperty::PowerlineFrequency:
-        return "Powerline frequency";
+        return QStringLiteral("Powerline frequency");
     case FSCameraProperty::Pan:
-        return "Pan";
+        return QStringLiteral("Pan");
     case FSCameraProperty::Tilt:
-        return "Tilt";
+        return QStringLiteral("Tilt");
     case FSCameraProperty::Roll:
-        return "Roll";
+        return QStringLiteral("Roll");
     case FSCameraProperty::Zoom:
-        return "Zoom";
+        return QStringLiteral("Zoom");
     case FSCameraProperty::Exposure:
-        return "Exposure";
+        return QStringLiteral("Exposure");
     case FSCameraProperty::Iris:
-        return "Iris";
+        return QStringLiteral("Iris");
     case FSCameraProperty::Focus:
-        return "Focus";
+        return QStringLiteral("Focus");
     }
 
     return QString();
@@ -489,41 +489,41 @@ QString fsGetEnumName(FSCameraProperty property)
 
 FSCameraProperty fsReadNameEnum(const QString &propertyName)
 {
-    if (propertyName == "Brightness")
+    if (propertyName == QLatin1String("Brightness"))
         return FSCameraProperty::Brightness;
-    else if (propertyName == "Contrast")
+    else if (propertyName == QLatin1String("Contrast"))
         return FSCameraProperty::Contrast;
-    else if (propertyName == "Hue")
+    else if (propertyName == QLatin1String("Hue"))
         return FSCameraProperty::Hue;
-    else if (propertyName == "Saturation")
+    else if (propertyName == QLatin1String("Saturation"))
         return FSCameraProperty::Saturation;
-    else if (propertyName == "Sharpness")
+    else if (propertyName == QLatin1String("Sharpness"))
         return FSCameraProperty::Sharpness;
-    else if (propertyName == "Gamma")
+    else if (propertyName == QLatin1String("Gamma"))
         return FSCameraProperty::Gamma;
-    else if (propertyName == "Color enable")
+    else if (propertyName == QLatin1String("Color enable"))
         return FSCameraProperty::ColorEnable;
-    else if (propertyName == "White balance")
+    else if (propertyName == QLatin1String("White balance"))
         return FSCameraProperty::WhiteBalance;
-    else if (propertyName == "Backlight compensation")
+    else if (propertyName == QLatin1String("Backlight compensation"))
         return FSCameraProperty::BacklightCompensation;
-    else if (propertyName == "Gain")
+    else if (propertyName == QLatin1String("Gain"))
         return FSCameraProperty::Gain;
-    else if (propertyName == "Powerline frequency")
+    else if (propertyName == QLatin1String("Powerline frequency"))
         return FSCameraProperty::PowerlineFrequency;
-    else if (propertyName == "Pan")
+    else if (propertyName == QLatin1String("Pan"))
         return FSCameraProperty::Pan;
-    else if (propertyName == "Tilt")
+    else if (propertyName == QLatin1String("Tilt"))
         return FSCameraProperty::Tilt;
-    else if (propertyName == "Roll")
+    else if (propertyName == QLatin1String("Roll"))
         return FSCameraProperty::Roll;
-    else if (propertyName == "Zoom")
+    else if (propertyName == QLatin1String("Zoom"))
         return FSCameraProperty::Zoom;
-    else if (propertyName == "Exposure")
+    else if (propertyName == QLatin1String("Exposure"))
         return FSCameraProperty::Exposure;
-    else if (propertyName == "Iris")
+    else if (propertyName == QLatin1String("Iris"))
         return FSCameraProperty::Iris;
-    else if (propertyName == "Focus")
+    else if (propertyName == QLatin1String("Focus"))
         return FSCameraProperty::Focus;
 
     return FSCameraProperty::None;

@@ -41,7 +41,7 @@ public:
 FSCameraLockPropertiesModelPrivate::FSCameraLockPropertiesModelPrivate()
     : lockPropertiesManager(nullptr)
 {
-
+    // do nothing
 }
 
 FSCameraLockPropertiesModel::FSCameraLockPropertiesModel(QObject *parent)
@@ -60,43 +60,43 @@ void FSCameraLockPropertiesModel::setLockPropertiesManager(FSLockPropertiesManag
 {
     if (d->lockPropertiesManager != lockPropertiesManager) {
         if (d->lockPropertiesManager) {
-            disconnect(d->lockPropertiesManager, SIGNAL(lockedCamera(DevicePath)),
-                       this,                       SLOT(updateLockCameraColumns(DevicePath)));
-            disconnect(d->lockPropertiesManager, SIGNAL(unlockedCamera(DevicePath)),
-                       this,                       SLOT(updateUnlockCameraColumns(DevicePath)));
+            disconnect(d->lockPropertiesManager, &FSLockPropertiesManager::lockedCamera,
+                       this,                     &FSCameraLockPropertiesModel::updateLockCameraColumns);
+            disconnect(d->lockPropertiesManager, &FSLockPropertiesManager::unlockedCamera,
+                       this,                     &FSCameraLockPropertiesModel::updateUnlockCameraColumns);
 
-            disconnect(d->lockPropertiesManager, SIGNAL(lockedProperty(DevicePath,FSCameraProperty)),
-                       this,                       SLOT(updateLockPropertyColumns(DevicePath,FSCameraProperty)));
-            disconnect(d->lockPropertiesManager, SIGNAL(unlockedProperty(DevicePath,FSCameraProperty)),
-                       this,                       SLOT(updateUnlockPropertyColumns(DevicePath,FSCameraProperty)));
+            disconnect(d->lockPropertiesManager, &FSLockPropertiesManager::lockedProperty,
+                       this,                     &FSCameraLockPropertiesModel::updateLockPropertyColumns);
+            disconnect(d->lockPropertiesManager, &FSLockPropertiesManager::unlockedProperty,
+                       this,                     &FSCameraLockPropertiesModel::updateUnlockPropertyColumns);
 
-            disconnect(d->lockPropertiesManager, SIGNAL(switchedToManualMode(DevicePath)),
-                       this,                       SLOT(updateSwitchToManualModeColumns(DevicePath)));
-            disconnect(d->lockPropertiesManager, SIGNAL(lockedPreset(DevicePath,QString)),
-                       this,                       SLOT(updateLockPresetColumns(DevicePath,QString)));
-            disconnect(d->lockPropertiesManager, SIGNAL(unlockedPreset(DevicePath)),
-                       this,                       SLOT(updateUnlockPresetColumns(DevicePath)));
+            disconnect(d->lockPropertiesManager, &FSLockPropertiesManager::switchedToManualMode,
+                       this,                     &FSCameraLockPropertiesModel::updateSwitchToManualModeColumns);
+            disconnect(d->lockPropertiesManager, &FSLockPropertiesManager::lockedPreset,
+                       this,                     &FSCameraLockPropertiesModel::updateLockPresetColumns);
+            disconnect(d->lockPropertiesManager, &FSLockPropertiesManager::unlockedPreset,
+                       this,                     &FSCameraLockPropertiesModel::updateUnlockPresetColumns);
         }
 
         d->lockPropertiesManager = lockPropertiesManager;
 
         if (d->lockPropertiesManager) {
-            connect(d->lockPropertiesManager, SIGNAL(lockedCamera(DevicePath)),
-                    this,                       SLOT(updateLockCameraColumns(DevicePath)));
-            connect(d->lockPropertiesManager, SIGNAL(unlockedCamera(DevicePath)),
-                    this,                       SLOT(updateUnlockCameraColumns(DevicePath)));
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::lockedCamera,
+                    this,                     &FSCameraLockPropertiesModel::updateLockCameraColumns);
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::unlockedCamera,
+                    this,                     &FSCameraLockPropertiesModel::updateUnlockCameraColumns);
 
-            connect(d->lockPropertiesManager, SIGNAL(lockedProperty(DevicePath,FSCameraProperty)),
-                    this,                       SLOT(updateLockPropertyColumns(DevicePath,FSCameraProperty)));
-            connect(d->lockPropertiesManager, SIGNAL(unlockedProperty(DevicePath,FSCameraProperty)),
-                    this,                       SLOT(updateUnlockPropertyColumns(DevicePath,FSCameraProperty)));
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::lockedProperty,
+                    this,                     &FSCameraLockPropertiesModel::updateLockPropertyColumns);
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::unlockedProperty,
+                    this,                     &FSCameraLockPropertiesModel::updateUnlockPropertyColumns);
 
-            connect(d->lockPropertiesManager, SIGNAL(switchedToManualMode(DevicePath)),
-                    this,                       SLOT(updateSwitchToManualModeColumns(DevicePath)));
-            connect(d->lockPropertiesManager, SIGNAL(lockedPreset(DevicePath,QString)),
-                    this,                       SLOT(updateLockPresetColumns(DevicePath,QString)));
-            connect(d->lockPropertiesManager, SIGNAL(unlockedPreset(DevicePath)),
-                    this,                       SLOT(updateUnlockPresetColumns(DevicePath)));
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::switchedToManualMode,
+                    this,                     &FSCameraLockPropertiesModel::updateSwitchToManualModeColumns);
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::lockedPreset,
+                    this,                     &FSCameraLockPropertiesModel::updateLockPresetColumns);
+            connect(d->lockPropertiesManager, &FSLockPropertiesManager::unlockedPreset,
+                    this,                     &FSCameraLockPropertiesModel::updateUnlockPresetColumns);
         }
 
         updateDevices();
@@ -114,11 +114,16 @@ QVariant FSCameraLockPropertiesModel::getDeviceData(const DevicePath &devicePath
 {
     if (role == Qt::TextAlignmentRole) {
         switch (column) {
-        case 0: return Qt::AlignLeft;
-        case 1: return Qt::AlignCenter;
-        case 2: return Qt::AlignLeft;
-        case 3: return Qt::AlignCenter;
-        case 4: return Qt::AlignCenter;
+        case NameColumn:
+            return Qt::AlignLeft;
+        case IsConnectedColumn:
+            return Qt::AlignCenter;
+        case CurrentPresetColumn:
+            return Qt::AlignLeft;
+        case ManualPropertiesCountColumn:
+            return Qt::AlignCenter;
+        case PresetsCountColumn:
+            return Qt::AlignCenter;
         default:
             break;
         }
@@ -130,9 +135,11 @@ QVariant FSCameraLockPropertiesModel::getDeviceData(const DevicePath &devicePath
         return QVariant();
 
     switch (column) {
-    case 0: return camerasStorage()->getCameraDisplayName(devicePath);
-    case 1: return camerasStorage()->isCameraConnected(devicePath);
-    case 2:
+    case NameColumn:
+        return camerasStorage()->getCameraDisplayName(devicePath);
+    case IsConnectedColumn:
+        return camerasStorage()->isCameraConnected(devicePath);
+    case CurrentPresetColumn:
     {
         switch (d->lockPropertiesManager->currentLockMode(devicePath)) {
         case FSLockPropertiesManager::NoneLockMode:
@@ -145,8 +152,10 @@ QVariant FSCameraLockPropertiesModel::getDeviceData(const DevicePath &devicePath
 
         break;
     }
-    case 3: return d->lockPropertiesManager->lockedProperties(devicePath).size();
-    case 4: return camerasStorage()->getCameraUserPresetNames(devicePath).size();
+    case ManualPropertiesCountColumn:
+        return d->lockPropertiesManager->lockedProperties(devicePath).size();
+    case PresetsCountColumn:
+        return camerasStorage()->getCameraUserPresetNames(devicePath).size();
     default:
         break;
     }
@@ -190,7 +199,7 @@ void FSCameraLockPropertiesModel::addCamera(const DevicePath &devicePath)
          !d->lockPropertiesManager->isLockedLeastOneProperty(devicePath) ) {
         addDevice(devicePath);
     } else {
-        emitDataChanged(devicePath, { 0, 1 });
+        emitDataChanged(devicePath, { NameColumn, IsConnectedColumn });
     }
 }
 
@@ -200,18 +209,18 @@ void FSCameraLockPropertiesModel::removeCamera(const DevicePath &devicePath)
          !d->lockPropertiesManager->isLockedLeastOneProperty(devicePath) ) {
         removeDevice(devicePath);
     } else {
-        emitDataChanged(devicePath, { 0, 1 });
+        emitDataChanged(devicePath, { NameColumn, IsConnectedColumn });
     }
 }
 
 void FSCameraLockPropertiesModel::updateLockCameraColumns(const DevicePath &devicePath)
 {
-    emitDataChanged(devicePath, { 2, 3, 4 });
+    emitDataChanged(devicePath, { CurrentPresetColumn, ManualPropertiesCountColumn, PresetsCountColumn });
 }
 
 void FSCameraLockPropertiesModel::updateUnlockCameraColumns(const DevicePath &devicePath)
 {
-    emitDataChanged(devicePath, { 2, 3, 4 });
+    emitDataChanged(devicePath, { CurrentPresetColumn, ManualPropertiesCountColumn, PresetsCountColumn });
 }
 
 void FSCameraLockPropertiesModel::updateLockPropertyColumns(const DevicePath &devicePath,
@@ -219,7 +228,7 @@ void FSCameraLockPropertiesModel::updateLockPropertyColumns(const DevicePath &de
 {
     Q_UNUSED(property);
 
-    emitDataChanged(devicePath, { 2, 3, 4 });
+    emitDataChanged(devicePath, { CurrentPresetColumn, ManualPropertiesCountColumn, PresetsCountColumn });
 }
 
 void FSCameraLockPropertiesModel::updateUnlockPropertyColumns(const DevicePath &devicePath,
@@ -227,12 +236,12 @@ void FSCameraLockPropertiesModel::updateUnlockPropertyColumns(const DevicePath &
 {
     Q_UNUSED(property);
 
-    emitDataChanged(devicePath, { 2, 3, 4 });
+    emitDataChanged(devicePath, { CurrentPresetColumn, ManualPropertiesCountColumn, PresetsCountColumn });
 }
 
 void FSCameraLockPropertiesModel::updateSwitchToManualModeColumns(const DevicePath &devicePath)
 {
-    emitDataChanged(devicePath, { 2, 3, 4 });
+    emitDataChanged(devicePath, { CurrentPresetColumn, ManualPropertiesCountColumn, PresetsCountColumn });
 }
 
 void FSCameraLockPropertiesModel::updateLockPresetColumns(const DevicePath &devicePath,
@@ -240,12 +249,12 @@ void FSCameraLockPropertiesModel::updateLockPresetColumns(const DevicePath &devi
 {
     Q_UNUSED(presetName);
 
-    emitDataChanged(devicePath, { 2, 3, 4 });
+    emitDataChanged(devicePath, { CurrentPresetColumn, ManualPropertiesCountColumn, PresetsCountColumn });
 }
 
 void FSCameraLockPropertiesModel::updateUnlockPresetColumns(const DevicePath &devicePath)
 {
-    emitDataChanged(devicePath, { 2, 3, 4 });
+    emitDataChanged(devicePath, { CurrentPresetColumn, ManualPropertiesCountColumn, PresetsCountColumn });
 }
 
 void FSCameraLockPropertiesModel::init()

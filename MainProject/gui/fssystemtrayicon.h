@@ -65,6 +65,8 @@ private:
                            const std::vector<QString> &presetNames);
 
 private slots:
+    void activateProc(QSystemTrayIcon::ActivationReason reason);
+
     void registerCamera(const FSCameraData &cameraData);
     void unregisterCamera(FSCamera *camera);
 

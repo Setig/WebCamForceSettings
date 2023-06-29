@@ -33,6 +33,14 @@ class FSCameraUserSettingsModel : public FSAbstractCameraSettingsModel
 public:
     explicit FSCameraUserSettingsModel(QObject *parent = nullptr);
 
+    enum Column {
+        PathColumn = 0,
+        NameColumn,
+        IsConnectedColumn,
+        BlacklistedColumn,
+        UserNameColumn
+    };
+
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     QVariant getDeviceData(const DevicePath &devicePath,

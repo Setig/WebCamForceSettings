@@ -43,10 +43,14 @@ QVariant FSCameraDefaultSettingsModel::getDeviceData(const DevicePath &devicePat
 {
     if (role == Qt::TextAlignmentRole) {
         switch (column) {
-        case 0: return Qt::AlignLeft;
-        case 1: return Qt::AlignCenter;
-        case 2: return Qt::AlignCenter;
-        case 3: return Qt::AlignLeft;
+        case NameColumn:
+            return Qt::AlignLeft;
+        case IsConnectedColumn:
+            return Qt::AlignCenter;
+        case IsExistDefaultSettingsColumn:
+            return Qt::AlignCenter;
+        case DefaultSettingsCountColumn:
+            return Qt::AlignLeft;
         default:
             break;
         }
@@ -55,10 +59,14 @@ QVariant FSCameraDefaultSettingsModel::getDeviceData(const DevicePath &devicePat
     }
 
     switch (column) {
-    case 0: return camerasStorage()->getCameraDisplayName(devicePath);
-    case 1: return camerasStorage()->isCameraConnected(devicePath);
-    case 2: return camerasStorage()->isUserDefaultValuesUsed(devicePath);
-    case 3: return camerasStorage()->getUserDefaultValues(devicePath).size();
+    case NameColumn:
+        return camerasStorage()->getCameraDisplayName(devicePath);
+    case IsConnectedColumn:
+        return camerasStorage()->isCameraConnected(devicePath);
+    case IsExistDefaultSettingsColumn:
+        return camerasStorage()->isUserDefaultValuesUsed(devicePath);
+    case DefaultSettingsCountColumn:
+        return camerasStorage()->getUserDefaultValues(devicePath).size();
     default:
         break;
     }
@@ -83,7 +91,7 @@ std::vector<DevicePath> FSCameraDefaultSettingsModel::getDevicesFromStorage() co
 
         for (const DevicePath &devicePath : vecAvailableDevicePaths) {
             if ( !camerasStorage->isContaintsBlackList(devicePath) &&
-                 umapCameraPathValues.find(devicePath) == umapCameraPathValues.end() ) {
+                 umapCameraPathValues.find(devicePath) == umapCameraPathValues.cend() ) {
                 result.push_back(devicePath);
             }
         }
@@ -95,8 +103,8 @@ std::vector<DevicePath> FSCameraDefaultSettingsModel::getDevicesFromStorage() co
 void FSCameraDefaultSettingsModel::connectByCamerasStorage(FSCamerasStorage *camerasStorage)
 {
     if (camerasStorage) {
-        connect(camerasStorage, SIGNAL(userDefaultValuesChanged(DevicePath)),
-                this,             SLOT(updateDefaultSettingsColumns(DevicePath)));
+        connect(camerasStorage, &FSCamerasStorage::userDefaultValuesChanged,
+                this,           &FSCameraDefaultSettingsModel::updateDefaultSettingsColumns);
     }
 
     FSAbstractCameraSettingsModel::connectByCamerasStorage(camerasStorage);
@@ -105,8 +113,8 @@ void FSCameraDefaultSettingsModel::connectByCamerasStorage(FSCamerasStorage *cam
 void FSCameraDefaultSettingsModel::disconnectByCamerasStorage(FSCamerasStorage *camerasStorage)
 {
     if (camerasStorage) {
-        disconnect(camerasStorage, SIGNAL(userDefaultValuesChanged(DevicePath)),
-                   this,             SLOT(updateDefaultSettingsColumns(DevicePath)));
+        disconnect(camerasStorage, &FSCamerasStorage::userDefaultValuesChanged,
+                   this,           &FSCameraDefaultSettingsModel::updateDefaultSettingsColumns);
     }
 
     FSAbstractCameraSettingsModel::disconnectByCamerasStorage(camerasStorage);
@@ -119,7 +127,7 @@ void FSCameraDefaultSettingsModel::addCamera(const DevicePath &devicePath)
          !camerasStorage->isUserDefaultValuesUsed(devicePath) ) {
         addDevice(devicePath);
     } else {
-        emitDataChanged(devicePath, { 0, 1 });
+        emitDataChanged(devicePath, { NameColumn, IsConnectedColumn });
     }
 }
 
@@ -130,13 +138,13 @@ void FSCameraDefaultSettingsModel::removeCamera(const DevicePath &devicePath)
          !camerasStorage->isUserDefaultValuesUsed(devicePath) ) {
         removeDevice(devicePath);
     } else {
-        emitDataChanged(devicePath, { 0, 1 });
+        emitDataChanged(devicePath, { NameColumn, IsConnectedColumn });
     }
 }
 
 void FSCameraDefaultSettingsModel::updateDefaultSettingsColumns(const DevicePath &devicePath)
 {
-    emitDataChanged(devicePath, { 2, 3 });
+    emitDataChanged(devicePath, { IsExistDefaultSettingsColumn, DefaultSettingsCountColumn });
 }
 
 void FSCameraDefaultSettingsModel::retranslate()

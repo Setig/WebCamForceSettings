@@ -137,7 +137,10 @@ FSLockPropertiesManager::FSLockPropertiesManager(QObject *parent) : QObject(pare
 
 FSLockPropertiesManager::~FSLockPropertiesManager()
 {
-    QMetaObject::invokeMethod(d->sendLockedValuesTimer, &QTimer::stop, Qt::BlockingQueuedConnection);
+    QMetaObject::invokeMethod(d->sendLockedValuesTimer, [this]() {
+        d->sendLockedValuesTimer->stop();
+    }, Qt::BlockingQueuedConnection);
+
     d->parallelThread->quit();
     d->parallelThread->wait();
     delete d->sendLockedValuesTimer;
@@ -150,7 +153,7 @@ FSLockPropertiesManager::~FSLockPropertiesManager()
     {
         uint count = 1;
 
-        for (const auto &[camera, lockedPropertiesValues] : d->umapManualLockCamerasParams) {
+        for (const auto &[camera, lockedPropertiesValues] : qAsConst(d->umapManualLockCamerasParams)) {
             uint size = uint(lockedPropertiesValues.size());
 
             if (count < size)
@@ -229,16 +232,16 @@ bool FSLockPropertiesManager::isLockedLeastOneProperty(const DevicePath &deviceP
 
 bool FSLockPropertiesManager::isLockedProperty(const DevicePath &devicePath, FSCameraProperty property) const
 {
-    const FSCameraPathPresetsUmap::iterator &cameraPresetIterator = d->umapPresetsLockCameras.find(devicePath);
-    if (cameraPresetIterator != d->umapPresetsLockCameras.end()) {
+    const FSCameraPathPresetsUmap::const_iterator &cameraPresetIterator = d->umapPresetsLockCameras.find(devicePath);
+    if (cameraPresetIterator != d->umapPresetsLockCameras.cend()) {
         const FSCameraPropertyValuesUMap umapCameraPropertyValues = d->camerasStorage->getCameraUserPreset(devicePath, cameraPresetIterator->second);
-        return (umapCameraPropertyValues.find(property) != umapCameraPropertyValues.end());
+        return (umapCameraPropertyValues.find(property) != umapCameraPropertyValues.cend());
     }
 
-    const FSCameraPathValuesUMap::iterator &cameraManualIterator = d->umapManualLockCamerasParams.find(devicePath);
-    if (cameraManualIterator != d->umapManualLockCamerasParams.end()) {
+    const FSCameraPathValuesUMap::const_iterator &cameraManualIterator = d->umapManualLockCamerasParams.find(devicePath);
+    if (cameraManualIterator != d->umapManualLockCamerasParams.cend()) {
         const FSCameraPropertyValuesUMap &umapCameraPropertyValues = cameraManualIterator->second;
-        return (umapCameraPropertyValues.find(property) != umapCameraPropertyValues.end());
+        return (umapCameraPropertyValues.find(property) != umapCameraPropertyValues.cend());
     }
 
     return false;
@@ -246,20 +249,20 @@ bool FSLockPropertiesManager::isLockedProperty(const DevicePath &devicePath, FSC
 
 FSValueParams FSLockPropertiesManager::lockedValueParams(const DevicePath &devicePath, FSCameraProperty property) const
 {
-    const FSCameraPathPresetsUmap::iterator &cameraPresetIterator = d->umapPresetsLockCameras.find(devicePath);
-    if (cameraPresetIterator != d->umapPresetsLockCameras.end()) {
+    const FSCameraPathPresetsUmap::const_iterator &cameraPresetIterator = d->umapPresetsLockCameras.find(devicePath);
+    if (cameraPresetIterator != d->umapPresetsLockCameras.cend()) {
         const FSCameraPropertyValuesUMap umapCameraPropertyValues = d->camerasStorage->getCameraUserPreset(devicePath, cameraPresetIterator->second);
         const FSCameraPropertyValuesUMap::const_iterator &propertyIterator = umapCameraPropertyValues.find(property);
-        if (propertyIterator != umapCameraPropertyValues.end()) {
+        if (propertyIterator != umapCameraPropertyValues.cend()) {
             return propertyIterator->second;
         }
     }
 
-    const FSCameraPathValuesUMap::iterator &cameraManualIterator = d->umapManualLockCamerasParams.find(devicePath);
-    if (cameraManualIterator != d->umapManualLockCamerasParams.end()) {
+    const FSCameraPathValuesUMap::const_iterator &cameraManualIterator = d->umapManualLockCamerasParams.find(devicePath);
+    if (cameraManualIterator != d->umapManualLockCamerasParams.cend()) {
         const FSCameraPropertyValuesUMap &umapCameraPropertyValues = cameraManualIterator->second;
         const FSCameraPropertyValuesUMap::const_iterator &propertyIterator = umapCameraPropertyValues.find(property);
-        if (propertyIterator != umapCameraPropertyValues.end()) {
+        if (propertyIterator != umapCameraPropertyValues.cend()) {
             return propertyIterator->second;
         }
     }
@@ -282,11 +285,11 @@ std::vector<DevicePath> FSLockPropertiesManager::lockedDevicePaths() const
     std::vector<DevicePath> result;
     result.reserve(d->umapManualLockCamerasParams.size() + d->umapPresetsLockCameras.size());
 
-    for (const auto &[devicePath, umapCameraPropertyValues] : d->umapManualLockCamerasParams) {
+    for (const auto &[devicePath, umapCameraPropertyValues] : qAsConst(d->umapManualLockCamerasParams)) {
         result.push_back(devicePath);
     }
 
-    for (const auto&[devicePath, presetName] : d->umapPresetsLockCameras) {
+    for (const auto &[devicePath, presetName] : qAsConst(d->umapPresetsLockCameras)) {
         if (d->umapManualLockCamerasParams.find(devicePath) == d->umapManualLockCamerasParams.end()) {
             result.push_back(devicePath);
         }
@@ -299,8 +302,8 @@ FSCameraPropertyValuesUMap FSLockPropertiesManager::lockedProperties(const Devic
 {
     FSCameraPropertyValuesUMap result;
 
-    FSCameraPathValuesUMap::iterator iterator = d->umapManualLockCamerasParams.find(devicePath);
-    if (iterator != d->umapManualLockCamerasParams.end()) {
+    FSCameraPathValuesUMap::const_iterator iterator = d->umapManualLockCamerasParams.find(devicePath);
+    if (iterator != d->umapManualLockCamerasParams.cend()) {
         result = iterator->second;
     }
 
@@ -323,7 +326,7 @@ FSLockPropertiesManager::LockMode FSLockPropertiesManager::currentLockMode(const
 QString FSLockPropertiesManager::lockPresetName(const DevicePath &devicePath) const
 {
     FSCameraPathPresetsUmap::const_iterator iterator = d->umapPresetsLockCameras.find(devicePath);
-    if (iterator != d->umapPresetsLockCameras.end()) {
+    if (iterator != d->umapPresetsLockCameras.cend()) {
         return iterator->second;
     }
 
@@ -338,7 +341,7 @@ void FSLockPropertiesManager::loadLockSettings()
         FSCameraPathValuesUMap umapCameraPathValues;
 
         for (QVariantMap::const_iterator deviceIterator = varMap.begin();
-             deviceIterator != varMap.end();
+             deviceIterator != varMap.cend();
              ++deviceIterator) {
             const DevicePath &devicePath = deviceIterator.key();
 
@@ -349,7 +352,7 @@ void FSLockPropertiesManager::loadLockSettings()
                     FSCameraPropertyValuesUMap umapCameraPropertyValues;
 
                     for (QVariantMap::const_iterator propertyIterator = propertyVarMap.begin();
-                         propertyIterator != propertyVarMap.end();
+                         propertyIterator != propertyVarMap.cend();
                          ++propertyIterator) {
                         const FSCameraProperty property = fsReadNameEnum(propertyIterator.key());
 
@@ -377,7 +380,7 @@ void FSLockPropertiesManager::loadLockSettings()
         FSCameraPathPresetsUmap umapLockCamerasPresets;
 
         for (QVariantMap::const_iterator deviceIterator = varMap.begin();
-             deviceIterator != varMap.end();
+             deviceIterator != varMap.cend();
              ++deviceIterator) {
             const DevicePath &devicePath = deviceIterator.key();
             const QString &presetName = deviceIterator.value().toString();
@@ -399,11 +402,11 @@ void FSLockPropertiesManager::saveLockSettings()
     {
         QVariantMap varMap;
 
-        for (const auto&[devicePath, umapCameraPropertyValues] : d->umapManualLockCamerasParams) {
+        for (const auto&[devicePath, umapCameraPropertyValues] : qAsConst(d->umapManualLockCamerasParams)) {
             if (!devicePath.isEmpty() && !umapCameraPropertyValues.empty()) {
                 QVariantMap propertyVarMap;
 
-                for (const auto &[property, valueParams] : umapCameraPropertyValues) {
+                for (const auto &[property, valueParams] : qAsConst(umapCameraPropertyValues)) {
                     if (!valueParams.isNull()) {
                         propertyVarMap.insert(fsGetEnumName(property),
                                               QVariant::fromValue(valueParams.toByteArray()));
@@ -421,7 +424,7 @@ void FSLockPropertiesManager::saveLockSettings()
     {
         QVariantMap varMap;
 
-        for (const auto&[devicePath, presetName] : d->umapPresetsLockCameras) {
+        for (const auto&[devicePath, presetName] : qAsConst(d->umapPresetsLockCameras)) {
             if (!devicePath.isEmpty() && !presetName.isEmpty()) {
                 varMap.insert(devicePath, presetName);
             }
@@ -537,7 +540,7 @@ void FSLockPropertiesManager::manualUnlockProperties(const DevicePath &devicePat
 {
     FSCameraPathValuesUMap::const_iterator iterator = d->umapManualLockCamerasParams.find(devicePath);
 
-    if (iterator == d->umapManualLockCamerasParams.end())
+    if (iterator == d->umapManualLockCamerasParams.cend())
         return;
 
     trySwitchToManualMode(devicePath);
@@ -563,7 +566,7 @@ void FSLockPropertiesManager::presetLockProperties(const DevicePath &devicePath,
         return;
 
     FSCameraPathPresetsUmap::const_iterator presetIterator = d->umapPresetsLockCameras.find(devicePath);
-    if (presetIterator != d->umapPresetsLockCameras.end()) {
+    if (presetIterator != d->umapPresetsLockCameras.cend()) {
         if (presetIterator->second == presetName)
             return;
 
@@ -576,7 +579,7 @@ void FSLockPropertiesManager::presetLockProperties(const DevicePath &devicePath,
     const FSCameraPropertyValuesUMap umapCameraPresetPropertyValues = d->camerasStorage->getCameraUserPreset(devicePath, presetName);
 
     FSCameraPathValuesUMap::const_iterator manualIterator = d->umapManualLockCamerasParams.find(devicePath);
-    if (manualIterator == d->umapManualLockCamerasParams.end()) {
+    if (manualIterator == d->umapManualLockCamerasParams.cend()) {
         emit lockedCamera(devicePath);
 
         for (const auto &[property, valueParams] : umapCameraPresetPropertyValues) {
@@ -586,13 +589,13 @@ void FSLockPropertiesManager::presetLockProperties(const DevicePath &devicePath,
         const FSCameraPropertyValuesUMap &umapCameraManualPropertyValues = manualIterator->second;
 
         for (const auto &[property, valueParams] : umapCameraPresetPropertyValues) {
-            if (umapCameraManualPropertyValues.find(property) == umapCameraManualPropertyValues.end()) {
+            if (umapCameraManualPropertyValues.find(property) == umapCameraManualPropertyValues.cend()) {
                 emit lockedProperty(devicePath, property);
             }
         }
 
         for (const auto &[property, valueParams] : umapCameraManualPropertyValues) {
-            if (umapCameraPresetPropertyValues.find(property) == umapCameraPresetPropertyValues.end()) {
+            if (umapCameraPresetPropertyValues.find(property) == umapCameraPresetPropertyValues.cend()) {
                 restoreDefaultPropertyValue(devicePath, property);
                 emit unlockedProperty(devicePath, property);
             }
@@ -608,7 +611,7 @@ void FSLockPropertiesManager::presetUnlockProperies(const DevicePath &devicePath
         return;
 
     FSCameraPathPresetsUmap::const_iterator iterator = d->umapPresetsLockCameras.find(devicePath);
-    if (iterator == d->umapPresetsLockCameras.end())
+    if (iterator == d->umapPresetsLockCameras.cend())
         return;
 
     const QString oldPresetName = iterator->second;
@@ -618,7 +621,7 @@ void FSLockPropertiesManager::presetUnlockProperies(const DevicePath &devicePath
     const FSCameraPropertyValuesUMap umapCameraPresetPropertyValues = d->camerasStorage->getCameraUserPreset(devicePath, oldPresetName);
 
     FSCameraPathValuesUMap::const_iterator manualIterator = d->umapManualLockCamerasParams.find(devicePath);
-    if (manualIterator == d->umapManualLockCamerasParams.end()) {
+    if (manualIterator == d->umapManualLockCamerasParams.cend()) {
         for (const auto &[property, valueParams] : umapCameraPresetPropertyValues) {
             restoreDefaultPropertyValue(devicePath, property);
             emit unlockedProperty(devicePath, property);
@@ -629,14 +632,14 @@ void FSLockPropertiesManager::presetUnlockProperies(const DevicePath &devicePath
         const FSCameraPropertyValuesUMap &umapCameraManualPropertyValues = manualIterator->second;
 
         for (const auto &[property, valueParams] : umapCameraPresetPropertyValues) {
-            if (umapCameraManualPropertyValues.find(property) == umapCameraManualPropertyValues.end()) {
+            if (umapCameraManualPropertyValues.find(property) == umapCameraManualPropertyValues.cend()) {
                 restoreDefaultPropertyValue(devicePath, property);
                 emit unlockedProperty(devicePath, property);
             }
         }
 
         for (const auto &[property, valueParams] : umapCameraManualPropertyValues) {
-            if (umapCameraPresetPropertyValues.find(property) == umapCameraPresetPropertyValues.end()) {
+            if (umapCameraPresetPropertyValues.find(property) == umapCameraPresetPropertyValues.cend()) {
                 emit lockedProperty(devicePath, property);
             }
         }
@@ -649,19 +652,18 @@ void FSLockPropertiesManager::updateTimerStatus()
 {
     if (d->isLockPropertiesEnabled) {
         if (!isExistLockedProperties()) {
-            QMetaObject::invokeMethod(d->sendLockedValuesTimer,
-                                      &QTimer::stop,
-                                      Qt::QueuedConnection);
+            QMetaObject::invokeMethod(d->sendLockedValuesTimer, [this]() {
+                d->sendLockedValuesTimer->stop();
+            }, Qt::QueuedConnection);
         } else {
-            QMetaObject::invokeMethod(d->sendLockedValuesTimer,
-                                      "start",
-                                      Qt::QueuedConnection,
-                                      Q_ARG(int, FSSettings::lockPropertiesInterval()));
+            QMetaObject::invokeMethod(d->sendLockedValuesTimer, [this]() {
+                d->sendLockedValuesTimer->start(FSSettings::lockPropertiesInterval());
+            }, Qt::QueuedConnection);
         }
     } else {
-        QMetaObject::invokeMethod(d->sendLockedValuesTimer,
-                                  &QTimer::stop,
-                                  Qt::QueuedConnection);
+        QMetaObject::invokeMethod(d->sendLockedValuesTimer, [this]() {
+            d->sendLockedValuesTimer->stop();
+        }, Qt::QueuedConnection);
     }
 }
 
@@ -675,8 +677,8 @@ void FSLockPropertiesManager::init()
     d->sendLockedValuesTimer = new QTimer();
     d->sendLockedValuesTimer->moveToThread(d->parallelThread);
     d->sendLockedValuesTimer->setInterval(FSSettings::lockPropertiesInterval());
-    connect(d->sendLockedValuesTimer, SIGNAL(timeout()),
-            this,                       SLOT(sendAllLockedValues()));
+    connect(d->sendLockedValuesTimer, &QTimer::timeout,
+            this,                     &FSLockPropertiesManager::sendAllLockedValues);
     updateTimerStatus();
 }
 
@@ -687,7 +689,7 @@ void FSLockPropertiesManager::copyCurrentPresetToManualPropertyValues(const Devi
 
     FSCameraPathPresetsUmap::const_iterator presetCameraIterator = d->umapPresetsLockCameras.find(devicePath);
 
-    if (presetCameraIterator == d->umapPresetsLockCameras.end())
+    if (presetCameraIterator == d->umapPresetsLockCameras.cend())
         return;
 
     d->umapPresetsLockCameras.erase(presetCameraIterator);
@@ -790,7 +792,7 @@ void FSLockPropertiesManager::addCamera(const DevicePath &devicePath)
         return;
 
     FSCameraPathValuesUMap::const_iterator iterator = d->umapManualLockCamerasParams.find(devicePath);
-    if (iterator != d->umapManualLockCamerasParams.end()) {
+    if (iterator != d->umapManualLockCamerasParams.cend()) {
         emit lockedCamera(devicePath);
 
         const FSCameraPropertyValuesUMap &umapCameraPropertyValues = iterator->second;
@@ -806,7 +808,7 @@ void FSLockPropertiesManager::removeCamera(const DevicePath &devicePath)
         return;
 
     FSCameraPathValuesUMap::const_iterator lockPropertiesIterator = d->umapManualLockCamerasParams.find(devicePath);
-    if (lockPropertiesIterator != d->umapManualLockCamerasParams.end()) {
+    if (lockPropertiesIterator != d->umapManualLockCamerasParams.cend()) {
         emit unlockedCamera(devicePath);
 
         const FSCameraPropertyValuesUMap &umapCameraPropertyValues = lockPropertiesIterator->second;
@@ -824,7 +826,7 @@ void FSLockPropertiesManager::updateCurrentPreset(const DevicePath &devicePath)
 
     FSCameraPathPresetsUmap::const_iterator iterator = d->umapPresetsLockCameras.find(devicePath);
 
-    if (iterator == d->umapPresetsLockCameras.end())
+    if (iterator == d->umapPresetsLockCameras.cend())
         return;
 
     const QString &lockPresetName = iterator->second;
@@ -848,7 +850,7 @@ void FSLockPropertiesManager::sendAllLockedValues()
     if (!d->camerasStorage)
         return;
 
-    for (const auto &[devicePath, presetName] : d->umapPresetsLockCameras) {
+    for (const auto &[devicePath, presetName] : qAsConst(d->umapPresetsLockCameras)) {
         if ( !d->camerasStorage->isCameraConnected(devicePath) ||
              d->camerasStorage->isContaintsBlackList(devicePath) )
             continue;
@@ -859,13 +861,13 @@ void FSLockPropertiesManager::sendAllLockedValues()
         }
     }
 
-    for (const auto &[devicePath, lockedPropertiesValues] : d->umapManualLockCamerasParams) {
+    for (const auto &[devicePath, lockedPropertiesValues] : qAsConst(d->umapManualLockCamerasParams)) {
         if ( !d->camerasStorage->isCameraConnected(devicePath) ||
              d->camerasStorage->isContaintsBlackList(devicePath) ||
              d->umapPresetsLockCameras.find(devicePath) != d->umapPresetsLockCameras.end() )
             continue;
 
-        for (const auto &[property, lockedValueParams] : lockedPropertiesValues) {
+        for (const auto &[property, lockedValueParams] : qAsConst(lockedPropertiesValues)) {
             setLockValueParams(devicePath, property, lockedValueParams);
         }
     }

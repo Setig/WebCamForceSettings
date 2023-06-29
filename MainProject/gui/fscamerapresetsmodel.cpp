@@ -43,10 +43,14 @@ QVariant FSCameraPresetsModel::getDeviceData(const DevicePath &devicePath,
 {
     if (role == Qt::TextAlignmentRole) {
         switch (column) {
-        case 0: return Qt::AlignLeft;
-        case 1: return Qt::AlignCenter;
-        case 2: return Qt::AlignCenter;
-        case 3: return Qt::AlignLeft;
+        case NameColumn:
+            return Qt::AlignLeft;
+        case IsConnectedColumn:
+            return Qt::AlignCenter;
+        case IsExistPresetsColumn:
+            return Qt::AlignCenter;
+        case PresetsCountColumn:
+            return Qt::AlignLeft;
         default:
             break;
         }
@@ -55,10 +59,14 @@ QVariant FSCameraPresetsModel::getDeviceData(const DevicePath &devicePath,
     }
 
     switch (column) {
-    case 0: return camerasStorage()->getCameraDisplayName(devicePath);
-    case 1: return camerasStorage()->isCameraConnected(devicePath);
-    case 2: return camerasStorage()->isCameraUserPresetsUsed(devicePath);
-    case 3: return camerasStorage()->getCameraUserPresets(devicePath).size();
+    case NameColumn:
+        return camerasStorage()->getCameraDisplayName(devicePath);
+    case IsConnectedColumn:
+        return camerasStorage()->isCameraConnected(devicePath);
+    case IsExistPresetsColumn:
+        return camerasStorage()->isCameraUserPresetsUsed(devicePath);
+    case PresetsCountColumn:
+        return camerasStorage()->getCameraUserPresets(devicePath).size();
     default:
         break;
     }
@@ -83,7 +91,7 @@ std::vector<DevicePath> FSCameraPresetsModel::getDevicesFromStorage() const
 
         for (const DevicePath &devicePath : vecAvailableDevicePaths) {
             if ( !camerasStorage->isContaintsBlackList(devicePath) &&
-                 umapCameraPathUserPresets.find(devicePath) == umapCameraPathUserPresets.end()) {
+                 umapCameraPathUserPresets.find(devicePath) == umapCameraPathUserPresets.cend()) {
                 result.push_back(devicePath);
             }
         }
@@ -95,8 +103,8 @@ std::vector<DevicePath> FSCameraPresetsModel::getDevicesFromStorage() const
 void FSCameraPresetsModel::connectByCamerasStorage(FSCamerasStorage *camerasStorage)
 {
     if (camerasStorage) {
-        connect(camerasStorage, SIGNAL(cameraUserPresetNamesChanged(DevicePath)),
-                this,             SLOT(updatePresetsColumns(DevicePath)));
+        connect(camerasStorage, &FSCamerasStorage::cameraUserPresetNamesChanged,
+                this,           &FSCameraPresetsModel::updatePresetsColumns);
     }
 
     FSAbstractCameraSettingsModel::connectByCamerasStorage(camerasStorage);
@@ -105,8 +113,8 @@ void FSCameraPresetsModel::connectByCamerasStorage(FSCamerasStorage *camerasStor
 void FSCameraPresetsModel::disconnectByCamerasStorage(FSCamerasStorage *camerasStorage)
 {
     if (camerasStorage) {
-        disconnect(camerasStorage, SIGNAL(cameraUserPresetNamesChanged(DevicePath)),
-                   this,             SLOT(updatePresetsColumns(DevicePath)));
+        disconnect(camerasStorage, &FSCamerasStorage::cameraUserPresetNamesChanged,
+                   this,           &FSCameraPresetsModel::updatePresetsColumns);
     }
 
     FSAbstractCameraSettingsModel::disconnectByCamerasStorage(camerasStorage);
@@ -119,7 +127,7 @@ void FSCameraPresetsModel::addCamera(const DevicePath &devicePath)
          !camerasStorage->isCameraUserPresetsUsed(devicePath) ) {
         addDevice(devicePath);
     } else {
-        emitDataChanged(devicePath, { 0, 1 });
+        emitDataChanged(devicePath, { NameColumn, IsConnectedColumn });
     }
 }
 
@@ -130,13 +138,13 @@ void FSCameraPresetsModel::removeCamera(const DevicePath &devicePath)
          !camerasStorage->isCameraUserPresetsUsed(devicePath) ) {
         removeDevice(devicePath);
     } else {
-        emitDataChanged(devicePath, { 0, 1 });
+        emitDataChanged(devicePath, { NameColumn, IsConnectedColumn });
     }
 }
 
 void FSCameraPresetsModel::updatePresetsColumns(const DevicePath &devicePath)
 {
-    emitDataChanged(devicePath, { 2, 3 });
+    emitDataChanged(devicePath, { IsExistPresetsColumn, PresetsCountColumn });
 }
 
 void FSCameraPresetsModel::retranslate()

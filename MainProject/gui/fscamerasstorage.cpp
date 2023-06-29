@@ -57,8 +57,8 @@ FSCamerasStorage::~FSCamerasStorage()
 
 void FSCamerasStorage::setUserDefaultValues(const FSCameraPathValuesUMap &umapCameraPathValues)
 {
-    for (const auto &[devicePath, umapCameraPropertyValues] : d->umapCameraUserDefaultValues) {
-        if (umapCameraPathValues.find(devicePath) == umapCameraPathValues.end())
+    for (const auto &[devicePath, umapCameraPropertyValues] : qAsConst(d->umapCameraUserDefaultValues)) {
+        if (umapCameraPathValues.find(devicePath) == umapCameraPathValues.cend())
             userDefaultValuesRemove(devicePath);
     }
 
@@ -80,7 +80,7 @@ void FSCamerasStorage::setUserDefaultValues(const DevicePath &devicePath,
 
             for (const auto &[property, valueParams] : umapCameraPropertyValues) {
                 FSCameraPropertyValuesUMap::const_iterator propertyIterator = currentUMapCameraPropertyValues.find(property);
-                if (propertyIterator != currentUMapCameraPropertyValues.end()) {
+                if (propertyIterator != currentUMapCameraPropertyValues.cend()) {
                     const FSValueParams &currentValueParams = propertyIterator->second;
 
                     if (currentValueParams != valueParams) {
@@ -96,7 +96,7 @@ void FSCamerasStorage::setUserDefaultValues(const DevicePath &devicePath,
             if (!isChanged) {
                 for (const auto &[property, valueParams] : currentUMapCameraPropertyValues) {
                     FSCameraPropertyValuesUMap::const_iterator propertyIterator = umapCameraPropertyValues.find(property);
-                    if (propertyIterator == umapCameraPropertyValues.end()) {
+                    if (propertyIterator == umapCameraPropertyValues.cend()) {
                         isChanged = true;
                         break;
                     }
@@ -146,7 +146,7 @@ void FSCamerasStorage::setUserDefaultValue(const DevicePath &devicePath,
 bool FSCamerasStorage::isUserDefaultValuesUsed(const DevicePath &devicePath)
 {
     FSCameraPathValuesUMap::const_iterator iterator = d->umapCameraUserDefaultValues.find(devicePath);
-    if (iterator != d->umapCameraUserDefaultValues.end()) {
+    if (iterator != d->umapCameraUserDefaultValues.cend()) {
         if (iterator->second.size() != 0) {
             return true;
         }
@@ -159,10 +159,10 @@ bool FSCamerasStorage::isUserDefaultValueUsed(const DevicePath &devicePath,
                                               FSCameraProperty property)
 {
     FSCameraPathValuesUMap::const_iterator devicePathIterator = d->umapCameraUserDefaultValues.find(devicePath);
-    if (devicePathIterator != d->umapCameraUserDefaultValues.end()) {
+    if (devicePathIterator != d->umapCameraUserDefaultValues.cend()) {
         const FSCameraPropertyValuesUMap &umapCameraPropertyValues = devicePathIterator->second;
         FSCameraPropertyValuesUMap::const_iterator propertyIterator = umapCameraPropertyValues.find(property);
-        if (propertyIterator != umapCameraPropertyValues.end() && !propertyIterator->second.isNull()) {
+        if (propertyIterator != umapCameraPropertyValues.cend() && !propertyIterator->second.isNull()) {
             return true;
         }
     }
@@ -178,7 +178,7 @@ FSCameraPathValuesUMap FSCamerasStorage::getUserDefaultValues() const
 FSCameraPropertyValuesUMap FSCamerasStorage::getUserDefaultValues(const DevicePath &devicePath) const
 {
     FSCameraPathValuesUMap::const_iterator iterator = d->umapCameraUserDefaultValues.find(devicePath);
-    if (iterator != d->umapCameraUserDefaultValues.end())
+    if (iterator != d->umapCameraUserDefaultValues.cend())
         return iterator->second;
 
     return FSCameraPropertyValuesUMap();
@@ -188,10 +188,10 @@ FSValueParams FSCamerasStorage::getUserDefaultValue(const DevicePath &devicePath
                                                     FSCameraProperty property) const
 {
     FSCameraPathValuesUMap::const_iterator devicePathIterator = d->umapCameraUserDefaultValues.find(devicePath);
-    if (devicePathIterator != d->umapCameraUserDefaultValues.end()) {
+    if (devicePathIterator != d->umapCameraUserDefaultValues.cend()) {
         const FSCameraPropertyValuesUMap &umapCameraPropertyValues = devicePathIterator->second;
         FSCameraPropertyValuesUMap::const_iterator propertyIterator = umapCameraPropertyValues.find(property);
-        if (propertyIterator != umapCameraPropertyValues.end()) {
+        if (propertyIterator != umapCameraPropertyValues.cend()) {
             return propertyIterator->second;
         }
     }
@@ -201,8 +201,8 @@ FSValueParams FSCamerasStorage::getUserDefaultValue(const DevicePath &devicePath
 
 void FSCamerasStorage::userDefaultValuesRemove(const DevicePath &devicePath)
 {
-    FSCameraPathValuesUMap::iterator iterator = d->umapCameraUserDefaultValues.find(devicePath);
-    if (iterator != d->umapCameraUserDefaultValues.end()) {
+    FSCameraPathValuesUMap::const_iterator iterator = d->umapCameraUserDefaultValues.find(devicePath);
+    if (iterator != d->umapCameraUserDefaultValues.cend()) {
         d->umapCameraUserDefaultValues.erase(iterator);
         emit userDefaultValuesChanged(devicePath);
     }
@@ -214,8 +214,8 @@ void FSCamerasStorage::userDefaultValueRemove(const DevicePath &devicePath,
     FSCameraPathValuesUMap::iterator devicePathIterator = d->umapCameraUserDefaultValues.find(devicePath);
     if (devicePathIterator != d->umapCameraUserDefaultValues.end()) {
         FSCameraPropertyValuesUMap &umapCameraPropertyValues = devicePathIterator->second;
-        FSCameraPropertyValuesUMap::iterator propertyIterator = umapCameraPropertyValues.find(property);
-        if (propertyIterator != umapCameraPropertyValues.end()) {
+        FSCameraPropertyValuesUMap::const_iterator propertyIterator = umapCameraPropertyValues.find(property);
+        if (propertyIterator != umapCameraPropertyValues.cend()) {
             umapCameraPropertyValues.erase(propertyIterator);
             emit userDefaultValuesChanged(devicePath);
         }
@@ -230,12 +230,12 @@ void FSCamerasStorage::userDefaultValuesClear()
 {
     if (d->umapCameraUserDefaultValues.empty()) {
         std::list<DevicePath> listDevicePaths;
-        for (const auto &[devicePath, umapCameraPropertyValues] : d->umapCameraUserDefaultValues)
+        for (const auto &[devicePath, umapCameraPropertyValues] : qAsConst(d->umapCameraUserDefaultValues))
             listDevicePaths.push_back(devicePath);
 
         d->umapCameraUserDefaultValues.clear();
 
-        for (const DevicePath &devicePath: listDevicePaths)
+        for (const DevicePath &devicePath : qAsConst(listDevicePaths))
             emit userDefaultValuesChanged(devicePath);
     }
 }
@@ -248,7 +248,7 @@ void FSCamerasStorage::saveDefaultValueParams()
         if (!devicePath.isEmpty() && !umapCameraPropertyValues.empty()) {
             QVariantMap propertyVarMap;
 
-            for (const auto &[property, valueParams] : umapCameraPropertyValues) {
+            for (const auto &[property, valueParams] : qAsConst(umapCameraPropertyValues)) {
                 if (!valueParams.isNull()) {
                     propertyVarMap.insert(fsGetEnumName(property),
                                           QVariant::fromValue(valueParams.toByteArray()));
@@ -268,7 +268,7 @@ void FSCamerasStorage::loadDefaultValueParams()
     FSCameraPathValuesUMap umapCameraPathValues;
 
     for (QVariantMap::const_iterator deviceIterator = varMap.begin();
-         deviceIterator != varMap.end();
+         deviceIterator != varMap.cend();
          ++deviceIterator) {
         const DevicePath &devicePath = deviceIterator.key();
 
@@ -279,7 +279,7 @@ void FSCamerasStorage::loadDefaultValueParams()
                 FSCameraPropertyValuesUMap umapCameraPropertyValues;
 
                 for (QVariantMap::const_iterator propertyIterator = propertyVarMap.begin();
-                     propertyIterator != propertyVarMap.end();
+                     propertyIterator != propertyVarMap.cend();
                      ++propertyIterator) {
                     const FSCameraProperty property = fsReadNameEnum(propertyIterator.key());
 
@@ -303,7 +303,7 @@ void FSCamerasStorage::loadDefaultValueParams()
 
 void FSCamerasStorage::setCameraUserPresets(const FSCameraPathUserPresetsUMap &umapCameraUserPresets)
 {
-    for (const auto &[devicePath, umapCameraUserPresets] : d->umapCameraUserPresets) {
+    for (const auto &[devicePath, umapCameraUserPresets] : qAsConst(d->umapCameraUserPresets)) {
         if (umapCameraUserPresets.find(devicePath) == umapCameraUserPresets.end())
             cameraUserNameRemove(devicePath);
     }
@@ -325,7 +325,7 @@ void FSCamerasStorage::setCameraUserPresets(const DevicePath &devicePath,
 
             bool isPresetNamesChanged = false;
             for (const auto &[presetName, propertyValues] : oldUMapCameraUserPresets) {
-                if (umapCameraUserPresets.find(presetName) == umapCameraUserPresets.end()) {
+                if (umapCameraUserPresets.find(presetName) == umapCameraUserPresets.cend()) {
                     isPresetNamesChanged = true;
                     break;
                 }
@@ -333,7 +333,7 @@ void FSCamerasStorage::setCameraUserPresets(const DevicePath &devicePath,
 
             if (!isPresetNamesChanged) {
                 for (const auto &[presetName, propertyValues] : umapCameraUserPresets) {
-                    if (oldUMapCameraUserPresets.find(presetName) == oldUMapCameraUserPresets.end()) {
+                    if (oldUMapCameraUserPresets.find(presetName) == oldUMapCameraUserPresets.cend()) {
                         isPresetNamesChanged = true;
                         break;
                     }
@@ -414,11 +414,11 @@ bool FSCamerasStorage::isCameraUserPresetsUsed(const DevicePath &devicePath)
 bool FSCamerasStorage::isCameraUserPresetUsed(const DevicePath &devicePath,
                                               const QString &presetName)
 {
-    FSCameraPathUserPresetsUMap::iterator deviceIterator = d->umapCameraUserPresets.find(devicePath);
-    if (deviceIterator != d->umapCameraUserPresets.end()) {
-        FSCameraUserPresetsUMap &umapCameraUserPresets = deviceIterator->second;
-        FSCameraUserPresetsUMap::iterator presetIterator = umapCameraUserPresets.find(presetName);
-        return (presetIterator != umapCameraUserPresets.end());
+    FSCameraPathUserPresetsUMap::const_iterator deviceIterator = d->umapCameraUserPresets.find(devicePath);
+    if (deviceIterator != d->umapCameraUserPresets.cend()) {
+        const FSCameraUserPresetsUMap &umapCameraUserPresets = deviceIterator->second;
+        FSCameraUserPresetsUMap::const_iterator presetIterator = umapCameraUserPresets.find(presetName);
+        return (presetIterator != umapCameraUserPresets.cend());
     }
 
     return false;
@@ -428,13 +428,13 @@ bool FSCamerasStorage::isCameraUserPresetValueUsed(const DevicePath &devicePath,
                                                    const QString &presetName,
                                                    FSCameraProperty property)
 {
-    FSCameraPathUserPresetsUMap::iterator deviceIterator = d->umapCameraUserPresets.find(devicePath);
-    if (deviceIterator != d->umapCameraUserPresets.end()) {
-        FSCameraUserPresetsUMap &umapCameraUserPresets = deviceIterator->second;
-        FSCameraUserPresetsUMap::iterator presetIterator = umapCameraUserPresets.find(presetName);
-        if (presetIterator != umapCameraUserPresets.end()) {
-            FSCameraPropertyValuesUMap &umapCameraPropertyValues = presetIterator->second;
-            return (umapCameraPropertyValues.find(property) != umapCameraPropertyValues.end());
+    FSCameraPathUserPresetsUMap::const_iterator deviceIterator = d->umapCameraUserPresets.find(devicePath);
+    if (deviceIterator != d->umapCameraUserPresets.cend()) {
+        const FSCameraUserPresetsUMap &umapCameraUserPresets = deviceIterator->second;
+        FSCameraUserPresetsUMap::const_iterator presetIterator = umapCameraUserPresets.find(presetName);
+        if (presetIterator != umapCameraUserPresets.cend()) {
+            const FSCameraPropertyValuesUMap &umapCameraPropertyValues = presetIterator->second;
+            return (umapCameraPropertyValues.find(property) != umapCameraPropertyValues.cend());
         }
     }
 
@@ -450,9 +450,9 @@ std::vector<QString> FSCamerasStorage::getCameraUserPresetNames(const DevicePath
 {
     std::vector<QString> result;
 
-    FSCameraPathUserPresetsUMap::iterator deviceIterator = d->umapCameraUserPresets.find(devicePath);
-    if (deviceIterator != d->umapCameraUserPresets.end()) {
-        FSCameraUserPresetsUMap &umapCameraUserPresets = deviceIterator->second;
+    FSCameraPathUserPresetsUMap::const_iterator deviceIterator = d->umapCameraUserPresets.find(devicePath);
+    if (deviceIterator != d->umapCameraUserPresets.cend()) {
+        const FSCameraUserPresetsUMap &umapCameraUserPresets = deviceIterator->second;
         result.reserve(umapCameraUserPresets.size());
         for (const auto &[presetName, propertyValues] : umapCameraUserPresets) {
             result.push_back(presetName);
@@ -464,8 +464,8 @@ std::vector<QString> FSCamerasStorage::getCameraUserPresetNames(const DevicePath
 
 FSCameraUserPresetsUMap FSCamerasStorage::getCameraUserPresets(const DevicePath &devicePath) const
 {
-    FSCameraPathUserPresetsUMap::iterator deviceIterator = d->umapCameraUserPresets.find(devicePath);
-    if (deviceIterator != d->umapCameraUserPresets.end()) {
+    FSCameraPathUserPresetsUMap::const_iterator deviceIterator = d->umapCameraUserPresets.find(devicePath);
+    if (deviceIterator != d->umapCameraUserPresets.cend()) {
         return deviceIterator->second;
     }
 
@@ -475,11 +475,11 @@ FSCameraUserPresetsUMap FSCamerasStorage::getCameraUserPresets(const DevicePath 
 FSCameraPropertyValuesUMap FSCamerasStorage::getCameraUserPreset(const DevicePath &devicePath,
                                                                  const QString &presetName) const
 {
-    FSCameraPathUserPresetsUMap::iterator deviceIterator = d->umapCameraUserPresets.find(devicePath);
-    if (deviceIterator != d->umapCameraUserPresets.end()) {
-        FSCameraUserPresetsUMap &umapCameraUserPresets = deviceIterator->second;
-        FSCameraUserPresetsUMap::iterator presetIterator = umapCameraUserPresets.find(presetName);
-        if (presetIterator != umapCameraUserPresets.end()) {
+    FSCameraPathUserPresetsUMap::const_iterator deviceIterator = d->umapCameraUserPresets.find(devicePath);
+    if (deviceIterator != d->umapCameraUserPresets.cend()) {
+        const FSCameraUserPresetsUMap &umapCameraUserPresets = deviceIterator->second;
+        FSCameraUserPresetsUMap::const_iterator presetIterator = umapCameraUserPresets.find(presetName);
+        if (presetIterator != umapCameraUserPresets.cend()) {
             return presetIterator->second;
         }
     }
@@ -491,14 +491,14 @@ FSValueParams FSCamerasStorage::getCameraUserPresetValue(const DevicePath &devic
                                                          const QString &presetName,
                                                          FSCameraProperty property) const
 {
-    FSCameraPathUserPresetsUMap::iterator deviceIterator = d->umapCameraUserPresets.find(devicePath);
-    if (deviceIterator != d->umapCameraUserPresets.end()) {
-        FSCameraUserPresetsUMap &umapCameraUserPresets = deviceIterator->second;
-        FSCameraUserPresetsUMap::iterator presetIterator = umapCameraUserPresets.find(presetName);
-        if (presetIterator != umapCameraUserPresets.end()) {
-            FSCameraPropertyValuesUMap &umapCameraPropertyValues = presetIterator->second;
-            FSCameraPropertyValuesUMap::iterator propertyIterator = umapCameraPropertyValues.find(property);
-            if (propertyIterator != umapCameraPropertyValues.end()) {
+    FSCameraPathUserPresetsUMap::const_iterator deviceIterator = d->umapCameraUserPresets.find(devicePath);
+    if (deviceIterator != d->umapCameraUserPresets.cend()) {
+        const FSCameraUserPresetsUMap &umapCameraUserPresets = deviceIterator->second;
+        FSCameraUserPresetsUMap::const_iterator presetIterator = umapCameraUserPresets.find(presetName);
+        if (presetIterator != umapCameraUserPresets.cend()) {
+            const FSCameraPropertyValuesUMap &umapCameraPropertyValues = presetIterator->second;
+            FSCameraPropertyValuesUMap::const_iterator propertyIterator = umapCameraPropertyValues.find(property);
+            if (propertyIterator != umapCameraPropertyValues.cend()) {
                 return propertyIterator->second;
             }
         }
@@ -520,8 +520,8 @@ void FSCamerasStorage::cameraUserPresetRemove(const DevicePath &devicePath,
     FSCameraPathUserPresetsUMap::iterator deviceIterator = d->umapCameraUserPresets.find(devicePath);
     if (deviceIterator != d->umapCameraUserPresets.end()) {
         FSCameraUserPresetsUMap &umapCameraUserPresets = deviceIterator->second;
-        FSCameraUserPresetsUMap::iterator presetIterator = umapCameraUserPresets.find(presetName);
-        if (presetIterator != umapCameraUserPresets.end()) {
+        FSCameraUserPresetsUMap::const_iterator presetIterator = umapCameraUserPresets.find(presetName);
+        if (presetIterator != umapCameraUserPresets.cend()) {
             umapCameraUserPresets.erase(presetIterator);
 
             emit cameraUserPresetNamesChanged(devicePath);
@@ -543,8 +543,8 @@ void FSCamerasStorage::cameraUserPresetValueRemove(const DevicePath &devicePath,
         FSCameraUserPresetsUMap::iterator presetIterator = umapCameraUserPresets.find(presetName);
         if (presetIterator != umapCameraUserPresets.end()) {
             FSCameraPropertyValuesUMap &umapCameraPropertyValues = presetIterator->second;
-            FSCameraPropertyValuesUMap::iterator propertyIterator = umapCameraPropertyValues.find(property);
-            if (propertyIterator != umapCameraPropertyValues.end()) {
+            FSCameraPropertyValuesUMap::const_iterator propertyIterator = umapCameraPropertyValues.find(property);
+            if (propertyIterator != umapCameraPropertyValues.cend()) {
                 umapCameraPropertyValues.erase(propertyIterator);
             }
 
@@ -568,13 +568,13 @@ void FSCamerasStorage::cameraUserPresetsClear()
 
     std::vector<DevicePath> devicePaths;
     devicePaths.reserve(d->umapCameraUserPresets.size());
-    for (const auto &[devicePath, umapCameraUserPreset] : d->umapCameraUserPresets) {
+    for (const auto &[devicePath, umapCameraUserPreset] : qAsConst(d->umapCameraUserPresets)) {
         devicePaths.push_back(devicePath);
     }
 
     d->umapCameraUserPresets.clear();
 
-    for (const DevicePath &devicePath : devicePaths) {
+    for (const DevicePath &devicePath : qAsConst(devicePaths)) {
         emit cameraUserPresetNamesChanged(devicePath);
     }
 }
@@ -583,15 +583,15 @@ void FSCamerasStorage::saveCameraUserPresets()
 {
     QVariantMap varMap;
 
-    for (const auto &[devicePath, umapCameraUserPreset] : d->umapCameraUserPresets) {
+    for (const auto &[devicePath, umapCameraUserPreset] : qAsConst(d->umapCameraUserPresets)) {
         if (!devicePath.isEmpty() && !umapCameraUserPreset.empty()) {
             QVariantMap presetVarMap;
 
-            for (const auto &[presetName, umapPropertyValueParams] : umapCameraUserPreset) {
+            for (const auto &[presetName, umapPropertyValueParams] : qAsConst(umapCameraUserPreset)) {
                 if (!presetName.isEmpty() && !umapPropertyValueParams.empty()) {
                     QVariantMap propertyVarMap;
 
-                    for (const auto &[property, valueParams] : umapPropertyValueParams) {
+                    for (const auto &[property, valueParams] : qAsConst(umapPropertyValueParams)) {
                         if (!valueParams.isNull()) {
                             propertyVarMap.insert(fsGetEnumName(property),
                                                   QVariant::fromValue(valueParams.toByteArray()));
@@ -615,7 +615,7 @@ void FSCamerasStorage::loadCameraUserPresets()
     FSCameraPathUserPresetsUMap umapCameraPathUserPresets;
 
     for (QVariantMap::const_iterator deviceIterator = varMap.begin();
-         deviceIterator != varMap.end();
+         deviceIterator != varMap.cend();
          ++deviceIterator) {
         const DevicePath &devicePath = deviceIterator.key();
 
@@ -625,7 +625,7 @@ void FSCamerasStorage::loadCameraUserPresets()
             if (!presetVarMap.isEmpty()) {
                 FSCameraUserPresetsUMap umapCameraUserPresets;
                 for (QVariantMap::const_iterator presetIterator = presetVarMap.begin();
-                     presetIterator != presetVarMap.end();
+                     presetIterator != presetVarMap.cend();
                      ++presetIterator) {
                     const QString &presetName = presetIterator.key();
 
@@ -636,7 +636,7 @@ void FSCamerasStorage::loadCameraUserPresets()
                             FSCameraPropertyValuesUMap umapCameraPropertyValues;
 
                             for (QVariantMap::const_iterator propertyIterator = propertyVarMap.begin();
-                                 propertyIterator != propertyVarMap.end();
+                                 propertyIterator != propertyVarMap.cend();
                                  ++propertyIterator) {
                                 const FSCameraProperty property = fsReadNameEnum(propertyIterator.key());
 

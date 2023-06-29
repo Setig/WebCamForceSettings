@@ -52,7 +52,7 @@ public:
 
 FSSettingsDialogPrivate::FSSettingsDialogPrivate()
 {
-
+    // do nothing
 }
 
 FSSettingsDialog::FSSettingsDialog(QWidget *parent)
@@ -90,7 +90,7 @@ void FSSettingsDialog::updateLocales()
 
     QStringList items;
 
-    QList<QLocale> locales = fsTH->availableFSLocales();
+    const QList<QLocale> locales = fsTH->availableFSLocales();
     d->hashItemTextLocales.reserve(locales.count());
 
     for (const QLocale &locale : locales) {
@@ -221,8 +221,8 @@ void FSSettingsDialog::init()
     }
 
     QPushButton *restoreDefaultsButton = ui->buttonBox->button(QDialogButtonBox::RestoreDefaults);
-    connect(restoreDefaultsButton, SIGNAL(clicked(bool)),
-            this,                    SLOT(restoreDefaultValues()));
+    connect(restoreDefaultsButton, qOverload<bool>(&QAbstractButton::clicked),
+            this,                  &FSSettingsDialog::restoreDefaultValues);
 
     connectionCheckBoxWithLabelAndSpinBox(ui->checkBoxIsCameraDetectionEnable,
                                           ui->labelCameraDetectionInterval,
@@ -254,7 +254,7 @@ void FSSettingsDialog::connectionCheckBoxWithLabelAndSpinBox(QCheckBox *checkBox
 
 QString FSSettingsDialog::genLocaleName(const QLocale &locale)
 {
-    return QString("%1 (%2)").arg(QLocale::languageToString(locale.language()), locale.nativeLanguageName());
+    return QStringLiteral("%1 (%2)").arg(QLocale::languageToString(locale.language()), locale.nativeLanguageName());
 }
 
 QStringList FSSettingsDialog::getCustomStyleNames()

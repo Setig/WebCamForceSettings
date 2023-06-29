@@ -29,7 +29,7 @@
 
 FSItemDelegate::FSItemDelegate(QObject *parent) : QItemDelegate(parent)
 {
-
+    // do nothing
 }
 
 void FSItemDelegate::paint(QPainter *painter,

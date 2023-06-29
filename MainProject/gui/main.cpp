@@ -101,11 +101,11 @@ void fsMessageOutput(QtMsgType type,
     QByteArray localMsgTypeLabel;
 
     switch (type) {
-    case QtDebugMsg:    localMsgTypeLabel = "D"; break;
-    case QtInfoMsg:     localMsgTypeLabel = "I"; break;
-    case QtWarningMsg:  localMsgTypeLabel = "W"; break;
-    case QtCriticalMsg: localMsgTypeLabel = "C"; break;
-    case QtFatalMsg:    localMsgTypeLabel = "F"; break;
+    case QtDebugMsg:    localMsgTypeLabel = QByteArrayLiteral("D"); break;
+    case QtInfoMsg:     localMsgTypeLabel = QByteArrayLiteral("I"); break;
+    case QtWarningMsg:  localMsgTypeLabel = QByteArrayLiteral("W"); break;
+    case QtCriticalMsg: localMsgTypeLabel = QByteArrayLiteral("C"); break;
+    case QtFatalMsg:    localMsgTypeLabel = QByteArrayLiteral("F"); break;
     }
 
     if (context.file || context.function)
@@ -133,13 +133,13 @@ int main(int argc, char *argv[])
 #endif // BUILD_WITH_QT_SINGLE_APPLICATION
 
     a.setWindowIcon(QIcon(FSIconCreator::generate()));
-    a.setApplicationName(FS_GUI_APPLICATION_NAME);
-    a.setApplicationVersion(FS_PROJECT_GLOBAL_VERSION);
+    a.setApplicationName(QStringLiteral(FS_GUI_APPLICATION_NAME));
+    a.setApplicationVersion(QStringLiteral(FS_PROJECT_GLOBAL_VERSION));
 
 #ifdef SHOW_ONLY_PROJECT_ICON
     int size = 128;
     QPixmap pixmap = FSIconCreator::generate(size);
-    pixmap.save(qApp->applicationDirPath() + ".png", "PNG");
+    pixmap.save(qApp->applicationDirPath() + QStringLiteral(".png"), QStringLiteral("PNG"));
 
     QLabel label;
     label.setScaledContents(true);
@@ -167,21 +167,21 @@ int main(int argc, char *argv[])
         for (int i = 0; i < appArgs.count(); i++) {
             const QString &arg = appArgs.at(i);
 
-            if (arg == SHOW_CAMERA_SETTINGS_DIALOG_SHORT_ARG_NAME) {
+            if (arg == QLatin1String(SHOW_CAMERA_SETTINGS_DIALOG_SHORT_ARG_NAME)) {
                 showCameraSettingsDialogArgIndex = i;
                 i++; // Not read next argument
                 continue;
-            } else if (arg.startsWith(SHOW_CAMERA_SETTINGS_DIALOG_LONG_ARG_NAME "=")) {
+            } else if (arg.startsWith(QLatin1String(SHOW_CAMERA_SETTINGS_DIALOG_LONG_ARG_NAME "="))) {
                 showCameraSettingsDialogArgIndex = i;
                 continue;
-            } else if ( arg == USE_USER_DEFAULT_SETTINGS_SHORT_ARG_NAME ||
-                        arg == USE_USER_DEFAULT_SETTINGS_LONG_ARG_NAME ) {
+            } else if ( arg == QLatin1String(USE_USER_DEFAULT_SETTINGS_SHORT_ARG_NAME) ||
+                        arg == QLatin1String(USE_USER_DEFAULT_SETTINGS_LONG_ARG_NAME) ) {
                 isUseDefaultSettings = true;
-            } else if (arg == CREATE_LOG_FILE_SHORT_ARG_NAME) {
-                const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/WebCamFS/logs";
+            } else if (arg == QLatin1String(CREATE_LOG_FILE_SHORT_ARG_NAME)) {
+                const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + QStringLiteral("/WebCamFS/logs");
                 QDir().mkpath(dirPath);
-                QByteArray logFileName = QString("%1/%2.log").arg(dirPath,
-                                                                  QDateTime::currentDateTime().toString("yyyy-MM-dd hh-mm-ss")).toLocal8Bit();
+                QByteArray logFileName = QStringLiteral("%1/%2.log").arg(dirPath,
+                                                                  QDateTime::currentDateTime().toString(QStringLiteral("yyyy-MM-dd hh-mm-ss"))).toLocal8Bit();
                 logFile = fopen(logFileName.constData(), "a");
 
                 if (logFile != NULL) {
@@ -200,15 +200,15 @@ int main(int argc, char *argv[])
 
             const QString &arg = appArgs.at(showCameraSettingsDialogArgIndex);
 
-            if (arg == SHOW_CAMERA_SETTINGS_DIALOG_SHORT_ARG_NAME) {
+            if (arg == QLatin1String(SHOW_CAMERA_SETTINGS_DIALOG_SHORT_ARG_NAME)) {
                 if (showCameraSettingsDialogArgIndex != appArgs.count() - 1) {
                     devicePath = appArgs.at(showCameraSettingsDialogArgIndex + 1);
                 } else {
                     qCritical("Not set device path!\n");
                     return 1;
                 }
-            } else if (arg.startsWith(SHOW_CAMERA_SETTINGS_DIALOG_LONG_ARG_NAME "=")) {
-                devicePath = arg.right(arg.count() - QString(SHOW_CAMERA_SETTINGS_DIALOG_LONG_ARG_NAME "=").count());
+            } else if (arg.startsWith(QLatin1String(SHOW_CAMERA_SETTINGS_DIALOG_LONG_ARG_NAME "="))) {
+                devicePath = arg.right(arg.count() - QStringLiteral(SHOW_CAMERA_SETTINGS_DIALOG_LONG_ARG_NAME "=").count());
             }
 
             if (devicePath.startsWith('"') && devicePath.endsWith('"')) {
@@ -224,6 +224,9 @@ int main(int argc, char *argv[])
         }
     }
 
+    FSSettings::initialization();
+    fsTH->setCurrentLocale(FSSettings::currentLocale());
+
 #ifdef BUILD_WITH_QT_SINGLE_APPLICATION
     if (a.isRunning()) {
         QMessageBox::information(nullptr,
@@ -232,9 +235,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 #endif // SHOW_ONLY_PROJECT_ICON
-
-    FSSettings::initialization();
-    fsTH->setCurrentLocale(FSSettings::currentLocale());
 
     a.setQuitOnLastWindowClosed(false);
 

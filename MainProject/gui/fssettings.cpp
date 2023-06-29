@@ -31,18 +31,18 @@
 #include "qeasysettings.hpp"
 #endif // BUILD_WITH_Q_EASY_SETTINGS
 
-#define CURRENT_LOCALE_NAME               "CurrentLocale"
-#define STYLE_NAME                        "Style"
-#define CAMERA_DETECTION_ENABLE_NAME      "CameraDetectionEnable"
-#define CAMERA_DETECTION_INTERVAL_NAME    "CameraDetectionInterval"
-#define CAMERA_VALUE_UPDATE_ENABLE_NAME   "CameraValueUpdateEnable"
-#define CAMERA_VALUE_UPDATE_INTERVAL_NAME "CameraValueUpdateInterval"
-#define LOCK_PROPERTIES_ENABLE_NAME       "LockPropertiesEnable"
-#define LOCK_PROPERTIES_INTERVAL_NAME     "LockPropertiesInterval"
-#define LOCK_PROPERTIES_NAME              "LockProperties"
-#define LOCK_PROPERTIES_PRESETS_NAME      "LockPropertiesPresets"
-#define CAMERA_USER_DEFAULT_VALUES_NAME   "UserDefaultValues"
-#define CAMERA_USER_PRESETS_NAME          "UserPresets"
+#define CURRENT_LOCALE_NAME               QStringLiteral("CurrentLocale")
+#define STYLE_NAME                        QStringLiteral("Style")
+#define CAMERA_DETECTION_ENABLE_NAME      QStringLiteral("CameraDetectionEnable")
+#define CAMERA_DETECTION_INTERVAL_NAME    QStringLiteral("CameraDetectionInterval")
+#define CAMERA_VALUE_UPDATE_ENABLE_NAME   QStringLiteral("CameraValueUpdateEnable")
+#define CAMERA_VALUE_UPDATE_INTERVAL_NAME QStringLiteral("CameraValueUpdateInterval")
+#define LOCK_PROPERTIES_ENABLE_NAME       QStringLiteral("LockPropertiesEnable")
+#define LOCK_PROPERTIES_INTERVAL_NAME     QStringLiteral("LockPropertiesInterval")
+#define LOCK_PROPERTIES_NAME              QStringLiteral("LockProperties")
+#define LOCK_PROPERTIES_PRESETS_NAME      QStringLiteral("LockPropertiesPresets")
+#define CAMERA_USER_DEFAULT_VALUES_NAME   QStringLiteral("UserDefaultValues")
+#define CAMERA_USER_PRESETS_NAME          QStringLiteral("UserPresets")
 
 #define CAMERA_DETECTION_ENABLE_DEFAULT_VALUE      true
 #define CAMERA_DETECTION_INTERVAL_DEFAULT_VALUE    1000

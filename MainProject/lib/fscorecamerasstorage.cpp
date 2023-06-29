@@ -72,7 +72,7 @@ FSCoreCamerasStorage::~FSCoreCamerasStorage()
     // Update statistics param
     FSSettings::setUsuallyAvailableCamerasCount(int(d->umapCameraPaths.size()));
 
-    for (const auto &[devicePath, camera] : d->umapCameraPaths)
+    for (const auto &[devicePath, camera] : qAsConst(d->umapCameraPaths))
         delete camera;
 
     delete d;
@@ -87,7 +87,7 @@ DeviceName FSCoreCamerasStorage::getFreeDeviceName(const DeviceName &deviceName)
 
     // Check free device name with number
     for (int i = 2; i < MAX_FREE_CAM_NUMBER; i++) {
-        const DeviceName newDeviceName = QString("%1 (%2)").arg(deviceName, QString::number(i));
+        const DeviceName newDeviceName = QStringLiteral("%1 (%2)").arg(deviceName, QString::number(i));
 
         if (d->umapCameraNames.find(newDeviceName) == d->umapCameraNames.end())
             return deviceName;
@@ -103,7 +103,7 @@ std::vector<DevicePath> FSCoreCamerasStorage::availableDevicePaths() const
     std::vector<DevicePath> result;
     result.reserve(d->umapCameraPaths.size());
 
-    for (const auto &[devicePath, camera] : d->umapCameraPaths)
+    for (const auto &[devicePath, camera] : qAsConst(d->umapCameraPaths))
         result.push_back(devicePath);
 
     return result;
@@ -116,7 +116,7 @@ std::vector<FSCamera *> FSCoreCamerasStorage::availableCameras() const
     std::vector<FSCamera *> result;
     result.reserve(d->umapCameraPaths.size());
 
-    for (const auto &[devicePath, camera] : d->umapCameraPaths)
+    for (const auto &[devicePath, camera] : qAsConst(d->umapCameraPaths))
         result.push_back(camera);
 
     return result;
@@ -126,8 +126,8 @@ DeviceName FSCoreCamerasStorage::getCameraName(const DevicePath &devicePath) con
 {
     QMutexLocker(&d->cameraMutex);
 
-    FSCameraPathsUMap::iterator iterator = d->umapCameraPaths.find(devicePath);
-    if (iterator != d->umapCameraPaths.end())
+    FSCameraPathsUMap::const_iterator iterator = d->umapCameraPaths.find(devicePath);
+    if (iterator != d->umapCameraPaths.cend())
         return iterator->second->name();
 
     return DevicePath();
@@ -140,8 +140,8 @@ DeviceName FSCoreCamerasStorage::getCameraDisplayName(const DevicePath &devicePa
 
     QMutexLocker(&d->cameraMutex);
 
-    FSCameraPathsUMap::iterator iterator = d->umapCameraPaths.find(devicePath);
-    if (iterator != d->umapCameraPaths.end())
+    FSCameraPathsUMap::const_iterator iterator = d->umapCameraPaths.find(devicePath);
+    if (iterator != d->umapCameraPaths.cend())
         return iterator->second->name();
 
     return devicePath;
@@ -172,7 +172,7 @@ void FSCoreCamerasStorage::unregisterCamera(FSCamera *camera)
 
     FSCameraPathsUMap::const_iterator iterator = d->umapCameraPaths.find(devicePath);
 
-    if (iterator == d->umapCameraPaths.end())
+    if (iterator == d->umapCameraPaths.cend())
         return;
 
     d->umapCameraPaths.erase(iterator);
@@ -201,7 +201,7 @@ FSCamera *FSCoreCamerasStorage::findCameraByDevicePath(const DevicePath &deviceP
 
     FSCameraPathsUMap::const_iterator iterator = d->umapCameraPaths.find(devicePath);
 
-    if (iterator == d->umapCameraPaths.end())
+    if (iterator == d->umapCameraPaths.cend())
         return nullptr;
     else
         return iterator->second;
@@ -218,7 +218,7 @@ DevicePath FSCoreCamerasStorage::findCameraPathByUserName(const DeviceName &user
 {
     if (!userName.isEmpty()) {
         FSCameraNamePathsUMap::const_iterator iterator = d->umapCameraUserNamePaths.find(userName);
-        if (iterator != d->umapCameraUserNamePaths.end()) {
+        if (iterator != d->umapCameraUserNamePaths.cend()) {
             return iterator->second;
         }
     }
@@ -240,14 +240,14 @@ void FSCoreCamerasStorage::setCameraUserNames(const FSCameraPathNamesUMap &umapC
     d->umapCameraPathUserNames = filteredUMapCameraUserNames;
 
     d->umapCameraUserNamePaths.clear();
-    for (const auto &[devicePath, userName] : d->umapCameraPathUserNames) {
+    for (const auto &[devicePath, userName] : qAsConst(d->umapCameraPathUserNames)) {
         d->umapCameraUserNamePaths.insert( { userName, devicePath } );
     }
 
     for (const auto &[devicePath, userName] : oldUMapCameraUserNames) {
         FSCameraPathNamesUMap::const_iterator iterator = d->umapCameraPathUserNames.find(devicePath);
 
-        if (iterator != d->umapCameraPathUserNames.end()) {
+        if (iterator != d->umapCameraPathUserNames.cend()) {
             const QString oldUserName = userName;
 
             if (oldUserName != iterator->first) {
@@ -258,10 +258,10 @@ void FSCoreCamerasStorage::setCameraUserNames(const FSCameraPathNamesUMap &umapC
         }
     }
 
-    for (const auto &[devicePath, userName] : d->umapCameraPathUserNames) {
+    for (const auto &[devicePath, userName] : qAsConst(d->umapCameraPathUserNames)) {
         FSCameraPathNamesUMap::const_iterator iterator = oldUMapCameraUserNames.find(devicePath);
 
-        if (iterator == oldUMapCameraUserNames.end()) {
+        if (iterator == oldUMapCameraUserNames.cend()) {
             emit cameraUserNameChanged(devicePath);
         }
     }
@@ -283,7 +283,7 @@ bool FSCoreCamerasStorage::setCameraUserName(const DevicePath &devicePath, const
 
     FSCameraPathNamesUMap::const_iterator iterator = d->umapCameraPathUserNames.find(devicePath);
 
-    if (iterator == d->umapCameraPathUserNames.end()) {
+    if (iterator == d->umapCameraPathUserNames.cend()) {
         d->umapCameraPathUserNames.insert( { devicePath, userName } );
         d->umapCameraUserNamePaths.insert( { userName, devicePath } );
 
@@ -316,7 +316,7 @@ FSCameraPathNamesUMap FSCoreCamerasStorage::getCameraUserNames()
 DeviceName FSCoreCamerasStorage::getCameraUserName(const DevicePath &devicePath) const
 {
     FSCameraPathNamesUMap::const_iterator iterator = d->umapCameraPathUserNames.find(devicePath);
-    if (iterator != d->umapCameraPathUserNames.end())
+    if (iterator != d->umapCameraPathUserNames.cend())
         return iterator->second;
 
     return DeviceName();
@@ -326,7 +326,7 @@ void FSCoreCamerasStorage::cameraUserNameRemove(const DevicePath &devicePath)
 {
     FSCameraPathNamesUMap::const_iterator iterator = d->umapCameraPathUserNames.find(devicePath);
 
-    if (iterator != d->umapCameraPathUserNames.end()) {
+    if (iterator != d->umapCameraPathUserNames.cend()) {
         d->umapCameraPathUserNames.erase(iterator);
         d->umapCameraUserNamePaths.erase(iterator->second);
 
@@ -350,7 +350,7 @@ void FSCoreCamerasStorage::saveUserNamesSettings()
 {
     QVariantMap varMap;
 
-    for (const auto &[devicePath, userName] : d->umapCameraPathUserNames) {
+    for (const auto &[devicePath, userName] : qAsConst(d->umapCameraPathUserNames)) {
         if (!devicePath.isEmpty() && !userName.isEmpty()) {
             varMap.insert(devicePath, userName);
         }
@@ -365,7 +365,7 @@ void FSCoreCamerasStorage::loadUserNamesSettings()
     FSCameraPathNamesUMap umapCameraUserNames;
 
     for (QVariantMap::const_iterator iterator = varMap.begin();
-         iterator != varMap.end();
+         iterator != varMap.cend();
          ++iterator) {
         const DevicePath &devicePath = iterator.key();
         if (!devicePath.isEmpty()) {
@@ -390,8 +390,8 @@ void FSCoreCamerasStorage::setBlackList(const std::vector<DevicePath> &devicePat
     }
 
     // Find new
-    for (const DevicePath &devicePath : d->usetBlackListDevices) {
-        if (oldUSetBlackListDevices.find(devicePath) == oldUSetBlackListDevices.end())
+    for (const DevicePath &devicePath : qAsConst(d->usetBlackListDevices)) {
+        if (oldUSetBlackListDevices.find(devicePath) == oldUSetBlackListDevices.cend())
             emit addedBlacklistCamera(devicePath);
     }
 
@@ -416,7 +416,7 @@ void FSCoreCamerasStorage::removeBlackList(const DevicePath &devicePath)
 {
     FSDevicePathsUSet::const_iterator iterator = d->usetBlackListDevices.find(devicePath);
 
-    if (iterator == d->usetBlackListDevices.end())
+    if (iterator == d->usetBlackListDevices.cend())
         return;
 
     d->usetBlackListDevices.erase(iterator);
@@ -443,7 +443,7 @@ void FSCoreCamerasStorage::saveBlackList()
 {
     QVariantList varList;
 
-    for (const DevicePath &devicePath : d->usetBlackListDevices) {
+    for (const DevicePath &devicePath : qAsConst(d->usetBlackListDevices)) {
         if (!devicePath.isEmpty()) {
             varList.push_back(devicePath);
         }

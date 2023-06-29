@@ -136,23 +136,23 @@ void FSCameraUserSettingsDialog::init()
     connect(ui->tabWidget, &QTabWidget::currentChanged,
             this,          &FSCameraUserSettingsDialog::updateTabData);
 
-    connect(ui->pushButtonChangeCameraUserSettings, SIGNAL(clicked()),
-            this,                                     SLOT(on_pushButtonChangeCameraUserSettings()));
-    connect(ui->pushButtonChangeDefaultSettings, SIGNAL(clicked()),
-            this,                                  SLOT(on_pushButtonChangeDefaultSettings()));
-    connect(ui->pushButtonChangePresets, SIGNAL(clicked()),
-            this,                          SLOT(on_pushButtonChangePresets()));
-    connect(ui->pushButtonChangeLockProperties, SIGNAL(clicked()),
-            this,                                 SLOT(on_pushButtonChangeLockProperties()));
+    connect(ui->pushButtonChangeCameraUserSettings, &QAbstractButton::clicked,
+            this,                                   &FSCameraUserSettingsDialog::on_pushButtonChangeCameraUserSettings);
+    connect(ui->pushButtonChangeDefaultSettings, &QAbstractButton::clicked,
+            this,                                &FSCameraUserSettingsDialog::on_pushButtonChangeDefaultSettings);
+    connect(ui->pushButtonChangePresets, &QAbstractButton::clicked,
+            this,                        &FSCameraUserSettingsDialog::on_pushButtonChangePresets);
+    connect(ui->pushButtonChangeLockProperties, &QAbstractButton::clicked,
+            this,                               &FSCameraUserSettingsDialog::on_pushButtonChangeLockProperties);
 
-    connect(ui->pushButtonClearCameraUserSettings, SIGNAL(clicked()),
-            this,                                    SLOT(on_pushButtonClearCameraUserSettings()));
-    connect(ui->pushButtonClearDefaultSettings, SIGNAL(clicked()),
-            this,                                 SLOT(on_pushButtonClearDefaultSettings()));
-    connect(ui->pushButtonClearPresets, SIGNAL(clicked()),
-            this,                         SLOT(on_pushButtonClearPresets()));
-    connect(ui->pushButtonClearLockProperties, SIGNAL(clicked()),
-            this,                                SLOT(on_pushButtonClearLockProperties()));
+    connect(ui->pushButtonClearCameraUserSettings, &QAbstractButton::clicked,
+            this,                                  &FSCameraUserSettingsDialog::on_pushButtonClearCameraUserSettings);
+    connect(ui->pushButtonClearDefaultSettings, &QAbstractButton::clicked,
+            this,                               &FSCameraUserSettingsDialog::on_pushButtonClearDefaultSettings);
+    connect(ui->pushButtonClearPresets, &QAbstractButton::clicked,
+            this,                       &FSCameraUserSettingsDialog::on_pushButtonClearPresets);
+    connect(ui->pushButtonClearLockProperties, &QAbstractButton::clicked,
+            this,                              &FSCameraUserSettingsDialog::on_pushButtonClearLockProperties);
 
     FSItemDelegate *itemDelegate = new FSItemDelegate(this);
     ui->treeViewCameraUserSettings->setItemDelegate(itemDelegate);
@@ -171,10 +171,10 @@ void FSCameraUserSettingsDialog::init()
     ui->treeViewCameraUserSettings->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     ui->treeViewCameraUserSettings->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
     ui->treeViewCameraUserSettings->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
-    ui->treeViewCameraUserSettings->sortByColumn(2, Qt::DescendingOrder);
+    ui->treeViewCameraUserSettings->sortByColumn(FSCameraUserSettingsModel::IsConnectedColumn, Qt::DescendingOrder);
 
-    connect(ui->treeViewCameraUserSettings->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)),
-            this,                                               SLOT(updateButtonsChangeCameraUserSettings()));
+    connect(ui->treeViewCameraUserSettings->selectionModel(), &QItemSelectionModel::currentChanged,
+            this,                                             &FSCameraUserSettingsDialog::updateButtonsChangeCameraUserSettings);
 
     d->cameraDefaultSettingsModel = new FSCameraDefaultSettingsModel(this);
     d->cameraDefaultSettingsProxyModel = new QSortFilterProxyModel(d->cameraDefaultSettingsModel);
@@ -183,10 +183,10 @@ void FSCameraUserSettingsDialog::init()
     ui->treeViewDefaultSettings->setSortingEnabled(true);
     ui->treeViewDefaultSettings->setTreePosition(d->cameraDefaultSettingsModel->columnCount()); // Skip tree offset
     ui->treeViewDefaultSettings->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->treeViewDefaultSettings->sortByColumn(1, Qt::DescendingOrder);
+    ui->treeViewDefaultSettings->sortByColumn(FSCameraDefaultSettingsModel::IsConnectedColumn, Qt::DescendingOrder);
 
-    connect(ui->treeViewDefaultSettings->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)),
-            this,                                            SLOT(updateButtonsChangeDefaultSettings()));
+    connect(ui->treeViewDefaultSettings->selectionModel(), &QItemSelectionModel::currentChanged,
+            this,                                          &FSCameraUserSettingsDialog::updateButtonsChangeDefaultSettings);
 
     d->cameraPresetsModel = new FSCameraPresetsModel(this);
     d->cameraPresetsProxyModel = new QSortFilterProxyModel(d->cameraPresetsModel);
@@ -195,10 +195,10 @@ void FSCameraUserSettingsDialog::init()
     ui->treeViewPresets->setSortingEnabled(true);
     ui->treeViewPresets->setTreePosition(d->cameraPresetsModel->columnCount()); // Skip tree offset
     ui->treeViewPresets->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->treeViewPresets->sortByColumn(1, Qt::DescendingOrder);
+    ui->treeViewPresets->sortByColumn(FSCameraPresetsModel::IsConnectedColumn, Qt::DescendingOrder);
 
-    connect(ui->treeViewPresets->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)),
-            this,                                    SLOT(updateButtonsChangePresets()));
+    connect(ui->treeViewPresets->selectionModel(), &QItemSelectionModel::currentChanged,
+            this,                                  &FSCameraUserSettingsDialog::updateButtonsChangePresets);
 
     d->cameraLockPropertiesModel = new FSCameraLockPropertiesModel(this);
     d->cameraLockPropertiesProxyModel = new QSortFilterProxyModel(d->cameraLockPropertiesModel);
@@ -207,19 +207,19 @@ void FSCameraUserSettingsDialog::init()
     ui->treeViewLockProperties->setSortingEnabled(true);
     ui->treeViewLockProperties->setTreePosition(d->cameraLockPropertiesModel->columnCount()); // Skip tree offset
     ui->treeViewLockProperties->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->treeViewLockProperties->sortByColumn(1, Qt::DescendingOrder);
+    ui->treeViewLockProperties->sortByColumn(FSCameraLockPropertiesModel::IsConnectedColumn, Qt::DescendingOrder);
 
-    connect(ui->treeViewLockProperties->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)),
-            this,                                           SLOT(updateButtonsLockProperties()));
+    connect(ui->treeViewLockProperties->selectionModel(), &QItemSelectionModel::currentChanged,
+            this,                                         &FSCameraUserSettingsDialog::updateButtonsLockProperties);
 
-    connect(ui->treeViewCameraUserSettings, SIGNAL(doubleClicked(QModelIndex)),
-            this,                             SLOT(execCameraUserSettingsDialog(QModelIndex)));
-    connect(ui->treeViewDefaultSettings, SIGNAL(doubleClicked(QModelIndex)),
-            this,                          SLOT(execDefaultSettingsDialog(QModelIndex)));
-    connect(ui->treeViewPresets, SIGNAL(doubleClicked(QModelIndex)),
-            this,                  SLOT(execPresetSettingsDialog(QModelIndex)));
-    connect(ui->treeViewLockProperties, SIGNAL(doubleClicked(QModelIndex)),
-            this,                         SLOT(execLockPropertiesDialog(QModelIndex)));
+    connect(ui->treeViewCameraUserSettings, &QAbstractItemView::doubleClicked,
+            this,                           &FSCameraUserSettingsDialog::execCameraUserSettingsDialog);
+    connect(ui->treeViewDefaultSettings, &QAbstractItemView::doubleClicked,
+            this,                        &FSCameraUserSettingsDialog::execDefaultSettingsDialog);
+    connect(ui->treeViewPresets, &QAbstractItemView::doubleClicked,
+            this,                &FSCameraUserSettingsDialog::execPresetSettingsDialog);
+    connect(ui->treeViewLockProperties, &QAbstractItemView::doubleClicked,
+            this,                       &FSCameraUserSettingsDialog::execLockPropertiesDialog);
 
     updateButtonsChangeCameraUserSettings();
     updateButtonsChangeDefaultSettings();
@@ -459,7 +459,10 @@ void FSCameraUserSettingsDialog::on_pushButtonClearLockProperties()
 
 void FSCameraUserSettingsDialog::execCameraUserSettingsDialog(const QModelIndex &index)
 {
-    if (!d->camerasStorage || !index.isValid() || index.column() == 3 || index.column() == 4)
+    if ( !d->camerasStorage ||
+         !index.isValid() ||
+         index.column() == FSCameraUserSettingsModel::BlacklistedColumn ||
+         index.column() == FSCameraUserSettingsModel::UserNameColumn )
         return;
 
     const QModelIndex sourceIndex = d->cameraUserSettingsProxyModel->mapToSource(index);

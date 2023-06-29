@@ -28,14 +28,14 @@
 
 #include <WebCamFS/Camera>
 
-#define MAIN_SETTINGS_GROUP_NAME       "MainSettings"
-#define STATISTICS_SETTINGS_GROUP_NAME "Statistics"
+#define MAIN_SETTINGS_GROUP_NAME       QLatin1String("MainSettings")
+#define STATISTICS_SETTINGS_GROUP_NAME QLatin1String("Statistics")
 
-#define CAMERA_USER_NAMES_NAME            "UserNames"
-#define CAMERA_BLACK_LIST_NAME            "BlackList"
+#define CAMERA_USER_NAMES_NAME QLatin1String("UserNames")
+#define CAMERA_BLACK_LIST_NAME QLatin1String("BlackList")
 
-#define USUALLY_AVAILABLE_CAMERAS_COUNT_NAME "UsuallyAvailableCamerasCount"
-#define MAX_LOCK_PROPERTIES_NAME             "MaxLockProperties"
+#define USUALLY_AVAILABLE_CAMERAS_COUNT_NAME QLatin1String("UsuallyAvailableCamerasCount")
+#define MAX_LOCK_PROPERTIES_NAME             QLatin1String("MaxLockProperties")
 
 #define USUALLY_AVAILABLE_CAMERAS_COUNT_DEFAULT_VALUE 2
 #define MAX_LOCK_PROPERTIES_DEFAULT_VALUE             fsCameraPropertiesCount()/4
@@ -47,8 +47,8 @@ void FSCoreSettings::initialization()
     if (!statSettingsInstance) {
         statSettingsInstance = new QSettings(QSettings::IniFormat,
                                              QSettings::UserScope,
-                                             "WebCamFS",
-                                             "WebCamFS");
+                                             QLatin1String("WebCamFS"),
+                                             QLatin1String("WebCamFS"));
     }
 }
 
@@ -98,7 +98,7 @@ uint FSCoreSettings::usuallyAvailableCamerasCount()
     return value;
 }
 
-uint FSCoreSettings::defaultUsuallyAvailableCamerasCount()
+constexpr uint FSCoreSettings::defaultUsuallyAvailableCamerasCount()
 {
     return USUALLY_AVAILABLE_CAMERAS_COUNT_DEFAULT_VALUE;
 }
@@ -184,14 +184,14 @@ QString FSCoreSettings::replaceSettingName(const QString &orig)
     result.reserve(orig.size());
 
     for (QString::const_iterator it = orig.cbegin(); it != orig.cend(); ++it) {
-        if (*it == ' ') {
+        if (*it == QChar::Space) {
             ++it;
             if (it != orig.cend()) {
                 if (it->category() == QChar::Letter_Lowercase) {
                     result.push_back(it->toUpper());
                     continue;
                 } else {
-                    result.push_back(' ');
+                    result.push_back(QChar::Space);
                 }
             } else {
                 break;
